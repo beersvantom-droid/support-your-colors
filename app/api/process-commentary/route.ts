@@ -34,8 +34,11 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
-  if (req.nextUrl.searchParams.get("secret") !== process.env.CRON_SECRET) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const expected = process.env.CRON_SECRET;
+  const fromHeader = req.headers.get("x-cron-secret");
+  const fromQuery  = req.nextUrl.searchParams.get("secret");
+  if (fromHeader !== expected && fromQuery !== expected) {
+    return NextResponse.json({ error: "Unauthorized", receivedHeader: fromHeader, receivedQuery: fromQuery, expectedDefined: expected !== undefined }, { status: 401 });
   }
   return run();
 }
