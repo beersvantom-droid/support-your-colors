@@ -1,6 +1,9 @@
 import { MessageCircle } from "lucide-react";
 import type { Comment } from "@/lib/supabase";
 import { getCountryInfo, timeAgo } from "@/lib/countries";
+import { COMMENTATORS, type CommentatorId } from "@/lib/commentators";
+
+const COMMENTATOR_IDS = new Set<string>(["jeroen", "sierd", "fabrizio"]);
 
 interface CommentsSectionProps {
   comments: Comment[];
@@ -20,13 +23,17 @@ export default function CommentsSection({ comments }: CommentsSectionProps) {
   return (
     <div className="space-y-3 py-4 px-4">
       {comments.map((comment) => {
+        const isCommentator = COMMENTATOR_IDS.has(comment.country);
         const country = getCountryInfo(comment.country);
+        const displayFlag = isCommentator
+          ? COMMENTATORS[comment.country as CommentatorId].emoji
+          : country.flag;
         const time = timeAgo(comment.created_at);
 
         return (
           <div key={comment.id} className="flex gap-3">
-            {/* Country flag */}
-            <div className="text-sm mt-0.5 flex-shrink-0">{country.flag}</div>
+            {/* Country flag or commentator emoji */}
+            <div className="text-sm mt-0.5 flex-shrink-0">{displayFlag}</div>
 
             {/* Comment content */}
             <div className="flex-1 min-w-0">

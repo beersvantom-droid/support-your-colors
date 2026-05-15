@@ -8,7 +8,7 @@ import { ArrowLeft, ImagePlus, Globe, Send, X, Loader2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { useAchievements } from "@/components/achievements/AchievementsProvider";
-import { maybeFireCommentary } from "@/lib/commentator-engine";
+import { scheduleCommentatorReactions } from "@/lib/commentator-engine";
 import { getCountryInfo } from "@/lib/countries";
 
 export default function CreatePostPage() {
@@ -67,21 +67,28 @@ export default function CreatePostPage() {
         .from("posts-images")
         .getPublicUrl(fileName);
 
-      const { error: insertError } = await supabase.from("posts").insert({
-        username: profile.username,
-        country: profile.country ?? "Unknown",
-        caption: caption.trim() || null,
-        image_url: urlData.publicUrl,
-      });
+      const { data: insertData, error: insertError } = await supabase
+        .from("posts")
+        .insert({
+          username:  profile.username,
+          country:   profile.country ?? "Unknown",
+          caption:   caption.trim() || null,
+          image_url: urlData.publicUrl,
+        })
+        .select("id")
+        .single();
 
       if (insertError) throw new Error(`Database insert failed: ${insertError.message}`);
 
       triggerCheck();
-      // Fire commentary in background — don't block navigation
-      maybeFireCommentary({
-        triggeredBy: "post",
-        country: profile.country ?? undefined,
-      }).catch(() => {});
+      // Schedule commentator reactions in background — don't block navigation
+      if (insertData?.id) {
+        scheduleCommentatorReactions({
+          postId:  insertData.id,
+          caption: caption.trim() || null,
+          country: profile.country,
+        }).catch(() => {});
+      }
       router.push("/");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.");
