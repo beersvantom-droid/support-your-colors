@@ -38,7 +38,15 @@ export async function GET(req: NextRequest) {
   const fromHeader = req.headers.get("x-cron-secret");
   const fromQuery  = req.nextUrl.searchParams.get("secret");
   if (fromHeader !== expected && fromQuery !== expected) {
-    return NextResponse.json({ error: "Unauthorized", receivedHeader: fromHeader, receivedQuery: fromQuery, expectedDefined: expected !== undefined }, { status: 401 });
+    return NextResponse.json({
+      error: "Unauthorized",
+      receivedHeader: fromHeader,
+      receivedQuery: fromQuery,
+      receivedQueryLen: fromQuery?.length ?? null,
+      expectedLen: expected?.length ?? null,
+      expectedTrimmed: expected?.trim() === expected,
+      expectedLast3: expected ? expected.slice(-3) : null,
+    }, { status: 401 });
   }
   return run();
 }
