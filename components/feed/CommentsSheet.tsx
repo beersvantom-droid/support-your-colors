@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { X, Send, Loader2 } from "lucide-react";
-import type { Post, Comment } from "@/lib/supabase";
+import type { Post, Comment, FanPersona } from "@/lib/supabase";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/components/auth/AuthProvider";
 import CommentsSection from "./CommentsSection";
@@ -21,6 +21,7 @@ export default function CommentsSheet({
   const { profile } = useAuth();
   const [comments, setComments] = useState<Comment[]>([]);
   const [avatarMap, setAvatarMap] = useState<Map<string, string | null>>(new Map());
+  const [fanMap, setFanMap] = useState<Map<string, FanPersona>>(new Map());
   const [newComment, setNewComment] = useState("");
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -31,14 +32,18 @@ export default function CommentsSheet({
 
     setLoading(true);
     (async () => {
-      const [{ data, error }, { data: configData }] = await Promise.all([
+      const [{ data, error }, { data: configData }, { data: fansData }] = await Promise.all([
         supabase.from("comments").select("*").eq("post_id", post.id).order("created_at", { ascending: true }),
         supabase.from("commentator_config").select("id, avatar_url"),
+        supabase.from("fan_personas").select("*"),
       ]);
 
       if (!error && data) setComments(data as Comment[]);
       if (configData) {
         setAvatarMap(new Map(configData.map((c: { id: string; avatar_url: string | null }) => [c.id, c.avatar_url])));
+      }
+      if (fansData) {
+        setFanMap(new Map((fansData as FanPersona[]).map(f => [f.id, f])));
       }
       setLoading(false);
     })();
@@ -110,7 +115,7 @@ export default function CommentsSheet({
               <Loader2 size={20} className="text-text-muted animate-spin" />
             </div>
           ) : (
-            <CommentsSection comments={comments} avatarMap={avatarMap} />
+            <CommentsSection comments={comments} avatarMap={avatarMap} fanMap={fanMap} />
           )}
         </div>
 

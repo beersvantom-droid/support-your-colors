@@ -1,16 +1,22 @@
 import { MessageCircle } from "lucide-react";
-import type { Comment } from "@/lib/supabase";
+import type { Comment, FanPersona } from "@/lib/supabase";
 import { getCountryInfo, timeAgo } from "@/lib/countries";
 import { COMMENTATORS, type CommentatorId } from "@/lib/commentators";
 
 const COMMENTATOR_IDS = new Set<string>(["jeroen", "sierd", "fabrizio"]);
 
+const PERSONALITY_EMOJI: Record<string, string> = {
+  hype: "🔥", sarcastic: "😐", funny: "😂", toxic: "💀",
+  tactical: "🧠", chill: "👌", chaotic: "😭",
+};
+
 interface CommentsSectionProps {
   comments: Comment[];
   avatarMap?: Map<string, string | null>;
+  fanMap?:   Map<string, FanPersona>;
 }
 
-export default function CommentsSection({ comments, avatarMap }: CommentsSectionProps) {
+export default function CommentsSection({ comments, avatarMap, fanMap }: CommentsSectionProps) {
   if (comments.length === 0) {
     return (
       <div className="flex flex-col items-center gap-2 py-6 px-4 text-center">
@@ -25,15 +31,16 @@ export default function CommentsSection({ comments, avatarMap }: CommentsSection
     <div className="space-y-3 py-4 px-4">
       {comments.map((comment) => {
         const isCommentator = COMMENTATOR_IDS.has(comment.country);
-        const country = getCountryInfo(comment.country);
-        const time = timeAgo(comment.created_at);
+        const fanPersona   = (!isCommentator && fanMap) ? fanMap.get(comment.country) : undefined;
+        const country      = getCountryInfo(comment.country);
+        const time         = timeAgo(comment.created_at);
 
         const commentatorCfg = isCommentator ? COMMENTATORS[comment.country as CommentatorId] : null;
-        const avatarUrl = isCommentator ? (avatarMap?.get(comment.country) ?? null) : null;
+        const commentatorUrl = isCommentator ? (avatarMap?.get(comment.country) ?? null) : null;
 
         return (
           <div key={comment.id} className="flex gap-3">
-            {/* Avatar: commentator image/emoji or country flag */}
+            {/* Avatar: commentator → fan persona → country flag */}
             {isCommentator && commentatorCfg ? (
               <div
                 className="w-7 h-7 rounded-full flex items-center justify-center text-sm flex-shrink-0 overflow-hidden mt-0.5"
@@ -42,11 +49,20 @@ export default function CommentsSection({ comments, avatarMap }: CommentsSection
                   border: `1.5px solid ${commentatorCfg.accentColor}35`,
                 }}
               >
-                {avatarUrl ? (
-                  <img src={avatarUrl} alt={commentatorCfg.name} className="w-full h-full object-cover" />
-                ) : (
-                  commentatorCfg.emoji
-                )}
+                {commentatorUrl
+                  ? <img src={commentatorUrl} alt={commentatorCfg.name} className="w-full h-full object-cover" />
+                  : commentatorCfg.emoji
+                }
+              </div>
+            ) : fanPersona ? (
+              <div
+                className="w-7 h-7 rounded-full flex items-center justify-center text-sm flex-shrink-0 overflow-hidden mt-0.5"
+                style={{ background: "rgba(168,85,247,0.15)", border: "1.5px solid rgba(168,85,247,0.3)" }}
+              >
+                {fanPersona.avatar_url
+                  ? <img src={fanPersona.avatar_url} alt={fanPersona.name} className="w-full h-full object-cover" />
+                  : <span>{PERSONALITY_EMOJI[fanPersona.personality] ?? "👤"}</span>
+                }
               </div>
             ) : (
               <div className="text-sm mt-0.5 flex-shrink-0">{country.flag}</div>

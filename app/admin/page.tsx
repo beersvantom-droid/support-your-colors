@@ -13,8 +13,9 @@ import PointsSection from "@/components/admin/PointsSection";
 import AchievementsSection from "@/components/admin/AchievementsSection";
 import ActivitySection from "@/components/admin/ActivitySection";
 import CommentatorSection from "@/components/admin/CommentatorSection";
+import FanPersonasSection from "@/components/admin/FanPersonasSection";
 
-type Tab = "activity" | "users" | "posts" | "points" | "achievements" | "commentators";
+type Tab = "activity" | "users" | "posts" | "points" | "achievements" | "commentators" | "fans";
 
 const TABS: { id: Tab; emoji: string; label: string }[] = [
   { id: "activity",     emoji: "📡", label: "Activity" },
@@ -23,6 +24,7 @@ const TABS: { id: Tab; emoji: string; label: string }[] = [
   { id: "points",       emoji: "⚡", label: "Points" },
   { id: "achievements", emoji: "🏆", label: "Trophies" },
   { id: "commentators", emoji: "🎙️", label: "Commentary" },
+  { id: "fans",         emoji: "👥",  label: "Fans" },
 ];
 
 export default function AdminPage() {
@@ -145,6 +147,7 @@ export default function AdminPage() {
         {activeTab === "points"       && <PointsSection />}
         {activeTab === "achievements" && <AchievementsSection />}
         {activeTab === "commentators" && <CommentatorSection />}
+        {activeTab === "fans"         && <FanPersonasSection />}
       </div>
     </div>
   );

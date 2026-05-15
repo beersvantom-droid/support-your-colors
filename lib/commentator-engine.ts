@@ -17,6 +17,7 @@
 
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
+import { scheduleFanReactions, processPendingFanReactions } from "@/lib/fan-personas";
 import {
   COMMENTATORS,
   generateCommentary,
@@ -204,8 +205,12 @@ export async function scheduleCommentatorReactions(ctx: ScheduleContext): Promis
     }
   }
 
-  if (rows.length === 0) return;
-  await supabase.from("pending_commentator_reactions").insert(rows);
+  if (rows.length > 0) {
+    await supabase.from("pending_commentator_reactions").insert(rows);
+  }
+
+  // Schedule fan persona reactions independently (fire-and-forget)
+  scheduleFanReactions({ postId: ctx.postId, caption: ctx.caption }).catch(() => {});
 }
 
 // ─── Process due pending reactions ───────────────────────────────────────────
@@ -291,6 +296,12 @@ export async function processPendingReactions(): Promise<ProcessResult> {
 
   // Check for trending posts and schedule extra reactions
   await checkAndScheduleTrending(db);
+
+  // Process fan persona reactions in parallel
+  const fanResult = await processPendingFanReactions();
+  result.processed += fanResult.processed;
+  result.skipped   += fanResult.skipped;
+  result.errors.push(...fanResult.errors);
 
   return result;
 }

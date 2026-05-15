@@ -66,3 +66,14 @@ export interface CommentatorConfig {
   id: "jeroen" | "sierd" | "fabrizio";
   avatar_url: string | null;
 }
+
+export type FanPersonality = "sarcastic" | "hype" | "toxic" | "funny" | "tactical" | "chill" | "chaotic";
+
+export interface FanPersona {
+  id: string;
+  name: string;
+  avatar_url: string | null;
+  personality: FanPersonality;
+  active: boolean;
+  created_at: string;
+}
