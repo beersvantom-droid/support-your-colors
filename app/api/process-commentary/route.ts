@@ -17,8 +17,18 @@ export const runtime    = "nodejs";
 export const maxDuration = 30;
 
 export async function POST(req: NextRequest) {
-  if (req.headers.get("x-cron-secret") !== process.env.CRON_SECRET) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const received = req.headers.get("x-cron-secret");
+  const expected = process.env.CRON_SECRET;
+  const method = req.method;
+  console.log("[process-commentary] auth check — method:", method, "| received:", received, "| expected:", expected ?? "(undefined)");
+  if (received !== expected) {
+    return NextResponse.json({
+      error: "Unauthorized",
+      received,
+      expected: expected ?? null,
+      expectedDefined: expected !== undefined,
+      method,
+    }, { status: 401 });
   }
   return run();
 }
