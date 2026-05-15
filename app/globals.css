@@ -1,0 +1,68 @@
+@import "tailwindcss";
+
+@theme {
+  /* Host nation brand colors */
+  --color-canada: #D52B1E;
+  --color-mexico: #006847;
+  --color-usa: #1A3A6E;
+
+  /* App surface */
+  --color-surface: #FFFFFF;
+  --color-muted: #F0F2F5;
+  --color-border: #E8EAED;
+
+  /* Typography */
+  --color-text-primary: #111827;
+  --color-text-secondary: #6B7280;
+  --color-text-muted: #9CA3AF;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background-color: #F0F2F5;
+  /* subtle dot pattern — feels premium, not blank */
+  background-image: radial-gradient(circle, rgba(0, 0, 0, 0.04) 1px, transparent 1px);
+  background-size: 20px 20px;
+  color: #111827;
+  overscroll-behavior: none;
+  scroll-behavior: smooth;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInFromRight {
+  from {
+    transform: translateX(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.slide-in-right {
+  animation: slideInFromRight 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+@keyframes spotlight-progress {
+  from { width: 0%; }
+  to   { width: 100%; }
+}
