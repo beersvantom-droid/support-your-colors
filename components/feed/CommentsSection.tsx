@@ -7,9 +7,10 @@ const COMMENTATOR_IDS = new Set<string>(["jeroen", "sierd", "fabrizio"]);
 
 interface CommentsSectionProps {
   comments: Comment[];
+  avatarMap?: Map<string, string | null>;
 }
 
-export default function CommentsSection({ comments }: CommentsSectionProps) {
+export default function CommentsSection({ comments, avatarMap }: CommentsSectionProps) {
   if (comments.length === 0) {
     return (
       <div className="flex flex-col items-center gap-2 py-6 px-4 text-center">
@@ -25,15 +26,31 @@ export default function CommentsSection({ comments }: CommentsSectionProps) {
       {comments.map((comment) => {
         const isCommentator = COMMENTATOR_IDS.has(comment.country);
         const country = getCountryInfo(comment.country);
-        const displayFlag = isCommentator
-          ? COMMENTATORS[comment.country as CommentatorId].emoji
-          : country.flag;
         const time = timeAgo(comment.created_at);
+
+        const commentatorCfg = isCommentator ? COMMENTATORS[comment.country as CommentatorId] : null;
+        const avatarUrl = isCommentator ? (avatarMap?.get(comment.country) ?? null) : null;
 
         return (
           <div key={comment.id} className="flex gap-3">
-            {/* Country flag or commentator emoji */}
-            <div className="text-sm mt-0.5 flex-shrink-0">{displayFlag}</div>
+            {/* Avatar: commentator image/emoji or country flag */}
+            {isCommentator && commentatorCfg ? (
+              <div
+                className="w-7 h-7 rounded-full flex items-center justify-center text-sm flex-shrink-0 overflow-hidden mt-0.5"
+                style={{
+                  background: `${commentatorCfg.accentColor}18`,
+                  border: `1.5px solid ${commentatorCfg.accentColor}35`,
+                }}
+              >
+                {avatarUrl ? (
+                  <img src={avatarUrl} alt={commentatorCfg.name} className="w-full h-full object-cover" />
+                ) : (
+                  commentatorCfg.emoji
+                )}
+              </div>
+            ) : (
+              <div className="text-sm mt-0.5 flex-shrink-0">{country.flag}</div>
+            )}
 
             {/* Comment content */}
             <div className="flex-1 min-w-0">

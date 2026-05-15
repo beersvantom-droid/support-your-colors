@@ -20,24 +20,25 @@ export default function CommentsSheet({
 }: CommentsSheetProps) {
   const { profile } = useAuth();
   const [comments, setComments] = useState<Comment[]>([]);
+  const [avatarMap, setAvatarMap] = useState<Map<string, string | null>>(new Map());
   const [newComment, setNewComment] = useState("");
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
-  // Fetch comments when sheet opens
+  // Fetch comments and commentator avatars when sheet opens
   useEffect(() => {
     if (!isOpen) return;
 
     setLoading(true);
     (async () => {
-      const { data, error } = await supabase
-        .from("comments")
-        .select("*")
-        .eq("post_id", post.id)
-        .order("created_at", { ascending: true });
+      const [{ data, error }, { data: configData }] = await Promise.all([
+        supabase.from("comments").select("*").eq("post_id", post.id).order("created_at", { ascending: true }),
+        supabase.from("commentator_config").select("id, avatar_url"),
+      ]);
 
-      if (!error && data) {
-        setComments(data as Comment[]);
+      if (!error && data) setComments(data as Comment[]);
+      if (configData) {
+        setAvatarMap(new Map(configData.map((c: { id: string; avatar_url: string | null }) => [c.id, c.avatar_url])));
       }
       setLoading(false);
     })();
@@ -109,7 +110,7 @@ export default function CommentsSheet({
               <Loader2 size={20} className="text-text-muted animate-spin" />
             </div>
           ) : (
-            <CommentsSection comments={comments} />
+            <CommentsSection comments={comments} avatarMap={avatarMap} />
           )}
         </div>
 
