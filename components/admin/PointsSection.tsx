@@ -18,6 +18,7 @@ export default function PointsSection() {
   const [pending, setPending] = useState<Record<string, PendingPoints>>({});
   const [saving, setSaving] = useState<string | null>(null);
   const [saved, setSaved] = useState<string | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   useEffect(() => {
     supabase
@@ -57,14 +58,24 @@ export default function PointsSection() {
   async function save(profile: Profile) {
     const pts = getPoints(profile);
     setSaving(profile.id);
+    setSaveError(null);
 
-    const { error } = await supabase.rpc("admin_set_points", {
-      target_user_id: profile.id,
-      new_supporter_points: pts.supporter_points,
-      new_tournament_points: pts.tournament_points,
-    });
+    try {
+      const res = await fetch("/api/admin/set-points", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId:          profile.id,
+          supporterPoints:   pts.supporter_points,
+          tournamentPoints:  pts.tournament_points,
+        }),
+      });
 
-    if (!error) {
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error ?? "Save failed");
+      }
+
       setProfiles((prev) =>
         prev.map((p) =>
           p.id === profile.id
@@ -79,9 +90,11 @@ export default function PointsSection() {
       });
       setSaved(profile.id);
       setTimeout(() => setSaved((s) => (s === profile.id ? null : s)), 2000);
+    } catch (err) {
+      setSaveError(err instanceof Error ? err.message : "Save failed");
+    } finally {
+      setSaving(null);
     }
-
-    setSaving(null);
   }
 
   if (loading) {
@@ -196,6 +209,11 @@ export default function PointsSection() {
                       "Save Changes"
                     )}
                   </button>
+                )}
+                {saveError && (
+                  <p className="text-[10px] font-semibold" style={{ color: "#EF4444" }}>
+                    ⚠️ {saveError}
+                  </p>
                 )}
               </div>
             )}
