@@ -65,9 +65,9 @@ export default function PointsSection() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          userId:          profile.id,
-          supporterPoints:   pts.supporter_points,
-          tournamentPoints:  pts.tournament_points,
+          userId:           profile.id,
+          supporterPoints:  pts.supporter_points  ?? 0,
+          tournamentPoints: pts.tournament_points ?? 0,
         }),
       });
 

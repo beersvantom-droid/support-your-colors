@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
   }
 
   const { userId, supporterPoints, tournamentPoints } = await req.json();
-  if (!userId || supporterPoints == null || tournamentPoints == null) {
+  if (!userId || typeof supporterPoints !== "number" || typeof tournamentPoints !== "number") {
     return NextResponse.json({ error: "Missing fields" }, { status: 400 });
   }
 
