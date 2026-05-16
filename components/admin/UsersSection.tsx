@@ -110,33 +110,28 @@ export default function UsersSection() {
     setResetError(null);
 
     try {
-      // 1. Delete the achievement row
-      const { error: delError } = await supabase
-        .from("user_achievements")
-        .delete()
-        .eq("id", ach.id);
-
-      if (delError) throw new Error(delError.message);
-
-      // 2. Subtract the awarded points via the existing RPC (negative delta)
-      const { error: rpcError } = await supabase.rpc("increment_supporter_points", {
-        user_id: user.id,
-        amount: -ach.points_awarded,
+      const res = await fetch("/api/admin/reset-achievement", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          achievementRowId: ach.id,
+          userId:           user.id,
+          pointsAwarded:    ach.points_awarded,
+        }),
       });
 
-      if (rpcError) {
-        // RPC failed — achievement was deleted but points weren't deducted.
-        // Surface a warning so admin can fix manually.
-        setResetError(`Achievement removed, but points deduction failed: ${rpcError.message}`);
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error ?? "Reset failed");
       }
 
-      // 3. Remove from local state
+      // Remove from local state
       setAchievements((prev) => ({
         ...prev,
         [user.id]: prev[user.id].filter((r) => r.id !== ach.id),
       }));
 
-      // 4. Decrement the trophy count badge on the user card
+      // Decrement trophy count badge on the user card
       setUsers((prev) =>
         prev.map((u) =>
           u.id === user.id
