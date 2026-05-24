@@ -41,7 +41,7 @@ export default function ProfilePage() {
         const { data: activityData } = await supabase
           .from("user_activity_log")
           .select("activity_date")
-          .eq("user_id", user.id)
+          .eq("user_id", user?.id!)
           .order("activity_date", { ascending: false });
 
         let consecutiveActivityDays = 0;
@@ -67,7 +67,7 @@ export default function ProfilePage() {
         const { data: packsData } = await supabase
           .from("user_pack_cooldowns")
           .select("pack_id")
-          .eq("user_id", user.id);
+          .eq("user_id", user?.id!);
         const packsOpenedCount = new Set(
           packsData?.map((p: any) => p.pack_id) ?? []
         ).size;
@@ -76,7 +76,7 @@ export default function ProfilePage() {
         const { data: cosmeticsData } = await supabase
           .from("user_cosmetics")
           .select("cosmetic_id")
-          .eq("user_id", user.id);
+          .eq("user_id", user?.id!);
         const cosmeticsOwnedCount = cosmeticsData?.length ?? 0;
         const mascotsOwnedCount = cosmeticsData?.filter((c: any) =>
           c.cosmetic_id.startsWith("mascot_")

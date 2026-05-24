@@ -170,7 +170,7 @@ export async function POST(req: NextRequest) {
     // ── Coins Pack: just roll for coins ────────────────────────────────────
     console.log(`[pack/open] Coins pack detected: ${pack.id}`);
     const coinsResult = pickCoinsFromPack(pack.rarityPool);
-    console.log(`[pack/open] Coins result: ${coinsResult.coins} coins (${coinsResult.rarity})`);
+    console.log(`[pack/open] Coins result: ${coinsResult.coins} coins (${String(coinsResult.rarity)})`);
 
     // ── Add coins to user balance ──────────────────────────────────────────
     const serviceDb = createServerClient(

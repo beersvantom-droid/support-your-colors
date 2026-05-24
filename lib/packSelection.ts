@@ -12,7 +12,7 @@ import {
   type Cosmetic,
   type Mascot,
 } from "@/lib/cosmetics";
-import { rollRarityFromPool, type Pack } from "@/lib/packs";
+import { rollRarityFromPool, type Pack, type RarityPool } from "@/lib/packs";
 
 // ── Internal: mascot pool with weighted rarity split ─────────────────────────
 // Within the "mascots" tier: legendary 20%, epic 30%, rare 50%

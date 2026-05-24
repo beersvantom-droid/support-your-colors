@@ -4,6 +4,7 @@ import { useRef, useEffect, useState, useMemo } from "react";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import type { Cosmetic } from "@/lib/cosmetics";
+import type { RarityPool } from "@/lib/packs";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -306,7 +307,8 @@ function drawWheel(canvas: HTMLCanvasElement, size: number) {
       seg.rarity === "legendary" ? 0.055 :
       seg.rarity === "epic"      ? 0.045 :
       seg.rarity === "rare"      ? 0.032 :
-      seg.rarity === "powerup"   ? 0.040 :
+      seg.rarity === "common"    ? 0.015 :
+      seg.rarity === "mascots"   ? 0.040 :
       0.015
     );
 
