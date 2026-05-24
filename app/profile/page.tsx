@@ -2,10 +2,14 @@
 
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { LogOut, Star, Flame, MessageCircle, Trophy, ShieldCheck } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { useAchievements } from "@/components/achievements/AchievementsProvider";
 import TrophyCase from "@/components/achievements/TrophyCase";
+import ProgressAchievementCard from "@/components/achievements/ProgressAchievementCard";
+import { getAchievementById, ALL_ACHIEVEMENTS } from "@/lib/achievements";
+import { supabase } from "@/lib/supabase";
 import { getCountryInfo } from "@/lib/countries";
 import { ADMIN_USER_ID } from "@/lib/admin";
 
@@ -15,9 +19,81 @@ export default function ProfilePage() {
   const { userAchievements } = useAchievements();
   const isAdmin = user?.id === ADMIN_USER_ID;
 
+  const [progressStats, setProgressStats] = useState<{
+    consecutiveActivityDays: number;
+    packsOpenedCount: number;
+    cosmeticsOwnedCount: number;
+    mascotsOwnedCount: number;
+  } | null>(null);
+
   const country = profile?.country ?? null;
   const countryInfo = getCountryInfo(country);
   const accentColor = countryInfo.color;
+
+  // Load progression stats
+  useEffect(() => {
+    if (!user?.id) return;
+
+    async function loadStats() {
+      try {
+        // Consecutive activity days
+        const { data: activityData } = await supabase
+          .from("user_activity_log")
+          .select("activity_date")
+          .eq("user_id", user.id)
+          .order("activity_date", { ascending: false });
+
+        let consecutiveActivityDays = 0;
+        if (activityData && activityData.length > 0) {
+          const dates: string[] = activityData.map((r: any) => r.activity_date);
+          if (dates.length === 0) {
+            consecutiveActivityDays = 0;
+          } else {
+            consecutiveActivityDays = 1;
+            for (let i = 1; i < dates.length; i++) {
+              const prev = Date.parse(dates[i - 1] + "T12:00:00Z");
+              const curr = Date.parse(dates[i] + "T12:00:00Z");
+              if (Math.round((prev - curr) / 86_400_000) === 1) {
+                consecutiveActivityDays++;
+              } else {
+                break;
+              }
+            }
+          }
+        }
+
+        // Packs opened
+        const { data: packsData } = await supabase
+          .from("user_pack_cooldowns")
+          .select("pack_id")
+          .eq("user_id", user.id);
+        const packsOpenedCount = new Set(
+          packsData?.map((p: any) => p.pack_id) ?? []
+        ).size;
+
+        // Cosmetics owned
+        const { data: cosmeticsData } = await supabase
+          .from("user_cosmetics")
+          .select("cosmetic_id")
+          .eq("user_id", user.id);
+        const cosmeticsOwnedCount = cosmeticsData?.length ?? 0;
+        const mascotsOwnedCount = cosmeticsData?.filter((c: any) =>
+          c.cosmetic_id.startsWith("mascot_")
+        ).length ?? 0;
+
+        setProgressStats({
+          consecutiveActivityDays,
+          packsOpenedCount,
+          cosmeticsOwnedCount,
+          mascotsOwnedCount,
+        });
+      } catch (err) {
+        console.error("[Profile] Error loading progress stats:", err);
+      }
+    }
+
+    loadStats();
+  }, [user?.id]);
 
   async function handleSignOut() {
     await signOut();
@@ -201,6 +277,76 @@ export default function ProfilePage() {
             </div>
           </div>
         </div>
+
+        {/* ── My Progress (Progression Achievements) ─────────────────────────────────────────── */}
+        {progressStats && (
+          <div
+            className="rounded-2xl overflow-hidden"
+            style={{ background: "#FFFFFF", border: "1px solid rgba(0,0,0,0.06)" }}
+          >
+            <div className="px-4 py-2.5 border-b border-gray-50">
+              <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">
+                My Progress
+              </span>
+            </div>
+            <div className="px-3 py-3 space-y-2">
+              {/* Filter progression achievements */}
+              {ALL_ACHIEVEMENTS.filter(a => a.coins !== undefined)
+                .sort((a, b) => {
+                  const rarityOrder = { easy: 0, medium: 1, hard: 2, secret: 3 };
+                  return rarityOrder[a.rarity] - rarityOrder[b.rarity];
+                })
+                .map((achievement) => {
+                  const unlocked = userAchievements.some(
+                    (ua) => ua.achievement_id === achievement.id
+                  );
+
+                  // Calculate current progress
+                  let currentProgress = 0;
+                  let targetProgress = 1;
+
+                  if (achievement.id === "login_7days") {
+                    currentProgress = progressStats.consecutiveActivityDays;
+                    targetProgress = 7;
+                  } else if (achievement.id === "login_10days") {
+                    currentProgress = progressStats.consecutiveActivityDays;
+                    targetProgress = 10;
+                  } else if (achievement.id === "login_15days") {
+                    currentProgress = progressStats.consecutiveActivityDays;
+                    targetProgress = 15;
+                  } else if (achievement.id === "open_10packs") {
+                    currentProgress = progressStats.packsOpenedCount;
+                    targetProgress = 10;
+                  } else if (achievement.id === "collect_5cosmetics") {
+                    currentProgress = progressStats.cosmeticsOwnedCount;
+                    targetProgress = 5;
+                  } else if (achievement.id === "collect_10cosmetics") {
+                    currentProgress = progressStats.cosmeticsOwnedCount;
+                    targetProgress = 10;
+                  } else if (achievement.id === "collect_1mascot") {
+                    currentProgress = progressStats.mascotsOwnedCount;
+                    targetProgress = 1;
+                  } else if (achievement.id === "collect_2mascots") {
+                    currentProgress = progressStats.mascotsOwnedCount;
+                    targetProgress = 2;
+                  } else if (achievement.id === "collect_5mascots") {
+                    currentProgress = progressStats.mascotsOwnedCount;
+                    targetProgress = 5;
+                  }
+
+                  return (
+                    <ProgressAchievementCard
+                      key={achievement.id}
+                      achievement={achievement}
+                      currentProgress={Math.min(currentProgress, targetProgress)}
+                      targetProgress={targetProgress}
+                      unlocked={unlocked}
+                    />
+                  );
+                })}
+            </div>
+          </div>
+        )}
 
         {/* ── Trophy Case ──────────────────────────────────────────── */}
         <div
