@@ -34,6 +34,11 @@ export interface Profile {
   tournament_points: number;
   rank: string;
   created_at: string;
+  equipped_name_color: string | null;
+  equipped_border: string | null;
+  equipped_badge: string | null;
+  equipped_card_bg: string | null;
+  equipped_mascots: string[] | null; // max 3 mascot IDs
 }
 
 export interface UserAchievement {

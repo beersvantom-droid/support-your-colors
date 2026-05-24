@@ -7,6 +7,8 @@ export interface AchievementDef {
   hint: string; // revealed only after unlock
   rarity: AchievementRarity;
   points: number;
+  coins?: number; // coins awarded (for progression achievements)
+  unlocksCosmetic?: string; // cosmetic_id if this achievement unlocks a cosmetic
 }
 
 export const RARITY_POINTS: Record<AchievementRarity, number> = {
@@ -230,6 +232,143 @@ export const ALL_ACHIEVEMENTS: AchievementDef[] = [
     rarity: "secret",
     points: 1000,
   },
+  {
+    id: "dj_derksen_fan",
+    emoji: "🎧",
+    name: "DJ Approved",
+    hint: "Received 10 comments from DJ Derksen",
+    rarity: "secret",
+    points: 0,
+    unlocksCosmetic: "mascot_dj_derksen",
+  },
+  {
+    id: "abu_harb_fan",
+    emoji: "🦅",
+    name: "Reckless Companion",
+    hint: "Received 10 comments from أبو حرب",
+    rarity: "secret",
+    points: 0,
+    unlocksCosmetic: "mascot_abu_harb",
+  },
+  {
+    id: "jannes_fan",
+    emoji: "🤪",
+    name: "Clumsy Ref",
+    hint: "Commented with the word 'scheidsrechter'",
+    rarity: "secret",
+    points: 0,
+    unlocksCosmetic: "mascot_jannes",
+  },
+  {
+    id: "ron_jans_fan",
+    emoji: "🧻",
+    name: "Kitchen Roll Chaos",
+    hint: "Commented with 'keukenrol', 'ronjansdans', or 'pec zwolle'",
+    rarity: "secret",
+    points: 0,
+    unlocksCosmetic: "mascot_ron_jans",
+  },
+  {
+    id: "golden_cor_fan",
+    emoji: "🧣",
+    name: "Golden Ragebait",
+    hint: "Received 20 comments on a single post",
+    rarity: "secret",
+    points: 0,
+    unlocksCosmetic: "mascot_golden_cor",
+  },
+  {
+    id: "udo_fan",
+    emoji: "😎",
+    name: "Chill Vibes",
+    hint: "Commented with 'huts' or 'niffo'",
+    rarity: "secret",
+    points: 0,
+    unlocksCosmetic: "mascot_udo",
+  },
+
+  // ── Progression Achievements (visible progress, coins-only) ───────────────────
+  {
+    id: "login_7days",
+    emoji: "📅",
+    name: "Week Warrior",
+    hint: "Log in 7 consecutive days",
+    rarity: "easy",
+    points: 0,
+    coins: 50,
+  },
+  {
+    id: "login_10days",
+    emoji: "🔥",
+    name: "Habitué",
+    hint: "Log in 10 consecutive days",
+    rarity: "medium",
+    points: 0,
+    coins: 100,
+  },
+  {
+    id: "login_15days",
+    emoji: "⭐",
+    name: "Season Devotee",
+    hint: "Log in 15 consecutive days",
+    rarity: "hard",
+    points: 0,
+    coins: 150,
+  },
+  {
+    id: "open_10packs",
+    emoji: "📦",
+    name: "Pack Hunter",
+    hint: "Open 10 packs",
+    rarity: "easy",
+    points: 0,
+    coins: 50,
+  },
+  {
+    id: "collect_5cosmetics",
+    emoji: "👕",
+    name: "Starter Collector",
+    hint: "Collect 5 unique cosmetics",
+    rarity: "easy",
+    points: 0,
+    coins: 50,
+  },
+  {
+    id: "collect_10cosmetics",
+    emoji: "🎨",
+    name: "Outfit Master",
+    hint: "Collect 10 unique cosmetics",
+    rarity: "medium",
+    points: 0,
+    coins: 100,
+  },
+  {
+    id: "collect_1mascot",
+    emoji: "🎭",
+    name: "First Friend",
+    hint: "Collect 1 mascot",
+    rarity: "easy",
+    points: 0,
+    coins: 50,
+  },
+  {
+    id: "collect_2mascots",
+    emoji: "👯",
+    name: "Dynamic Duo",
+    hint: "Collect 2 mascots",
+    rarity: "medium",
+    points: 0,
+    coins: 100,
+  },
+  {
+    id: "collect_5mascots",
+    emoji: "🎪",
+    name: "Mascot Collector",
+    hint: "Collect 5 mascots",
+    rarity: "hard",
+    points: 0,
+    coins: 150,
+  },
 ];
 
 export function getAchievementById(id: string): AchievementDef | undefined {
@@ -249,6 +388,15 @@ export interface AchievementStats {
   hasAroundTheClock: boolean; // morning + afternoon + night on same calendar day
   hasFastResponse: boolean; // commented within 2 min of a post
   villain_arc_max_comments: number; // max comments on any single post
+  djDerksenCommentCount: number;    // comments from "dj derksen" fan on user's posts
+  abuHarbCommentCount: number;      // comments from "abu harb" fan on user's posts
+  hasScheidrechterComment: boolean; // user commented with "scheidsrechter"
+  hasRonJansKeyword: boolean;       // user commented with "keukenrol", "ronjansdans", or "pec zwolle"
+  hasHutsOrNiffo: boolean;          // user commented with "huts" or "niffo"
+  // Progression achievements stats
+  packsOpenedCount: number;         // unique pack types opened
+  cosmeticsOwnedCount: number;      // total unique cosmetics
+  mascotsOwnedCount: number;        // total unique mascots
 }
 
 export function resolveNewUnlocks(
@@ -272,11 +420,27 @@ export function resolveNewUnlocks(
     ["content_machine",   stats.postCount >= 15],
     ["democracy_addict",  stats.consecutiveVoteDays >= 14],
     ["villain_arc",       stats.villain_arc_max_comments >= 25],
+    ["golden_cor_fan",    stats.villain_arc_max_comments >= 20],
+    ["dj_derksen_fan",    stats.djDerksenCommentCount >= 10],
+    ["abu_harb_fan",      stats.abuHarbCommentCount >= 10],
+    ["jannes_fan",        stats.hasScheidrechterComment],
+    ["ron_jans_fan",      stats.hasRonJansKeyword],
+    ["udo_fan",           stats.hasHutsOrNiffo],
     // silent_operator: active 5 days but zero posts
     [
       "silent_operator",
       stats.consecutiveActivityDays >= 5 && stats.postCount === 0,
     ],
+    // Progression achievements (visible progress, coins-based)
+    ["login_7days",        stats.consecutiveActivityDays >= 7],
+    ["login_10days",       stats.consecutiveActivityDays >= 10],
+    ["login_15days",       stats.consecutiveActivityDays >= 15],
+    ["open_10packs",       stats.packsOpenedCount >= 10],
+    ["collect_5cosmetics", stats.cosmeticsOwnedCount >= 5],
+    ["collect_10cosmetics", stats.cosmeticsOwnedCount >= 10],
+    ["collect_1mascot",    stats.mascotsOwnedCount >= 1],
+    ["collect_2mascots",   stats.mascotsOwnedCount >= 2],
+    ["collect_5mascots",   stats.mascotsOwnedCount >= 5],
   ];
 
   return checks

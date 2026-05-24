@@ -111,6 +111,25 @@ export default function ProfilePage() {
           ))}
         </div>
 
+        {/* ── Locker button ────────────────────────────────────────── */}
+        <Link
+          href="/locker"
+          className="flex items-center gap-3 rounded-2xl px-4 py-3.5 w-full transition-all active:scale-[0.98]"
+          style={{
+            background: "linear-gradient(135deg, rgba(168,85,247,0.12), rgba(245,158,11,0.10))",
+            border: "1px solid rgba(168,85,247,0.25)",
+          }}
+        >
+          <span className="text-2xl">🎡</span>
+          <div className="flex-1">
+            <p className="text-sm font-black text-white">Locker</p>
+            <p className="text-[10px] font-semibold" style={{ color: "#6B7280" }}>
+              Customize your card cosmetics
+            </p>
+          </div>
+          <span className="text-xs font-bold" style={{ color: "#A855F7" }}>Open →</span>
+        </Link>
+
         {/* ── Supporter card ───────────────────────────────────────── */}
         {country && (
           <div

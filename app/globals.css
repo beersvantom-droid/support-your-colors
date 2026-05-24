@@ -66,3 +66,870 @@ body {
   from { width: 0%; }
   to   { width: 100%; }
 }
+
+/* ── Cosmetic: shared shimmer keyframe ───────────────────────────────────── */
+@keyframes cosmetic-shimmer {
+  0%   { background-position: -300% center; }
+  100% { background-position:  300% center; }
+}
+
+/* ── Cosmetic: name color — Bronze (Rare) ────────────────────────────────── */
+.cosmetic-name-bronze {
+  background: linear-gradient(
+    90deg,
+    #6B3100 0%, #CD7F32 18%, #E8A963 32%, #FFCA80 50%,
+    #E8A963 68%, #CD7F32 82%, #6B3100 100%
+  );
+  background-size: 300% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: cosmetic-shimmer 2.8s linear infinite;
+  filter: drop-shadow(0 0 3px rgba(205,127,50,0.55));
+}
+
+/* ── Cosmetic: name color — Silver (Epic) ────────────────────────────────── */
+.cosmetic-name-silver {
+  background: linear-gradient(
+    90deg,
+    #475569 0%, #94A3B8 18%, #CBD5E1 32%, #F1F5F9 50%,
+    #CBD5E1 68%, #94A3B8 82%, #475569 100%
+  );
+  background-size: 300% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: cosmetic-shimmer 2.0s linear infinite;
+  filter: drop-shadow(0 0 4px rgba(148,163,184,0.70));
+}
+
+/* ── Cosmetic: name color — Gold (Legendary) ─────────────────────────────── */
+@keyframes cosmetic-gold-aura {
+  0%, 100% {
+    filter:
+      drop-shadow(0 0 5px rgba(251,191,36,0.90))
+      drop-shadow(0 0 14px rgba(245,158,11,0.55));
+  }
+  50% {
+    filter:
+      drop-shadow(0 0 9px rgba(251,191,36,1.00))
+      drop-shadow(0 0 26px rgba(245,158,11,0.80))
+      drop-shadow(0 0 44px rgba(217,119,6,0.40));
+  }
+}
+
+.cosmetic-name-gold {
+  background: linear-gradient(
+    90deg,
+    #92400E 0%, #D97706 14%, #FBBF24 28%, #FEF3C7 50%,
+    #FBBF24 72%, #D97706 86%, #92400E 100%
+  );
+  background-size: 300% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: cosmetic-shimmer 1.4s linear infinite, cosmetic-gold-aura 2s ease-in-out infinite;
+}
+
+/* ── Cosmetic: borders ───────────────────────────────────────────────────── */
+.cosmetic-border-bronze {
+  animation: cosmetic-bronze-border 3s ease-in-out infinite;
+}
+@keyframes cosmetic-bronze-border {
+  0%, 100% {
+    box-shadow: 0 0 8px rgba(205,127,50,0.40), 0 0 22px rgba(205,127,50,0.15);
+  }
+  50% {
+    box-shadow: 0 0 18px rgba(205,127,50,0.75), 0 0 42px rgba(205,127,50,0.30),
+                inset 0 0 12px rgba(205,127,50,0.12);
+  }
+}
+
+.cosmetic-border-silver {
+  animation: cosmetic-silver-border 2.4s ease-in-out infinite;
+}
+@keyframes cosmetic-silver-border {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(148,163,184,0.50), 0 0 28px rgba(148,163,184,0.18);
+  }
+  50% {
+    box-shadow: 0 0 22px rgba(148,163,184,0.90), 0 0 50px rgba(148,163,184,0.36),
+                inset 0 0 14px rgba(148,163,184,0.14);
+  }
+}
+
+.cosmetic-border-gold {
+  animation: cosmetic-gold-border 1.7s ease-in-out infinite;
+}
+@keyframes cosmetic-gold-border {
+  0%, 100% {
+    box-shadow: 0 0 14px rgba(245,158,11,0.65), 0 0 38px rgba(245,158,11,0.25),
+                0 0 65px rgba(245,158,11,0.10);
+  }
+  50% {
+    box-shadow: 0 0 28px rgba(245,158,11,1.00), 0 0 60px rgba(245,158,11,0.50),
+                0 0 100px rgba(245,158,11,0.22), inset 0 0 18px rgba(245,158,11,0.14);
+  }
+}
+
+/* ── Cosmetic: badges ────────────────────────────────────────────────────── */
+.cosmetic-badge-star {
+  display: inline-block;
+  animation: cosmetic-star-glow 2s ease-in-out infinite;
+}
+@keyframes cosmetic-star-glow {
+  0%, 100% { filter: drop-shadow(0 0 3px rgba(168,85,247,0.70)); }
+  50%       { filter: drop-shadow(0 0 9px rgba(168,85,247,1.00)) drop-shadow(0 0 18px rgba(168,85,247,0.50)); }
+}
+
+.cosmetic-badge-crown {
+  display: inline-block;
+  animation: cosmetic-crown-glow 1.5s ease-in-out infinite;
+}
+@keyframes cosmetic-crown-glow {
+  0%, 100% { filter: drop-shadow(0 0 5px rgba(245,158,11,0.80)); transform: scale(1); }
+  50%       { filter: drop-shadow(0 0 12px rgba(245,158,11,1.00)) drop-shadow(0 0 24px rgba(245,158,11,0.60)); transform: scale(1.09); }
+}
+
+/* ── Cosmetic: card backgrounds ──────────────────────────────────────────── */
+.cosmetic-bg-particles {
+  background-image: radial-gradient(circle, rgba(168,85,247,0.32) 1.5px, transparent 1.5px);
+  background-size: 16px 16px;
+  animation: cosmetic-particle-drift 9s linear infinite;
+}
+@keyframes cosmetic-particle-drift {
+  0%   { background-position: 0 0; }
+  100% { background-position: 32px 32px; }
+}
+
+.cosmetic-bg-waves {
+  background: linear-gradient(
+    135deg,
+    rgba(168,85,247,0.22) 0%,
+    rgba(59,130,246,0.18) 35%,
+    rgba(168,85,247,0.08) 50%,
+    rgba(59,130,246,0.18) 65%,
+    rgba(168,85,247,0.22) 100%
+  );
+  background-size: 200% 200%;
+  animation: cosmetic-wave-shift 5s ease infinite;
+}
+@keyframes cosmetic-wave-shift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ── New cosmetic: name colors (Rainbow, Neon Green, Hot Pink) ──────────────── */
+.cosmetic-name-rainbow {
+  background: linear-gradient(
+    90deg,
+    #FF0000 0%, #FF7F00 14%, #FFFF00 28%, #00FF00 42%,
+    #0000FF 57%, #4B0082 71%, #9400D3 100%
+  );
+  background-size: 300% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: cosmetic-shimmer 8s ease-in-out infinite;
+  filter: drop-shadow(0 0 3px rgba(168,85,247,0.50));
+}
+
+/* ── New cosmetic: borders (Neon, Hologram, Diamond) ────────────────────────── */
+.cosmetic-border-neon {
+  animation: cosmetic-neon-border 1.8s ease-in-out infinite;
+}
+@keyframes cosmetic-neon-border {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(167,139,250,0.50), 0 0 24px rgba(167,139,250,0.20);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(167,139,250,0.90), 0 0 48px rgba(167,139,250,0.45),
+                inset 0 0 16px rgba(167,139,250,0.15);
+  }
+}
+
+.cosmetic-border-hologram {
+  animation: cosmetic-hologram-border 2.2s ease-in-out infinite;
+}
+@keyframes cosmetic-hologram-border {
+  0%, 100% {
+    box-shadow: 0 0 12px rgba(168,85,247,0.45), 0 0 32px rgba(168,85,247,0.15);
+  }
+  25% {
+    box-shadow: 0 0 18px rgba(168,85,247,0.70), 0 0 44px rgba(168,85,247,0.30),
+                inset 0 0 12px rgba(59,130,246,0.10);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(59,130,246,0.70), 0 0 48px rgba(59,130,246,0.30),
+                inset 0 0 12px rgba(168,85,247,0.10);
+  }
+  75% {
+    box-shadow: 0 0 18px rgba(168,85,247,0.70), 0 0 44px rgba(168,85,247,0.30),
+                inset 0 0 12px rgba(34,197,94,0.08);
+  }
+}
+
+.cosmetic-border-diamond {
+  animation: cosmetic-diamond-border 1.6s ease-in-out infinite;
+}
+@keyframes cosmetic-diamond-border {
+  0%, 100% {
+    box-shadow: 0 0 12px rgba(100,220,255,0.60), 0 0 36px rgba(100,220,255,0.20);
+  }
+  50% {
+    box-shadow: 0 0 24px rgba(100,220,255,0.95), 0 0 60px rgba(100,220,255,0.45),
+                inset 0 0 16px rgba(100,220,255,0.16);
+  }
+}
+
+/* ── New cosmetic: badges (Fire, Thunder, Diamond, Phoenix) ──────────────────── */
+.cosmetic-badge-fire {
+  display: inline-block;
+  animation: cosmetic-fire-glow 1.4s ease-in-out infinite;
+}
+@keyframes cosmetic-fire-glow {
+  0%, 100% { filter: drop-shadow(0 0 4px rgba(239,68,68,0.65)); }
+  50%       { filter: drop-shadow(0 0 10px rgba(239,68,68,0.95)) drop-shadow(0 0 20px rgba(251,146,60,0.40)); }
+}
+
+.cosmetic-badge-thunder {
+  display: inline-block;
+  animation: cosmetic-thunder-glow 1.2s ease-in-out infinite;
+}
+@keyframes cosmetic-thunder-glow {
+  0%, 100% { filter: drop-shadow(0 0 3px rgba(59,130,246,0.70)); }
+  50%       { filter: drop-shadow(0 0 12px rgba(59,130,246,0.95)) drop-shadow(0 0 24px rgba(168,85,247,0.45)); }
+}
+
+.cosmetic-badge-diamond {
+  display: inline-block;
+  animation: cosmetic-diamond-glow 1.8s ease-in-out infinite;
+}
+@keyframes cosmetic-diamond-glow {
+  0%, 100% { filter: drop-shadow(0 0 4px rgba(100,220,255,0.65)); transform: scale(1); }
+  50%       { filter: drop-shadow(0 0 14px rgba(100,220,255,0.90)) drop-shadow(0 0 28px rgba(100,220,255,0.45)); transform: scale(1.07); }
+}
+
+.cosmetic-badge-phoenix {
+  display: inline-block;
+  animation: cosmetic-phoenix-glow 1.3s ease-in-out infinite;
+}
+@keyframes cosmetic-phoenix-glow {
+  0%, 100% { filter: drop-shadow(0 0 5px rgba(245,158,11,0.75)); transform: scale(1); }
+  50%       { filter: drop-shadow(0 0 14px rgba(245,158,11,0.95)) drop-shadow(0 0 28px rgba(239,68,68,0.50)); transform: scale(1.10); }
+}
+
+/* ── New cosmetic: card backgrounds (Stripes, Gradient, Stars, Gold Foil, Neon Grid) */
+.cosmetic-bg-neon-grid {
+  background-image:
+    linear-gradient(0deg, rgba(167,139,250,0.15) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(167,139,250,0.15) 1px, transparent 1px);
+  background-size: 20px 20px;
+  animation: cosmetic-neon-grid-pulse 3s ease-in-out infinite;
+}
+@keyframes cosmetic-neon-grid-pulse {
+  0%, 100% { opacity: 0.6; }
+  50%       { opacity: 0.95; }
+}
+
+.cosmetic-bg-soundwaves {
+  animation: cosmetic-soundwaves-flow 6s ease-in-out infinite;
+}
+@keyframes cosmetic-soundwaves-flow {
+  0%, 100% { background-position: 0 0; }
+  50%       { background-position: -20px 0; }
+}
+
+/* ── Cosmetic shimmer (reusable) ──────────────────────────────────────────── */
+
+/* Default idle: gentle float */
+@keyframes mascot-float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-3px); }
+}
+
+/* DJ Derksen: uninterested glance + lazy bob
+   Stays still most of the time, occasionally looks left/right, slow blink-bob */
+@keyframes mascot-dj-idle {
+  0%,  40%         { transform: translateY(0px) translateX(0px); }
+  45%              { transform: translateY(-1px) translateX(-5px); }
+  55%              { transform: translateY(-1px) translateX(-5px); }
+  60%              { transform: translateY(0px) translateX(0px); }
+  75%              { transform: translateY(0px) translateX(0px); }
+  80%              { transform: translateY(-1px) translateX(4px); }
+  88%              { transform: translateY(-1px) translateX(4px); }
+  93%, 100%        { transform: translateY(0px) translateX(0px); }
+}
+
+.mascot-sprite {
+  display: inline-block;
+}
+
+/* DJ Derksen wrapper — slow, lazy cycle (~8s) */
+.mascot-dj-derksen {
+  animation: mascot-dj-idle 8s ease-in-out infinite;
+}
+
+/* DJ Derksen image — very subtle breathing scale */
+.mascot-dj-derksen img {
+  animation: mascot-float 4s ease-in-out infinite;
+}
+
+/* Abu Harb: reckless warrior - more energetic, aggressive stance shifts */
+@keyframes mascot-abu-harb-idle {
+  0%,  30%         { transform: translateY(0px) translateX(0px) rotate(0deg); }
+  35%              { transform: translateY(-2px) translateX(3px) rotate(-2deg); }
+  45%              { transform: translateY(-2px) translateX(3px) rotate(-2deg); }
+  50%              { transform: translateY(0px) translateX(0px) rotate(0deg); }
+  65%              { transform: translateY(-2px) translateX(-4px) rotate(2deg); }
+  75%              { transform: translateY(-2px) translateX(-4px) rotate(2deg); }
+  85%, 100%        { transform: translateY(0px) translateX(0px) rotate(0deg); }
+}
+
+.mascot-abu-harb {
+  animation: mascot-abu-harb-idle 6s ease-in-out infinite;
+}
+
+.mascot-abu-harb img {
+  animation: mascot-float 3s ease-in-out infinite;
+}
+
+/* Jannes: clumsy player — wobbly, uncoordinated movements */
+@keyframes mascot-jannes-idle {
+  0%,  20%         { transform: translateY(0px) translateX(0px) rotate(0deg); }
+  25%              { transform: translateY(-3px) translateX(2px) rotate(-1deg); }
+  35%              { transform: translateY(-3px) translateX(2px) rotate(-1deg); }
+  40%              { transform: translateY(1px) translateX(-3px) rotate(1deg); }
+  50%              { transform: translateY(1px) translateX(-3px) rotate(1deg); }
+  55%              { transform: translateY(-2px) translateX(1px) rotate(0deg); }
+  65%              { transform: translateY(-2px) translateX(1px) rotate(0deg); }
+  70%              { transform: translateY(0px) translateX(-2px) rotate(-1deg); }
+  85%, 100%        { transform: translateY(0px) translateX(0px) rotate(0deg); }
+}
+
+.mascot-jannes {
+  animation: mascot-jannes-idle 5s ease-in-out infinite;
+}
+
+.mascot-jannes img {
+  animation: mascot-float 2.5s ease-in-out infinite;
+}
+
+/* Ron Jans: frustrated kitchen roll thrower — violent shake + head gets red + throw motion */
+@keyframes mascot-ron-jans-idle {
+  0%,   15%        { transform: translateY(0px) translateX(0px) rotate(0deg); }
+  20%              { transform: translateY(-2px) translateX(-4px) rotate(-3deg); }
+  25%              { transform: translateY(-2px) translateX(4px) rotate(3deg); }
+  30%              { transform: translateY(-1px) translateX(-3px) rotate(-2deg); }
+  35%, 40%         { transform: translateY(0px) translateX(0px) rotate(0deg); }
+  45%              { transform: translateY(2px) translateX(-2px) rotate(-1deg); }
+  55%              { transform: translateY(2px) translateX(2px) rotate(1deg); }
+  60%              { transform: translateY(0px) translateX(0px) rotate(0deg); }
+  65%, 100%        { transform: translateY(0px) translateX(0px) rotate(0deg); }
+}
+
+/* Head gets progressively redder during frustration */
+@keyframes mascot-ron-jans-head-red {
+  0%,  35%  { filter: saturate(1) hue-rotate(0deg); }
+  40%       { filter: saturate(1.4) hue-rotate(-15deg); }
+  50%       { filter: saturate(1.6) hue-rotate(-25deg); }
+  60%       { filter: saturate(1.4) hue-rotate(-15deg); }
+  70%, 100% { filter: saturate(1) hue-rotate(0deg); }
+}
+
+.mascot-ron-jans {
+  animation: mascot-ron-jans-idle 6s ease-in-out infinite;
+}
+
+.mascot-ron-jans img {
+  animation: mascot-ron-jans-head-red 6s ease-in-out infinite, mascot-float 2s ease-in-out infinite;
+}
+
+/* Golden Cor: subtle float + EXTREME gold moustache glow + sparkle particles */
+
+@keyframes mascot-golden-cor-float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-2px); }
+}
+
+/* Subtle golden aura around Cor's body that pulses gently */
+@keyframes mascot-golden-cor-aura {
+  0%, 100% {
+    filter: drop-shadow(0 0 6px rgba(251, 191, 36, 0.3));
+  }
+  50% {
+    filter: drop-shadow(0 0 14px rgba(251, 191, 36, 0.6)) drop-shadow(0 0 24px rgba(245, 158, 11, 0.35));
+  }
+}
+
+@keyframes mascot-golden-cor-mustache-glow {
+  0%, 100% {
+    opacity: 0.15;
+    filter: blur(10px);
+    transform: translate(-50%, 0) scale(0.6);
+  }
+  40% {
+    opacity: 0.7;
+    filter: blur(5px);
+    transform: translate(-50%, 0) scale(1.1);
+  }
+  50% {
+    opacity: 1;
+    filter: blur(2px);
+    transform: translate(-50%, 0) scale(1.45);
+  }
+  60% {
+    opacity: 0.8;
+    filter: blur(4px);
+    transform: translate(-50%, 0) scale(1.2);
+  }
+}
+
+.mascot-golden-cor {
+  position: relative;
+}
+
+/* Extreme gold glow ONLY on the moustache zone */
+.mascot-golden-cor::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 37%;
+  width: 65%;
+  height: 12%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 250, 200, 1) 0%,
+    rgba(255, 235, 100, 1) 8%,
+    rgba(251, 191, 36, 1) 18%,
+    rgba(245, 158, 11, 0.9) 40%,
+    rgba(217, 119, 6, 0.5) 70%,
+    transparent 100%
+  );
+  mix-blend-mode: screen;
+  pointer-events: none;
+  z-index: 3;
+  animation: mascot-golden-cor-mustache-glow 2.2s ease-in-out infinite;
+  filter: brightness(1.3);
+}
+
+
+.mascot-golden-cor img {
+  animation: mascot-golden-cor-float 2.5s ease-in-out infinite, mascot-golden-cor-aura 3s ease-in-out infinite;
+}
+
+/* Udo: chill vibes — subtle white twinkle + gravity lettering "huts" appearing */
+
+@keyframes mascot-udo-float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-2.5px); }
+}
+
+/* Subtle white twinkle glow around Udo */
+@keyframes mascot-udo-twinkle {
+  0%, 100% {
+    filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.2));
+  }
+  50% {
+    filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.5)) drop-shadow(0 0 20px rgba(245, 158, 11, 0.25));
+  }
+}
+
+/* Sunglasses light twinkle — sparkle reflection in the lenses */
+@keyframes mascot-udo-sunglasses-twinkle {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+/* Gravity lettering "huts" appears above him every 10s */
+@keyframes mascot-udo-huts-appear {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.9);
+  }
+  5% {
+    opacity: 1;
+    transform: translateY(0px) scale(1);
+  }
+  25% {
+    opacity: 1;
+    transform: translateY(0px) scale(1);
+  }
+  30% {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.9);
+  }
+  31% {
+    display: none;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.9);
+  }
+}
+
+.mascot-udo {
+  position: relative;
+}
+
+/* "huts" gravity text appears above Udo — golden glow keychain style */
+.mascot-udo::before {
+  content: "huts";
+  position: absolute;
+  left: 47%;
+  top: -8px;
+  transform: translateX(-50%);
+  font-family: "Comic Sans MS", "Chalkboard SE", cursive;
+  font-size: 11px;
+  font-weight: 900;
+  color: rgba(251, 191, 36, 1);
+  text-shadow:
+    2px 2px 0 rgba(217, 119, 6, 0.8),
+    0 0 6px rgba(251, 191, 36, 0.9),
+    0 0 12px rgba(245, 158, 11, 0.7);
+  letter-spacing: 2px;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 3;
+  animation: mascot-udo-huts-appear 10s ease-in-out infinite;
+  transform-origin: center bottom;
+  filter: drop-shadow(0 0 3px rgba(251, 191, 36, 0.6));
+}
+
+/* Sunglasses light twinkle — sparkle on the left lens */
+.mascot-udo::after {
+  content: "";
+  position: absolute;
+  left: 30%;
+  top: 30%;
+  width: 8px;
+  height: 8px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.6) 50%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 5;
+  animation: mascot-udo-sunglasses-twinkle 1.5s ease-in-out infinite;
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.8), 0 0 12px rgba(245, 158, 11, 0.4);
+}
+
+.mascot-udo img {
+  animation: mascot-udo-float 2.8s ease-in-out infinite, mascot-udo-twinkle 2.5s ease-in-out infinite;
+}
+
+/* Guiness: epic mascot — dark aura glow */
+
+@keyframes mascot-guiness-float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-2px); }
+}
+
+@keyframes mascot-guiness-glow {
+  0%, 100% {
+    filter: drop-shadow(0 0 8px rgba(0, 0, 0, 0.5));
+  }
+  50% {
+    filter: drop-shadow(0 0 16px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 24px rgba(0, 0, 0, 0.4));
+  }
+}
+
+.mascot-guiness {
+  position: relative;
+}
+
+/* Dark aura glow around Guiness */
+.mascot-guiness::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 120%;
+  height: 120%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(0, 0, 0, 0.3) 0%,
+    rgba(0, 0, 0, 0.15) 40%,
+    transparent 70%
+  );
+  pointer-events: none;
+  z-index: 0;
+  animation: mascot-guiness-glow 2s ease-in-out infinite;
+}
+
+.mascot-guiness img {
+  animation: mascot-guiness-float 2.6s ease-in-out infinite, mascot-guiness-glow 2s ease-in-out infinite;
+  position: relative;
+  z-index: 1;
+}
+
+/* Rustaagh: epic mascot — red head with pulsing red glow */
+
+
+/* Fallback for future mascots */
+.mascot-idle-default {
+  animation: mascot-float 3s ease-in-out infinite;
+}
+
+/* ── Pack system animations ──────────────────────────────────────────────────── */
+
+/* Pack card idle float */
+@keyframes packIdle {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  30%       { transform: translateY(-6px) rotate(-0.8deg); }
+  70%       { transform: translateY(-4px) rotate(0.6deg); }
+}
+
+/* Pack flies up + spins when opened — enhanced with 3D flip */
+@keyframes packOpen {
+  0%   {
+    transform: translateY(0)    scale(1)    rotateY(0deg)   rotateZ(0deg) rotateX(0deg);
+    opacity: 1;
+    filter: brightness(1);
+  }
+  15%  {
+    transform: translateY(-30px) scale(1.12) rotateY(45deg)  rotateZ(-3deg) rotateX(8deg);
+    opacity: 1;
+    filter: brightness(1.15);
+  }
+  35%  {
+    transform: translateY(-60px) scale(1.20) rotateY(180deg) rotateZ(8deg) rotateX(-12deg);
+    opacity: 1;
+    filter: brightness(1.30);
+  }
+  60%  {
+    transform: translateY(-100px) scale(1.10) rotateY(280deg) rotateZ(-12deg) rotateX(6deg);
+    opacity: 0.85;
+    filter: brightness(1.20);
+  }
+  100% {
+    transform: translateY(-180px) scale(0.3) rotateY(540deg) rotateZ(25deg) rotateX(-20deg);
+    opacity: 0;
+    filter: brightness(0.6);
+  }
+}
+
+/* Color flash when pack opens — enhanced with scale and glow */
+@keyframes packFlash {
+  0%   {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  10%  {
+    opacity: 1;
+    transform: scale(1.2);
+    filter: blur(2px) brightness(1.8);
+  }
+  25%  {
+    opacity: 0.9;
+    transform: scale(1);
+    filter: blur(0px) brightness(1.5);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.95);
+    filter: blur(8px) brightness(0.8);
+  }
+}
+
+/* Item zooms in from center */
+@keyframes packRevealItem {
+  0%   { transform: scale(0.2) rotate(-8deg); opacity: 0; filter: brightness(3); }
+  50%  { filter: brightness(1.8); }
+  100% { transform: scale(1)   rotate(0deg);  opacity: 1; filter: brightness(1); }
+}
+
+/* Particle burst from center — enhanced with rotation and acceleration */
+@keyframes particleBurst {
+  0%   {
+    transform: translate(0, 0) scale(1) rotate(0deg);
+    opacity: 1;
+    filter: brightness(1.5);
+  }
+  35%  {
+    transform: translate(calc(var(--px) * 0.4), calc(var(--py) * 0.4)) scale(0.8) rotate(45deg);
+    opacity: 1;
+    filter: brightness(1.2);
+  }
+  100% {
+    transform: translate(var(--px), var(--py)) scale(0) rotate(360deg);
+    opacity: 0;
+    filter: brightness(0.3);
+  }
+}
+
+/* Glow pulse on reveal — enhanced with multiple layers */
+@keyframes revealGlow {
+  0%   {
+    opacity: 0;
+    transform: scale(0.3);
+    filter: blur(20px);
+  }
+  30%  {
+    opacity: 1;
+    transform: scale(1.4);
+    filter: blur(8px) brightness(1.8);
+  }
+  70%  {
+    opacity: 0.9;
+    transform: scale(1.1);
+    filter: blur(2px) brightness(1.4);
+  }
+  100% {
+    opacity: 0.5;
+    transform: scale(1);
+    filter: blur(0px) brightness(1);
+  }
+}
+
+/* Sheet slides up from bottom (shared with wheel result) */
+@keyframes sheetUp {
+  from { transform: translateY(100%); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+/* Confetti fall */
+@keyframes confettiFall {
+  0%   { transform: translateY(0)     rotateZ(0deg);   opacity: 1;   }
+  80%  { opacity: 1; }
+  100% { transform: translateY(105vh) rotateZ(720deg); opacity: 0.2; }
+}
+
+/* Ring expand for epic/legendary — enhanced with multiple expanding rings */
+@keyframes ringExpand {
+  0%   {
+    transform: translate(-50%, -50%) scale(0.1);
+    opacity: 1;
+    filter: blur(0px) brightness(1.5);
+  }
+  40%  {
+    transform: translate(-50%, -50%) scale(1.2);
+    opacity: 0.8;
+    filter: blur(1px) brightness(1.3);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(2.8);
+    opacity: 0;
+    filter: blur(8px) brightness(0.5);
+  }
+}
+
+/* Rare bg fade in */
+@keyframes rareBg {
+  0%   { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+/* Badge pulse for legendary */
+@keyframes badgePulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(245,158,11,0.35); }
+  50%       { box-shadow: 0 0 40px rgba(245,158,11,0.70); }
+}
+
+/* Cosmetic item reveal pop — enhanced with bouncy entrance */
+@keyframes cosmeticReveal {
+  0%   {
+    transform: scale(0.1) rotate(-20deg) translateY(30px);
+    opacity: 0;
+    filter: blur(10px);
+  }
+  60%  {
+    transform: scale(1.15) rotate(3deg) translateY(-8px);
+    opacity: 1;
+    filter: blur(0px) brightness(1.3);
+  }
+  85%  {
+    transform: scale(0.95) rotate(-1deg) translateY(2px);
+    opacity: 1;
+    filter: brightness(1.1);
+  }
+  100% {
+    transform: scale(1) rotate(0deg) translateY(0px);
+    opacity: 1;
+    filter: brightness(1);
+  }
+}
+
+/* Spinning ring on epic+ items */
+@keyframes spinRing {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* Legendary glow pulse */
+@keyframes legendaryGlow {
+  0%, 100% { filter: drop-shadow(0 0 32px #FBBF24) drop-shadow(0 0 64px rgba(245,158,11,0.55)); }
+  50%       { filter: drop-shadow(0 0 48px #FDE68A) drop-shadow(0 0 80px rgba(245,158,11,0.75)); }
+}
+
+/* Open button pulse */
+@keyframes pulseBtn {
+  0%, 100% { box-shadow: 0 4px 24px rgba(245,158,11,0.45); }
+  50%       { box-shadow: 0 4px 36px rgba(245,158,11,0.70); }
+}
+
+/* ── Extra premium effects for pack opening ──────────────────────────────── */
+
+/* Shimmer flash across screen */
+@keyframes premiumShimmer {
+  0%   { left: -200%; opacity: 0; }
+  10%  { opacity: 1; }
+  50%  { opacity: 0.8; }
+  90%  { opacity: 0; }
+  100% { left: 200%; opacity: 0; }
+}
+
+/* Secondary glow wave */
+@keyframes glowWave {
+  0%   { transform: scale(0.5); opacity: 0; }
+  25%  { opacity: 0.6; }
+  50%  { transform: scale(1.8); opacity: 0.3; }
+  100% { transform: scale(3); opacity: 0; }
+}
+
+/* Mascotte Pack: Pulsing background gradient */
+@keyframes mascotteBgPulse {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50%      { opacity: 1; transform: scale(1.05); }
+}
+
+/* Mascotte Pack: Orbiting mascot icons */
+@keyframes mascotteOrbit {
+  0%   { transform: translate(-50%, -50%) rotate(0deg) translateY(-120px); }
+  100% { transform: translate(-50%, -50%) rotate(360deg) translateY(-120px); }
+}
+
+/* Mascotte Pack: Radiating glow wave */
+@keyframes mascotteGlowWave {
+  0%   { transform: scale(0.6); opacity: 0.8; }
+  50%  { transform: scale(1.3); opacity: 0.4; }
+  100% { transform: scale(2); opacity: 0; }
+}
+
+/* Roulette Pack: Spinning wheel animation */
+@keyframes rouletteSpin {
+  0%   { transform: rotate(0deg) scale(1); opacity: 1; }
+  50%  { transform: rotate(720deg) scale(1.1); opacity: 1; }
+  100% { transform: rotate(1440deg) scale(1); opacity: 1; }
+}
+
+/* Roulette Pack: Dramatic shake for lose */
+@keyframes rouletteShake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-8px); }
+  20%, 40%, 60%, 80% { transform: translateX(8px); }
+}
+
+/* Roulette Pack: Celebration pop for win */
+@keyframes roulettePop {
+  0%   { transform: scale(0.8); opacity: 0; }
+  50%  { transform: scale(1.15); }
+  100% { transform: scale(1); opacity: 1; }
+}

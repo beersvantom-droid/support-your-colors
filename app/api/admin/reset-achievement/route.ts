@@ -29,35 +29,50 @@ async function getRequestUser(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const user = await getRequestUser(req);
-  if (!user || user.id !== ADMIN_USER_ID) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  try {
+    const user = await getRequestUser(req);
+    if (!user || user.id !== ADMIN_USER_ID) {
+      return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
+    }
+
+    let body: { achievementRowId?: unknown; userId?: unknown; pointsAwarded?: unknown };
+    try {
+      body = await req.json();
+    } catch {
+      return NextResponse.json({ success: false, error: "Invalid request body" }, { status: 400 });
+    }
+
+    const { achievementRowId, userId, pointsAwarded } = body;
+    if (!achievementRowId || !userId || pointsAwarded == null) {
+      return NextResponse.json({ success: false, error: "Missing fields" }, { status: 400 });
+    }
+
+    const db = adminDb();
+
+    const { error: delError } = await db
+      .from("user_achievements")
+      .delete()
+      .eq("id", achievementRowId);
+
+    if (delError) {
+      console.error("[reset-achievement] delete error:", delError.message);
+      return NextResponse.json({ success: false, error: delError.message }, { status: 500 });
+    }
+
+    const { error: rpcError } = await db.rpc("increment_supporter_points", {
+      user_id: userId,
+      amount: -(pointsAwarded as number),
+    });
+
+    if (rpcError) {
+      console.error("[reset-achievement] RPC error:", rpcError.message);
+      return NextResponse.json({ success: false, error: `Points deduction failed: ${rpcError.message}` }, { status: 500 });
+    }
+
+    return NextResponse.json({ success: true });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error("[reset-achievement] unhandled error:", msg);
+    return NextResponse.json({ success: false, error: msg }, { status: 500 });
   }
-
-  const { achievementRowId, userId, pointsAwarded } = await req.json();
-  if (!achievementRowId || !userId || pointsAwarded == null) {
-    return NextResponse.json({ error: "Missing fields" }, { status: 400 });
-  }
-
-  const db = adminDb();
-
-  const { error: delError } = await db
-    .from("user_achievements")
-    .delete()
-    .eq("id", achievementRowId);
-
-  if (delError) {
-    return NextResponse.json({ error: delError.message }, { status: 500 });
-  }
-
-  const { error: rpcError } = await db.rpc("increment_supporter_points", {
-    user_id: userId,
-    amount: -pointsAwarded,
-  });
-
-  if (rpcError) {
-    return NextResponse.json({ error: `Points deduction failed: ${rpcError.message}` }, { status: 500 });
-  }
-
-  return NextResponse.json({ ok: true });
 }

@@ -5,6 +5,7 @@ import { X, Send, Loader2 } from "lucide-react";
 import type { Post, Comment, FanPersona } from "@/lib/supabase";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/components/auth/AuthProvider";
+import { useAchievements } from "@/components/achievements/AchievementsProvider";
 import CommentsSection from "./CommentsSection";
 
 interface CommentsSheetProps {
@@ -19,6 +20,7 @@ export default function CommentsSheet({
   onClose,
 }: CommentsSheetProps) {
   const { profile } = useAuth();
+  const { triggerCheck } = useAchievements();
   const [comments, setComments] = useState<Comment[]>([]);
   const [avatarMap, setAvatarMap] = useState<Map<string, string | null>>(new Map());
   const [fanMap, setFanMap] = useState<Map<string, FanPersona>>(new Map());
@@ -73,6 +75,9 @@ export default function CommentsSheet({
         if (data) {
           setComments(data as Comment[]);
         }
+
+        // Trigger achievement check after comment is posted
+        triggerCheck();
       }
     } finally {
       setSubmitting(false);

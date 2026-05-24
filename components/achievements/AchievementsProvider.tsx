@@ -9,6 +9,7 @@ import {
   useState,
 } from "react";
 import { supabase } from "@/lib/supabase";
+import { createServerClient } from "@supabase/ssr";
 import { useAuth } from "@/components/auth/AuthProvider";
 import {
   type AchievementDef,
@@ -167,24 +168,86 @@ export function AchievementsProvider({
 
         // Fast Responder: commented within 2 min of a post
         let hasFastResponse = false;
+        let hasScheidrechterComment = false;
+        let hasRonJansKeyword = false;
+        let hasHutsOrNiffo = false;
         try {
-          const { data: commentRows } = await supabase
+          // Fetch all comments from user
+          const { data: commentRows, error: commentError } = await supabase
             .from("comments")
-            .select("created_at, posts(created_at)")
+            .select("id, created_at, comment_text, post_id")
             .eq("username", profile!.username);
 
-          hasFastResponse = (commentRows ?? []).some((c: any) => {
-            const post = Array.isArray(c.posts) ? c.posts[0] : c.posts;
-            if (!post) return false;
-            const diff =
-              new Date(c.created_at).getTime() -
-              new Date(post.created_at).getTime();
-            return diff >= 0 && diff <= 2 * 60 * 1000;
-          });
-        } catch {}
+          if (commentError) {
+            console.error("[Achievements] Comment query error:", commentError);
+          }
+
+          if (commentRows && commentRows.length > 0) {
+            console.log("[Achievements] Found", commentRows.length, "comments");
+
+            // Check for scheidsrechter comment (simpler, no posts join needed)
+            hasScheidrechterComment = commentRows.some((c: any) => {
+              const hasWord = c.comment_text && c.comment_text.toLowerCase().includes("scheidsrechter");
+              if (hasWord) {
+                console.log("[Achievements] Found scheidsrechter in comment:", c.comment_text);
+              }
+              return hasWord;
+            });
+
+            // Check for Ron Jans keywords: "keukenrol", "ronjansdans", or "pec zwolle"
+            const ronJansKeywords = ["keukenrol", "ronjansdans", "pec zwolle"];
+            hasRonJansKeyword = commentRows.some((c: any) => {
+              const text = c.comment_text ? c.comment_text.toLowerCase() : "";
+              const hasKeyword = ronJansKeywords.some(keyword => text.includes(keyword));
+              if (hasKeyword) {
+                console.log("[Achievements] Found Ron Jans keyword in comment:", c.comment_text);
+              }
+              return hasKeyword;
+            });
+
+            // Check for Udo keywords: "huts" or "niffo"
+            const udoKeywords = ["huts", "niffo"];
+            hasHutsOrNiffo = commentRows.some((c: any) => {
+              const text = c.comment_text ? c.comment_text.toLowerCase() : "";
+              const hasKeyword = udoKeywords.some(keyword => text.includes(keyword));
+              if (hasKeyword) {
+                console.log("[Achievements] Found Udo keyword in comment:", c.comment_text);
+              }
+              return hasKeyword;
+            });
+
+            // For fast responder, fetch post creation times separately
+            try {
+              const postIds = commentRows.map((c: any) => c.post_id);
+              const { data: posts } = await supabase
+                .from("posts")
+                .select("id, created_at")
+                .in("id", postIds);
+
+              const postMap = new Map(posts?.map((p: any) => [p.id, p]) ?? []);
+
+              hasFastResponse = commentRows.some((c: any) => {
+                const post = postMap.get(c.post_id);
+                if (!post) return false;
+                const diff =
+                  new Date(c.created_at).getTime() -
+                  new Date(post.created_at).getTime();
+                return diff >= 0 && diff <= 2 * 60 * 1000;
+              });
+            } catch (err) {
+              console.error("[Achievements] Post fetch error:", err);
+            }
+
+            console.log("[Achievements] hasFastResponse:", hasFastResponse, "hasScheidrechterComment:", hasScheidrechterComment, "hasRonJansKeyword:", hasRonJansKeyword);
+          }
+        } catch (err) {
+          console.error("[Achievements] Comment section error:", err);
+        }
 
         // Villain Arc: received 25+ comments on a single post
         let villain_arc_max_comments = 0;
+        let djDerksenCommentCount    = 0;
+        let abuHarbCommentCount      = 0;
         try {
           const { data: myPosts } = await supabase
             .from("posts")
@@ -195,17 +258,50 @@ export function AchievementsProvider({
             const postIds = myPosts.map((p: { id: string }) => p.id);
             const { data: commentCounts } = await supabase
               .from("comments")
-              .select("post_id")
+              .select("post_id, username")
               .in("post_id", postIds);
 
             const counts = new Map<string, number>();
             for (const c of commentCounts ?? []) {
-              const pid = (c as { post_id: string }).post_id;
-              counts.set(pid, (counts.get(pid) ?? 0) + 1);
+              const row = c as { post_id: string; username: string };
+              counts.set(row.post_id, (counts.get(row.post_id) ?? 0) + 1);
+              // Count DJ Derksen fan comments on user's posts
+              if (row.username.toLowerCase().trim() === "dj derksen") {
+                djDerksenCommentCount++;
+              }
+              // Count Abu Harb fan comments on user's posts
+              if (row.username.toLowerCase().trim() === "abu harb") {
+                abuHarbCommentCount++;
+              }
             }
             villain_arc_max_comments = Math.max(0, ...counts.values());
           }
         } catch {}
+
+        // ── Progression achievements: count packs, cosmetics, mascots ───────────────
+        let packsOpenedCount = 0;
+        let cosmeticsOwnedCount = 0;
+        let mascotsOwnedCount = 0;
+        try {
+          // Count unique pack types opened
+          const { data: packsOpened } = await supabase
+            .from("user_pack_cooldowns")
+            .select("pack_id")
+            .eq("user_id", user!.id);
+          packsOpenedCount = new Set(packsOpened?.map((p: any) => p.pack_id) ?? []).size;
+
+          // Count unique cosmetics (including mascots)
+          const { data: allCosmetics } = await supabase
+            .from("user_cosmetics")
+            .select("cosmetic_id")
+            .eq("user_id", user!.id);
+          cosmeticsOwnedCount = allCosmetics?.length ?? 0;
+          mascotsOwnedCount = allCosmetics?.filter((c: any) =>
+            c.cosmetic_id.startsWith("mascot_")
+          ).length ?? 0;
+        } catch (err) {
+          console.error("[Achievements] Error counting progression stats:", err);
+        }
 
         const stats = {
           postCount,
@@ -218,6 +314,14 @@ export function AchievementsProvider({
           hasAroundTheClock,
           hasFastResponse,
           villain_arc_max_comments,
+          djDerksenCommentCount,
+          abuHarbCommentCount,
+          hasScheidrechterComment,
+          hasRonJansKeyword,
+          hasHutsOrNiffo,
+          packsOpenedCount,
+          cosmeticsOwnedCount,
+          mascotsOwnedCount,
         };
 
         const newUnlocks = resolveNewUnlocks(stats, unlockedIdsRef.current);
@@ -243,12 +347,103 @@ export function AchievementsProvider({
           return;
         }
 
-        // Award points
+        // Award points (normal achievements)
         const totalPoints = newUnlocks.reduce((sum, a) => sum + a.points, 0);
-        await supabase.rpc("increment_supporter_points", {
-          user_id: user!.id,
-          amount: totalPoints,
-        });
+        if (totalPoints > 0) {
+          await supabase.rpc("increment_supporter_points", {
+            user_id: user!.id,
+            amount: totalPoints,
+          });
+        }
+
+        // Award coins (progression achievements)
+        const coinTotal = newUnlocks.reduce((sum, a) => sum + (a.coins ?? 0), 0);
+        if (coinTotal > 0) {
+          try {
+            // Use service role to bypass RLS
+            const serviceDb = createServerClient(
+              process.env.NEXT_PUBLIC_SUPABASE_URL!,
+              process.env.SUPABASE_SERVICE_ROLE_KEY!,
+              {
+                cookies: {
+                  getAll: () => [],
+                  setAll: () => {},
+                },
+              }
+            );
+
+            const { data: existingCoins } = await serviceDb
+              .from("user_coins")
+              .select("balance")
+              .eq("user_id", user!.id)
+              .maybeSingle();
+
+            if (existingCoins) {
+              await serviceDb
+                .from("user_coins")
+                .update({ balance: existingCoins.balance + coinTotal })
+                .eq("user_id", user!.id);
+            } else {
+              await serviceDb.from("user_coins").insert({
+                user_id: user!.id,
+                balance: coinTotal,
+              });
+            }
+            console.log(`[Achievements] Awarded ${coinTotal} coins for progressions`);
+          } catch (err) {
+            console.error("[Achievements] Error awarding coins:", err);
+          }
+        }
+
+        // Auto-unlock mascots when achievements are earned
+        if (newUnlocks.some(a => a.id === "dj_derksen_fan")) {
+          await supabase
+            .from("user_cosmetics")
+            .upsert(
+              { user_id: user!.id, cosmetic_id: "mascot_dj_derksen" },
+              { onConflict: "user_id,cosmetic_id" }
+            );
+        }
+        if (newUnlocks.some(a => a.id === "abu_harb_fan")) {
+          await supabase
+            .from("user_cosmetics")
+            .upsert(
+              { user_id: user!.id, cosmetic_id: "mascot_abu_harb" },
+              { onConflict: "user_id,cosmetic_id" }
+            );
+        }
+        if (newUnlocks.some(a => a.id === "jannes_fan")) {
+          await supabase
+            .from("user_cosmetics")
+            .upsert(
+              { user_id: user!.id, cosmetic_id: "mascot_jannes" },
+              { onConflict: "user_id,cosmetic_id" }
+            );
+        }
+        if (newUnlocks.some(a => a.id === "ron_jans_fan")) {
+          await supabase
+            .from("user_cosmetics")
+            .upsert(
+              { user_id: user!.id, cosmetic_id: "mascot_ron_jans" },
+              { onConflict: "user_id,cosmetic_id" }
+            );
+        }
+        if (newUnlocks.some(a => a.id === "golden_cor_fan")) {
+          await supabase
+            .from("user_cosmetics")
+            .upsert(
+              { user_id: user!.id, cosmetic_id: "mascot_golden_cor" },
+              { onConflict: "user_id,cosmetic_id" }
+            );
+        }
+        if (newUnlocks.some(a => a.id === "udo_fan")) {
+          await supabase
+            .from("user_cosmetics")
+            .upsert(
+              { user_id: user!.id, cosmetic_id: "mascot_udo" },
+              { onConflict: "user_id,cosmetic_id" }
+            );
+        }
 
         // Update local state
         const now = new Date().toISOString();

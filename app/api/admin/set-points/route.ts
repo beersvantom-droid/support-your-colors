@@ -29,29 +29,44 @@ async function getRequestUser(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const user = await getRequestUser(req);
-  if (!user || user.id !== ADMIN_USER_ID) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  try {
+    const user = await getRequestUser(req);
+
+    if (!user || user.id !== ADMIN_USER_ID) {
+      return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
+    }
+
+    let body: { userId?: unknown; supporterPoints?: unknown; tournamentPoints?: unknown };
+    try {
+      body = await req.json();
+    } catch {
+      return NextResponse.json({ success: false, error: "Invalid request body" }, { status: 400 });
+    }
+
+    const { userId, supporterPoints, tournamentPoints } = body;
+    if (!userId || typeof supporterPoints !== "number" || typeof tournamentPoints !== "number") {
+      return NextResponse.json({ success: false, error: "Missing or invalid fields" }, { status: 400 });
+    }
+
+    const db = adminDb();
+
+    const { error } = await db
+      .from("profiles")
+      .update({
+        supporter_points:  supporterPoints,
+        tournament_points: tournamentPoints,
+      })
+      .eq("id", userId);
+
+    if (error) {
+      console.error("[set-points] DB update error:", error.message, "code:", error.code);
+      return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    }
+
+    return NextResponse.json({ success: true });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error("[set-points] unhandled error:", msg);
+    return NextResponse.json({ success: false, error: msg }, { status: 500 });
   }
-
-  const { userId, supporterPoints, tournamentPoints } = await req.json();
-  if (!userId || typeof supporterPoints !== "number" || typeof tournamentPoints !== "number") {
-    return NextResponse.json({ error: "Missing fields" }, { status: 400 });
-  }
-
-  const db = adminDb();
-
-  const { error } = await db
-    .from("profiles")
-    .update({
-      supporter_points:   supporterPoints,
-      tournament_points:  tournamentPoints,
-    })
-    .eq("id", userId);
-
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
-
-  return NextResponse.json({ ok: true });
 }

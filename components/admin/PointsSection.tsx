@@ -71,8 +71,10 @@ export default function PointsSection() {
         }),
       });
 
+      let data: { success?: boolean; error?: string } = {};
+      try { data = await res.json(); } catch { /* empty / non-JSON body */ }
+
       if (!res.ok) {
-        const data = await res.json();
         throw new Error(data.error ?? "Save failed");
       }
 

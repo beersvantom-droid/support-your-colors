@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import type { AchievementDef } from "@/lib/achievements";
 import { RARITY_LABEL, RARITY_STYLE } from "@/lib/achievements";
+import { getMascotById, getCosmeticById } from "@/lib/cosmetics";
+import MascotSprite from "@/components/mascot/MascotSprite";
 
 interface Props {
   achievement: AchievementDef;
@@ -95,22 +97,62 @@ export default function AchievementUnlockModal({ achievement, onDismiss }: Props
               {achievement.hint}
             </p>
 
-            {/* Rarity + Points row */}
-            <div className="flex items-center justify-center gap-3 mb-5">
+            {/* Rarity badge */}
+            <div className="mb-4">
               <span
                 className="px-3 py-1 rounded-full text-xs font-black"
                 style={{ background: style.badge, color: style.text }}
               >
                 {RARITY_LABEL[achievement.rarity]}
               </span>
-              <span className="text-xs font-semibold text-gray-300">·</span>
-              <span
-                className="text-sm font-black"
-                style={{ color: style.text }}
-              >
-                +{achievement.points} pts
-              </span>
             </div>
+
+            {/* Cosmetic Reward (if applicable) */}
+            {achievement.unlocksCosmetic && (() => {
+              const mascot = getMascotById(achievement.unlocksCosmetic);
+              const cosmetic = getCosmeticById(achievement.unlocksCosmetic);
+              const reward = mascot || cosmetic;
+
+              return reward ? (
+                <div className="mb-5">
+                  {/* Mascot sprite preview */}
+                  {mascot && (
+                    <div className="flex justify-center mb-3">
+                      <MascotSprite id={achievement.unlocksCosmetic} size={60} />
+                    </div>
+                  )}
+
+                  {/* Reward text */}
+                  <p className="text-sm font-black mb-2" style={{ color: style.text }}>
+                    + {reward.label}
+                  </p>
+                  <p className="text-xs text-gray-400">
+                    {mascot ? "Legendary Mascot" : "Cosmetic Unlocked"}
+                  </p>
+                </div>
+              ) : null;
+            })()}
+
+            {/* Points or Coins reward row (if no cosmetic) */}
+            {!achievement.unlocksCosmetic && (
+              <div className="mb-5">
+                {achievement.coins ? (
+                  <span
+                    className="text-sm font-black"
+                    style={{ color: style.text }}
+                  >
+                    +{achievement.coins} 🪙
+                  </span>
+                ) : (
+                  <span
+                    className="text-sm font-black"
+                    style={{ color: style.text }}
+                  >
+                    +{achievement.points} pts
+                  </span>
+                )}
+              </div>
+            )}
 
             {/* Dismiss button */}
             <button
