@@ -25,6 +25,7 @@ export default function ProfilePage() {
     cosmeticsOwnedCount: number;
     mascotsOwnedCount: number;
   } | null>(null);
+  const [expandedChallenges, setExpandedChallenges] = useState(false);
 
   const country = profile?.country ?? null;
   const countryInfo = getCountryInfo(country);
@@ -284,12 +285,25 @@ export default function ProfilePage() {
             className="rounded-2xl overflow-hidden"
             style={{ background: "#FFFFFF", border: "1px solid rgba(0,0,0,0.06)" }}
           >
-            <div className="px-4 py-2.5 border-b border-gray-50">
+            <button
+              onClick={() => setExpandedChallenges(!expandedChallenges)}
+              className="w-full px-4 py-2.5 border-b border-gray-50 flex items-center justify-between hover:bg-gray-50 transition-colors"
+            >
               <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">
                 Challenges
               </span>
-            </div>
-            <div className="px-3 py-3 space-y-2">
+              <span
+                style={{
+                  transform: expandedChallenges ? "rotate(180deg)" : "rotate(0deg)",
+                  transition: "transform 200ms ease",
+                  display: "inline-block",
+                }}
+              >
+                ▼
+              </span>
+            </button>
+            {expandedChallenges && (
+              <div className="px-3 py-3 space-y-2">
               {/* Filter tiered achievements */}
               {ALL_ACHIEVEMENTS.filter((a) => a.tiers && a.tiers.length > 0)
                 .sort((a, b) => {
@@ -355,7 +369,8 @@ export default function ProfilePage() {
                     />
                   );
                 })}
-            </div>
+              </div>
+            )}
           </div>
         )}
 
