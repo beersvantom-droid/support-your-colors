@@ -8,7 +8,7 @@ import { useAuth } from "@/components/auth/AuthProvider";
 import { useAchievements } from "@/components/achievements/AchievementsProvider";
 import TrophyCase from "@/components/achievements/TrophyCase";
 import ProgressAchievementCard from "@/components/achievements/ProgressAchievementCard";
-import { getAchievementById, ALL_ACHIEVEMENTS } from "@/lib/achievements";
+import { getAchievementById, ALL_ACHIEVEMENTS, getCurrentTierLevel } from "@/lib/achievements";
 import { supabase } from "@/lib/supabase";
 import { getCountryInfo } from "@/lib/countries";
 import { ADMIN_USER_ID } from "@/lib/admin";
@@ -278,7 +278,7 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* ── My Progress (Progression Achievements) ─────────────────────────────────────────── */}
+        {/* ── Challenges (Tiered Achievements) ─────────────────────────────────────────── */}
         {progressStats && (
           <div
             className="rounded-2xl overflow-hidden"
@@ -286,61 +286,67 @@ export default function ProfilePage() {
           >
             <div className="px-4 py-2.5 border-b border-gray-50">
               <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">
-                My Progress
+                Challenges
               </span>
             </div>
             <div className="px-3 py-3 space-y-2">
-              {/* Filter progression achievements */}
-              {ALL_ACHIEVEMENTS.filter(a => a.coins !== undefined)
+              {/* Filter tiered achievements */}
+              {ALL_ACHIEVEMENTS.filter((a) => a.tiers && a.tiers.length > 0)
                 .sort((a, b) => {
                   const rarityOrder = { easy: 0, medium: 1, hard: 2, secret: 3 };
                   return rarityOrder[a.rarity] - rarityOrder[b.rarity];
                 })
                 .map((achievement) => {
-                  const unlocked = userAchievements.some(
-                    (ua) => ua.achievement_id === achievement.id
-                  );
+                  const stats = {
+                    postCount: 0,
+                    commentCount: 0,
+                    voteDayCount: 0,
+                    consecutiveActivityDays: progressStats.consecutiveActivityDays,
+                    consecutiveVoteDays: 0,
+                    nightPostCount: 0,
+                    midnightPostCount: 0,
+                    hasAroundTheClock: false,
+                    hasFastResponse: false,
+                    villain_arc_max_comments: 0,
+                    djDerksenCommentCount: 0,
+                    abuHarbCommentCount: 0,
+                    hasScheidrechterComment: false,
+                    hasRonJansKeyword: false,
+                    hasHutsOrNiffo: false,
+                    packsOpenedCount: progressStats.packsOpenedCount,
+                    cosmeticsOwnedCount: progressStats.cosmeticsOwnedCount,
+                    mascotsOwnedCount: progressStats.mascotsOwnedCount,
+                  };
 
-                  // Calculate current progress
-                  let currentProgress = 0;
-                  let targetProgress = 1;
+                  const currentTier = getCurrentTierLevel(achievement, stats);
 
-                  if (achievement.id === "login_7days") {
-                    currentProgress = progressStats.consecutiveActivityDays;
-                    targetProgress = 7;
-                  } else if (achievement.id === "login_10days") {
-                    currentProgress = progressStats.consecutiveActivityDays;
-                    targetProgress = 10;
-                  } else if (achievement.id === "login_15days") {
-                    currentProgress = progressStats.consecutiveActivityDays;
-                    targetProgress = 15;
-                  } else if (achievement.id === "open_10packs") {
-                    currentProgress = progressStats.packsOpenedCount;
-                    targetProgress = 10;
-                  } else if (achievement.id === "collect_5cosmetics") {
-                    currentProgress = progressStats.cosmeticsOwnedCount;
-                    targetProgress = 5;
-                  } else if (achievement.id === "collect_10cosmetics") {
-                    currentProgress = progressStats.cosmeticsOwnedCount;
-                    targetProgress = 10;
-                  } else if (achievement.id === "collect_1mascot") {
-                    currentProgress = progressStats.mascotsOwnedCount;
-                    targetProgress = 1;
-                  } else if (achievement.id === "collect_2mascots") {
-                    currentProgress = progressStats.mascotsOwnedCount;
-                    targetProgress = 2;
-                  } else if (achievement.id === "collect_5mascots") {
-                    currentProgress = progressStats.mascotsOwnedCount;
-                    targetProgress = 5;
+                  // Get next tier threshold
+                  let nextTierThreshold = achievement.tiers![0].threshold;
+                  if (currentTier === "bronze" && achievement.tiers!.length > 1) {
+                    nextTierThreshold = achievement.tiers![1].threshold;
+                  } else if (currentTier === "silver" && achievement.tiers!.length > 2) {
+                    nextTierThreshold = achievement.tiers![2].threshold;
+                  }
+
+                  // Get current value
+                  let currentValue = 0;
+                  if (achievement.id === "login_challenge") {
+                    currentValue = progressStats.consecutiveActivityDays;
+                  } else if (achievement.id === "pack_hunter") {
+                    currentValue = progressStats.packsOpenedCount;
+                  } else if (achievement.id === "cosmetics_collector") {
+                    currentValue = progressStats.cosmeticsOwnedCount;
+                  } else if (achievement.id === "mascot_master") {
+                    currentValue = progressStats.mascotsOwnedCount;
                   }
 
                   return (
                     <ProgressAchievementCard
                       key={achievement.id}
                       achievement={achievement}
-                      currentProgress={Math.min(currentProgress, targetProgress)}
-                      targetProgress={targetProgress}
-                      unlocked={unlocked}
+                      currentTier={currentTier}
+                      currentProgress={currentValue}
+                      nextTierThreshold={nextTierThreshold}
                     />
                   );
                 })}

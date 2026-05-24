@@ -1,5 +1,10 @@
 export type AchievementRarity = "easy" | "medium" | "hard" | "secret";
 
+export interface AchievementTier {
+  level: "bronze" | "silver" | "gold";
+  threshold: number;
+}
+
 export interface AchievementDef {
   id: string;
   emoji: string;
@@ -9,6 +14,7 @@ export interface AchievementDef {
   points: number;
   coins?: number; // coins awarded (for progression achievements)
   unlocksCosmetic?: string; // cosmetic_id if this achievement unlocks a cosmetic
+  tiers?: AchievementTier[]; // For tiered achievements (bronze/silver/gold)
 }
 
 export const RARITY_POINTS: Record<AchievementRarity, number> = {
@@ -287,87 +293,58 @@ export const ALL_ACHIEVEMENTS: AchievementDef[] = [
     unlocksCosmetic: "mascot_udo",
   },
 
-  // ── Progression Achievements (visible progress, coins-only) ───────────────────
+  // ── Tiered Progression Achievements (visible progress, no coins) ───────────────────
   {
-    id: "login_7days",
+    id: "login_challenge",
     emoji: "📅",
-    name: "Week Warrior",
-    hint: "Log in 7 consecutive days",
+    name: "Login Challenge",
+    hint: "Log in consecutively — reach Gold for 15 days",
     rarity: "easy",
     points: 0,
-    coins: 50,
+    tiers: [
+      { level: "bronze", threshold: 7 },
+      { level: "silver", threshold: 10 },
+      { level: "gold", threshold: 15 },
+    ],
   },
   {
-    id: "login_10days",
-    emoji: "🔥",
-    name: "Habitué",
-    hint: "Log in 10 consecutive days",
-    rarity: "medium",
-    points: 0,
-    coins: 100,
-  },
-  {
-    id: "login_15days",
-    emoji: "⭐",
-    name: "Season Devotee",
-    hint: "Log in 15 consecutive days",
-    rarity: "hard",
-    points: 0,
-    coins: 150,
-  },
-  {
-    id: "open_10packs",
+    id: "pack_hunter",
     emoji: "📦",
     name: "Pack Hunter",
-    hint: "Open 10 packs",
+    hint: "Open packs — reach Gold for 30 opened",
     rarity: "easy",
     points: 0,
-    coins: 50,
+    tiers: [
+      { level: "bronze", threshold: 10 },
+      { level: "silver", threshold: 20 },
+      { level: "gold", threshold: 30 },
+    ],
   },
   {
-    id: "collect_5cosmetics",
-    emoji: "👕",
-    name: "Starter Collector",
-    hint: "Collect 5 unique cosmetics",
-    rarity: "easy",
-    points: 0,
-    coins: 50,
-  },
-  {
-    id: "collect_10cosmetics",
+    id: "cosmetics_collector",
     emoji: "🎨",
-    name: "Outfit Master",
-    hint: "Collect 10 unique cosmetics",
+    name: "Cosmetics Collector",
+    hint: "Collect cosmetics — reach Gold for 20 unique",
     rarity: "medium",
     points: 0,
-    coins: 100,
+    tiers: [
+      { level: "bronze", threshold: 5 },
+      { level: "silver", threshold: 10 },
+      { level: "gold", threshold: 20 },
+    ],
   },
   {
-    id: "collect_1mascot",
+    id: "mascot_master",
     emoji: "🎭",
-    name: "First Friend",
-    hint: "Collect 1 mascot",
-    rarity: "easy",
-    points: 0,
-    coins: 50,
-  },
-  {
-    id: "collect_2mascots",
-    emoji: "👯",
-    name: "Dynamic Duo",
-    hint: "Collect 2 mascots",
-    rarity: "medium",
-    points: 0,
-    coins: 100,
-  },
-  {
-    id: "collect_5mascots",
-    emoji: "🎪",
-    name: "Mascot Collector",
-    hint: "Collect 5 mascots",
+    name: "Mascot Master",
+    hint: "Collect mascots — reach Gold for 5 unique",
     rarity: "hard",
     points: 0,
-    coins: 150,
+    tiers: [
+      { level: "bronze", threshold: 1 },
+      { level: "silver", threshold: 2 },
+      { level: "gold", threshold: 5 },
+    ],
   },
 ];
 
@@ -431,22 +408,43 @@ export function resolveNewUnlocks(
       "silent_operator",
       stats.consecutiveActivityDays >= 5 && stats.postCount === 0,
     ],
-    // Progression achievements (visible progress, coins-based)
-    ["login_7days",        stats.consecutiveActivityDays >= 7],
-    ["login_10days",       stats.consecutiveActivityDays >= 10],
-    ["login_15days",       stats.consecutiveActivityDays >= 15],
-    ["open_10packs",       stats.packsOpenedCount >= 10],
-    ["collect_5cosmetics", stats.cosmeticsOwnedCount >= 5],
-    ["collect_10cosmetics", stats.cosmeticsOwnedCount >= 10],
-    ["collect_1mascot",    stats.mascotsOwnedCount >= 1],
-    ["collect_2mascots",   stats.mascotsOwnedCount >= 2],
-    ["collect_5mascots",   stats.mascotsOwnedCount >= 5],
   ];
 
   return checks
     .filter(([id, met]) => met && !alreadyUnlocked.has(id))
     .map(([id]) => getAchievementById(id)!)
     .filter(Boolean);
+}
+
+// Get the current tier level for a tiered achievement
+export function getCurrentTierLevel(
+  achievement: AchievementDef,
+  stats: AchievementStats
+): "bronze" | "silver" | "gold" | null {
+  if (!achievement.tiers || achievement.tiers.length === 0) return null;
+
+  let currentValue = 0;
+
+  // Map achievement IDs to stat values
+  if (achievement.id === "login_challenge") {
+    currentValue = stats.consecutiveActivityDays;
+  } else if (achievement.id === "pack_hunter") {
+    currentValue = stats.packsOpenedCount;
+  } else if (achievement.id === "cosmetics_collector") {
+    currentValue = stats.cosmeticsOwnedCount;
+  } else if (achievement.id === "mascot_master") {
+    currentValue = stats.mascotsOwnedCount;
+  }
+
+  // Find highest tier reached
+  let currentTier: "bronze" | "silver" | "gold" | null = null;
+  for (const tier of achievement.tiers) {
+    if (currentValue >= tier.threshold) {
+      currentTier = tier.level;
+    }
+  }
+
+  return currentTier;
 }
 
 // Consecutive days from a sorted-descending array of "YYYY-MM-DD" strings

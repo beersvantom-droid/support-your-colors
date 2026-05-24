@@ -347,8 +347,9 @@ export function AchievementsProvider({
           return;
         }
 
-        // Award points (normal achievements)
-        const totalPoints = newUnlocks.reduce((sum, a) => sum + a.points, 0);
+        // Award points (normal achievements only, not tiered)
+        const normalAchievements = newUnlocks.filter((a) => !a.tiers);
+        const totalPoints = normalAchievements.reduce((sum, a) => sum + a.points, 0);
         if (totalPoints > 0) {
           await supabase.rpc("increment_supporter_points", {
             user_id: user!.id,
@@ -356,8 +357,9 @@ export function AchievementsProvider({
           });
         }
 
-        // Award coins (progression achievements)
-        const coinTotal = newUnlocks.reduce((sum, a) => sum + (a.coins ?? 0), 0);
+        // Award coins (only for non-tiered achievements with coins)
+        const coinAchievements = normalAchievements.filter((a) => a.coins && a.coins > 0);
+        const coinTotal = coinAchievements.reduce((sum, a) => sum + (a.coins ?? 0), 0);
         if (coinTotal > 0) {
           try {
             // Use service role to bypass RLS
@@ -389,7 +391,7 @@ export function AchievementsProvider({
                 balance: coinTotal,
               });
             }
-            console.log(`[Achievements] Awarded ${coinTotal} coins for progressions`);
+            console.log(`[Achievements] Awarded ${coinTotal} coins`);
           } catch (err) {
             console.error("[Achievements] Error awarding coins:", err);
           }

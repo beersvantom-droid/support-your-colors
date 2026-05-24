@@ -1,42 +1,61 @@
 "use client";
 
 import type { AchievementDef } from "@/lib/achievements";
-import { RARITY_STYLE } from "@/lib/achievements";
+
+type TierLevel = "bronze" | "silver" | "gold" | null;
 
 interface Props {
   achievement: AchievementDef;
+  currentTier: TierLevel;
   currentProgress: number;
-  targetProgress: number;
-  unlocked: boolean;
+  nextTierThreshold: number;
 }
+
+const TIER_COLORS = {
+  bronze: {
+    color: "#CD7F32",
+    bg: "rgba(205,127,50,0.1)",
+    label: "🥉 Bronze",
+  },
+  silver: {
+    color: "#C0C0C0",
+    bg: "rgba(192,192,192,0.1)",
+    label: "🥈 Silver",
+  },
+  gold: {
+    color: "#FFD700",
+    bg: "rgba(255,215,0,0.1)",
+    label: "🥇 Gold",
+  },
+  locked: {
+    color: "#9CA3AF",
+    bg: "rgba(0,0,0,0.05)",
+    label: "🔒 Locked",
+  },
+};
 
 export default function ProgressAchievementCard({
   achievement,
+  currentTier,
   currentProgress,
-  targetProgress,
-  unlocked,
+  nextTierThreshold,
 }: Props) {
-  const style = RARITY_STYLE[achievement.rarity];
-  const percentage = Math.min(100, (currentProgress / targetProgress) * 100);
+  const tierInfo = currentTier ? TIER_COLORS[currentTier] : TIER_COLORS.locked;
+  const percentage = Math.min(100, (currentProgress / nextTierThreshold) * 100);
 
   return (
     <div
       className="rounded-2xl p-4 transition-all"
       style={{
-        background: unlocked ? style.bg : "rgba(0,0,0,0.05)",
-        border: `2px solid ${unlocked ? style.border : "#E5E7EB"}`,
+        background: tierInfo.bg,
+        border: `2px solid ${tierInfo.color}`,
       }}
     >
       <div className="flex justify-between items-start mb-3">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
             <span className="text-xl">{achievement.emoji}</span>
-            <p
-              className="font-bold text-sm truncate"
-              style={{
-                color: unlocked ? style.text : "#6B7280",
-              }}
-            >
+            <p className="font-bold text-sm truncate text-gray-900">
               {achievement.name}
             </p>
           </div>
@@ -48,22 +67,13 @@ export default function ProgressAchievementCard({
         <div className="flex-shrink-0 text-right ml-3">
           <p
             className="font-black text-sm"
-            style={{
-              color: unlocked ? style.text : "#9CA3AF",
-            }}
+            style={{ color: tierInfo.color }}
           >
-            {currentProgress}/{targetProgress}
+            {tierInfo.label}
           </p>
-          {achievement.coins && (
-            <p
-              className="text-xs font-black"
-              style={{
-                color: unlocked ? style.text : "#D1D5DB",
-              }}
-            >
-              +{achievement.coins} 🪙
-            </p>
-          )}
+          <p className="text-xs font-semibold text-gray-600 mt-1">
+            {currentProgress}/{nextTierThreshold}
+          </p>
         </div>
       </div>
 
@@ -72,17 +82,15 @@ export default function ProgressAchievementCard({
         <div
           className="h-full transition-all duration-300"
           style={{
-            background: unlocked
-              ? `linear-gradient(90deg, ${style.border}, ${style.border}dd)`
-              : "#9CA3AF",
+            background: tierInfo.color,
             width: `${percentage}%`,
           }}
         />
       </div>
 
-      {unlocked && (
-        <p className="text-xs text-center mt-2 font-bold" style={{ color: style.text }}>
-          ✓ Unlocked!
+      {currentTier === "gold" && (
+        <p className="text-xs text-center mt-2 font-bold" style={{ color: tierInfo.color }}>
+          ⭐ Maximum tier reached!
         </p>
       )}
     </div>
