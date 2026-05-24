@@ -9,6 +9,7 @@ interface Props {
   currentTier: TierLevel;
   currentProgress: number;
   nextTierThreshold: number;
+  nextTierCoins: number;
 }
 
 const TIER_COLORS = {
@@ -39,6 +40,7 @@ export default function ProgressAchievementCard({
   currentTier,
   currentProgress,
   nextTierThreshold,
+  nextTierCoins,
 }: Props) {
   const tierInfo = currentTier ? TIER_COLORS[currentTier] : TIER_COLORS.locked;
   const percentage = Math.min(100, (currentProgress / nextTierThreshold) * 100);
@@ -71,8 +73,11 @@ export default function ProgressAchievementCard({
           >
             {tierInfo.label}
           </p>
-          <p className="text-xs font-semibold text-gray-600 mt-1">
+          <p className="text-xs font-semibold text-gray-600 mt-0.5">
             {currentProgress}/{nextTierThreshold}
+          </p>
+          <p className="text-xs font-black" style={{ color: tierInfo.color, marginTop: "4px" }}>
+            +{nextTierCoins} 🪙
           </p>
         </div>
       </div>

@@ -3,6 +3,7 @@ export type AchievementRarity = "easy" | "medium" | "hard" | "secret";
 export interface AchievementTier {
   level: "bronze" | "silver" | "gold";
   threshold: number;
+  coins: number;
 }
 
 export interface AchievementDef {
@@ -293,7 +294,7 @@ export const ALL_ACHIEVEMENTS: AchievementDef[] = [
     unlocksCosmetic: "mascot_udo",
   },
 
-  // ── Tiered Progression Achievements (visible progress, no coins) ───────────────────
+  // ── Tiered Progression Achievements (visible progress with coin rewards) ───────────────────
   {
     id: "login_challenge",
     emoji: "📅",
@@ -302,9 +303,9 @@ export const ALL_ACHIEVEMENTS: AchievementDef[] = [
     rarity: "easy",
     points: 0,
     tiers: [
-      { level: "bronze", threshold: 7 },
-      { level: "silver", threshold: 10 },
-      { level: "gold", threshold: 15 },
+      { level: "bronze", threshold: 7, coins: 50 },
+      { level: "silver", threshold: 10, coins: 100 },
+      { level: "gold", threshold: 15, coins: 150 },
     ],
   },
   {
@@ -315,9 +316,9 @@ export const ALL_ACHIEVEMENTS: AchievementDef[] = [
     rarity: "easy",
     points: 0,
     tiers: [
-      { level: "bronze", threshold: 10 },
-      { level: "silver", threshold: 20 },
-      { level: "gold", threshold: 30 },
+      { level: "bronze", threshold: 10, coins: 50 },
+      { level: "silver", threshold: 20, coins: 100 },
+      { level: "gold", threshold: 30, coins: 150 },
     ],
   },
   {
@@ -328,9 +329,9 @@ export const ALL_ACHIEVEMENTS: AchievementDef[] = [
     rarity: "medium",
     points: 0,
     tiers: [
-      { level: "bronze", threshold: 5 },
-      { level: "silver", threshold: 10 },
-      { level: "gold", threshold: 20 },
+      { level: "bronze", threshold: 5, coins: 50 },
+      { level: "silver", threshold: 10, coins: 100 },
+      { level: "gold", threshold: 20, coins: 150 },
     ],
   },
   {
@@ -341,9 +342,9 @@ export const ALL_ACHIEVEMENTS: AchievementDef[] = [
     rarity: "hard",
     points: 0,
     tiers: [
-      { level: "bronze", threshold: 1 },
-      { level: "silver", threshold: 2 },
-      { level: "gold", threshold: 5 },
+      { level: "bronze", threshold: 1, coins: 50 },
+      { level: "silver", threshold: 2, coins: 100 },
+      { level: "gold", threshold: 5, coins: 150 },
     ],
   },
 ];

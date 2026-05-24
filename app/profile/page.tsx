@@ -320,12 +320,16 @@ export default function ProfilePage() {
 
                   const currentTier = getCurrentTierLevel(achievement, stats);
 
-                  // Get next tier threshold
+                  // Get next tier threshold and coins
                   let nextTierThreshold = achievement.tiers![0].threshold;
+                  let nextTierCoins = achievement.tiers![0].coins;
+
                   if (currentTier === "bronze" && achievement.tiers!.length > 1) {
                     nextTierThreshold = achievement.tiers![1].threshold;
+                    nextTierCoins = achievement.tiers![1].coins;
                   } else if (currentTier === "silver" && achievement.tiers!.length > 2) {
                     nextTierThreshold = achievement.tiers![2].threshold;
+                    nextTierCoins = achievement.tiers![2].coins;
                   }
 
                   // Get current value
@@ -347,6 +351,7 @@ export default function ProfilePage() {
                       currentTier={currentTier}
                       currentProgress={currentValue}
                       nextTierThreshold={nextTierThreshold}
+                      nextTierCoins={nextTierCoins}
                     />
                   );
                 })}
