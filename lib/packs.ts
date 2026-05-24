@@ -70,7 +70,7 @@ export const SHOP_PACKS: Pack[] = [
     label:           "The Ron Pack",
     description:     "Voetbal Legend | 30% Ron Jans • 60% Random Cosmetica • 10% Bonus",
     emoji:           "⚽",
-    imagePath:       "/packs/ron-pack.png",
+    imagePath:       "/packs/Ron-pack.png",
     cost:            { currency: "coins", amount: 300 },
     rarityPool:      { common: 50, rare: 25, epic: 15, legendary: 10 }, // Dummy - not used, pickFromRonPack() handles it
     cooldownMinutes: 0,
