@@ -274,6 +274,19 @@ export default function PackOpener({ pack, onReset }: PackOpenerProps) {
   const isHighRarity = rarity === "legendary" || rarity === "mascots" || rarity === "cor";
   const isEpicPlus   = rarity === "epic" || isHighRarity;
 
+  // Play special sound for Jannes when revealed
+  useEffect(() => {
+    if (phase === "reveal" && item?.cosmetic_id === "mascot_jannes") {
+      try {
+        const audio = new Audio("/sounds/reveal/jannes.wav");
+        audio.volume = 0.7;
+        audio.play().catch(() => {});
+      } catch (err) {
+        // Silent fail
+      }
+    }
+  }, [phase, item?.cosmetic_id]);
+
   // ── RESULT SHEET ──────────────────────────────────────────────────────────
   if (phase === "result") {
     return (
