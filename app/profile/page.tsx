@@ -32,7 +32,7 @@ export default function ProfilePage() {
   const accentColor = countryInfo.color;
   const isTestbot = profile?.username?.toLowerCase() === "testbot";
   const isTom = profile?.username?.toLowerCase() === "tom (built)";
-  const isTobias = profile?.username?.toLowerCase() === "tobias";
+  const isTobias = profile?.username?.toLowerCase() === "tobias" || user?.id === "50a130f7-5576-49b5-82c7-42a8ef8d06fb";
 
   // Load progression stats
   useEffect(() => {
