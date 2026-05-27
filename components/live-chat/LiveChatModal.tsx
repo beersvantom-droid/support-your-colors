@@ -163,24 +163,25 @@ export default function LiveChatModal({ onClose }: Props) {
         className="fixed bottom-0 left-0 right-0 z-50 max-w-md mx-auto flex flex-col rounded-t-3xl overflow-hidden"
         style={{
           height: "85vh",
-          background: "#0F1117",
+          backgroundImage: "url('/chat/achtergrond-chat.png')",
+          backgroundSize: "cover",
+          backgroundPosition: "center top",
           borderTop: isMatchLive
-            ? "2px solid #EF4444"
-            : "2px solid rgba(255,255,255,0.1)",
+            ? "2px solid #D52B1E"
+            : "2px solid rgba(0,0,0,0.08)",
         }}
       >
         {/* ── Header ── */}
         <div
           className="flex-none px-4 pt-4 pb-3"
           style={{
-            borderBottom: "1px solid rgba(255,255,255,0.08)",
-            background: isMatchLive
-              ? "linear-gradient(135deg, #1a0a0a, #0F1117)"
-              : "#0F1117",
+            borderBottom: "1px solid rgba(0,0,0,0.08)",
+            background: "rgba(255,255,255,0.75)",
+            backdropFilter: "blur(12px)",
           }}
         >
           {/* Drag handle */}
-          <div className="w-10 h-1 rounded-full bg-white/20 mx-auto mb-3" />
+          <div className="w-10 h-1 rounded-full mx-auto mb-3" style={{ background: "rgba(0,0,0,0.15)" }} />
 
           <div className="flex items-start justify-between gap-2">
             <div className="flex-1 min-w-0">
@@ -191,12 +192,12 @@ export default function LiveChatModal({ onClose }: Props) {
                     <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
                   </span>
                 )}
-                <span className="text-base font-black text-white">
+                <span className="text-base font-black" style={{ color: "#1F2937" }}>
                   {isMatchLive ? "LIVE CHAT" : "Match Chat"}
                 </span>
                 <span
                   className="text-[10px] font-bold px-1.5 py-0.5 rounded-full"
-                  style={{ background: "rgba(16,185,129,0.15)", color: "#10B981" }}
+                  style={{ background: "rgba(16,185,129,0.15)", color: "#059669" }}
                 >
                   {activeUsers} online
                 </span>
@@ -204,21 +205,21 @@ export default function LiveChatModal({ onClose }: Props) {
 
               {/* Live match scores */}
               {isMatchLive && liveMatches.map((m, i) => (
-                <p key={i} className="text-sm font-black" style={{ color: "#EF4444" }}>
+                <p key={i} className="text-sm font-black" style={{ color: "#D52B1E" }}>
                   ⚽ {m.home_team} {m.home_score ?? 0} – {m.away_score ?? 0} {m.away_team}
                 </p>
               ))}
 
               {/* Next match info */}
               {!isMatchLive && nextMatchDate && (
-                <p className="text-xs font-semibold" style={{ color: "#9CA3AF" }}>
+                <p className="text-xs font-semibold" style={{ color: "#6B7280" }}>
                   Volgende wedstrijd: {formatNextMatch(nextMatchDate)}
                 </p>
               )}
 
               {/* No matches info */}
               {!isMatchLive && !nextMatchDate && (
-                <p className="text-xs font-semibold" style={{ color: "#9CA3AF" }}>
+                <p className="text-xs font-semibold" style={{ color: "#6B7280" }}>
                   WK 2026 begint 11 juni 🏆
                 </p>
               )}
@@ -227,9 +228,9 @@ export default function LiveChatModal({ onClose }: Props) {
             <button
               onClick={onClose}
               className="w-8 h-8 flex items-center justify-center rounded-full transition-all active:scale-90 flex-none"
-              style={{ background: "rgba(255,255,255,0.08)" }}
+              style={{ background: "rgba(0,0,0,0.08)" }}
             >
-              <X size={16} className="text-white" />
+              <X size={16} style={{ color: "#374151" }} />
             </button>
           </div>
         </div>
@@ -244,10 +245,10 @@ export default function LiveChatModal({ onClose }: Props) {
           {messages.length === 0 && (
             <div className="flex flex-col items-center justify-center h-full text-center gap-3">
               <span className="text-5xl">⚽</span>
-              <p className="text-sm font-bold text-white/60">
+              <p className="text-sm font-bold" style={{ color: "rgba(0,0,0,0.45)" }}>
                 Nog geen berichten.
               </p>
-              <p className="text-xs text-white/40">
+              <p className="text-xs" style={{ color: "rgba(0,0,0,0.3)" }}>
                 Wees de eerste!
               </p>
             </div>
@@ -258,25 +259,25 @@ export default function LiveChatModal({ onClose }: Props) {
               {/* Avatar / Flag */}
               <div
                 className="w-7 h-7 rounded-xl flex items-center justify-center text-sm flex-none mt-0.5"
-                style={{ background: "rgba(255,255,255,0.08)" }}
+                style={{ background: "rgba(255,255,255,0.7)", backdropFilter: "blur(4px)" }}
               >
                 {msg.user_flag ?? "🌍"}
               </div>
 
               {/* Content */}
-              <div className="flex-1 min-w-0">
+              <div
+                className="flex-1 min-w-0 rounded-2xl rounded-tl-sm px-3 py-2"
+                style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)" }}
+              >
                 <div className="flex items-baseline gap-1.5 mb-0.5">
-                  <span className="text-[11px] font-black text-white/80 truncate max-w-[120px]">
+                  <span className="text-[11px] font-black truncate max-w-[120px]" style={{ color: "#1F2937" }}>
                     {msg.username}
                   </span>
-                  <span className="text-[10px] text-white/30 flex-none">
+                  <span className="text-[10px] flex-none" style={{ color: "#9CA3AF" }}>
                     {formatTime(msg.created_at)}
                   </span>
                 </div>
-                <p
-                  className="text-sm leading-snug break-words"
-                  style={{ color: "rgba(255,255,255,0.88)" }}
-                >
+                <p className="text-sm leading-snug break-words" style={{ color: "#374151" }}>
                   {msg.message}
                 </p>
               </div>
@@ -303,14 +304,15 @@ export default function LiveChatModal({ onClose }: Props) {
         {/* ── Input ── */}
         <div
           className="flex-none px-4 pb-6 pt-3"
-          style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}
+          style={{
+            borderTop: "1px solid rgba(0,0,0,0.08)",
+            background: "rgba(255,255,255,0.75)",
+            backdropFilter: "blur(12px)",
+          }}
         >
           {/* Rate limit error */}
           {rateLimitError && (
-            <p
-              className="text-xs font-bold mb-2 text-center"
-              style={{ color: "#EF4444" }}
-            >
+            <p className="text-xs font-bold mb-2 text-center" style={{ color: "#D52B1E" }}>
               {rateLimitError}
             </p>
           )}
@@ -318,7 +320,7 @@ export default function LiveChatModal({ onClose }: Props) {
           <div className="flex items-center gap-2">
             <div
               className="flex-1 flex items-center rounded-2xl px-3 py-2.5"
-              style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.10)" }}
+              style={{ background: "rgba(0,0,0,0.06)", border: "1px solid rgba(0,0,0,0.08)" }}
             >
               <input
                 type="text"
@@ -327,7 +329,8 @@ export default function LiveChatModal({ onClose }: Props) {
                 onKeyDown={handleKeyDown}
                 placeholder="Typ een bericht..."
                 maxLength={140}
-                className="flex-1 bg-transparent text-sm text-white placeholder-white/30 outline-none min-w-0"
+                className="flex-1 bg-transparent text-sm outline-none min-w-0"
+                style={{ color: "#1F2937" }}
                 autoComplete="off"
                 autoCorrect="off"
                 spellCheck={false}
@@ -335,7 +338,7 @@ export default function LiveChatModal({ onClose }: Props) {
               {inputText.length > 0 && (
                 <span
                   className="text-[10px] font-bold flex-none ml-1"
-                  style={{ color: charsLeft < 20 ? "#EF4444" : "rgba(255,255,255,0.3)" }}
+                  style={{ color: charsLeft < 20 ? "#D52B1E" : "rgba(0,0,0,0.25)" }}
                 >
                   {charsLeft}
                 </span>
@@ -349,10 +352,8 @@ export default function LiveChatModal({ onClose }: Props) {
               style={{
                 background:
                   inputText.trim() && !sending
-                    ? isMatchLive
-                      ? "linear-gradient(135deg, #EF4444, #B91C1C)"
-                      : "linear-gradient(135deg, #3B82F6, #2563EB)"
-                    : "rgba(255,255,255,0.08)",
+                    ? "linear-gradient(135deg, #D52B1E, #b01f15)"
+                    : "rgba(0,0,0,0.08)",
                 opacity: !inputText.trim() ? 0.4 : 1,
               }}
             >
