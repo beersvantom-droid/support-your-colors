@@ -3,6 +3,7 @@ import { GROUPS } from "@/lib/wc2026-data";
 import { supabase } from "@/lib/supabase";
 import type { Profile } from "@/lib/supabase";
 import type { SupporterMap } from "@/components/bracket/GroupCard";
+import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
@@ -201,6 +202,24 @@ export default async function BracketPage() {
         <div className="flex-shrink-0 ml-auto text-[10px] font-bold text-text-muted whitespace-nowrap">
           Jun 11 – 27
         </div>
+      </div>
+
+      {/* ── Predict button ───────────────────────────────────────────── */}
+      <div className="px-4 py-3">
+        <Link
+          href="/predictions"
+          className="w-full py-3 rounded-2xl font-black text-center text-white transition-all active:scale-95"
+          style={{
+            background: "#3B82F6",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "8px",
+          }}
+        >
+          <span>🎯</span>
+          <span>Predict Upcoming Matches</span>
+        </Link>
       </div>
 
       {/* ── Group overview ───────────────────────────────────────────── */}
