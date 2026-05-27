@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import { X, Send } from "lucide-react";
+import { getCountryInfo } from "@/lib/countries";
 
 interface ChatMessage {
   id: string;
@@ -254,35 +255,45 @@ export default function LiveChatModal({ onClose }: Props) {
             </div>
           )}
 
-          {messages.map((msg) => (
-            <div key={msg.id} className="flex items-start gap-2">
-              {/* Avatar / Flag */}
-              <div
-                className="w-7 h-7 rounded-xl flex items-center justify-center text-sm flex-none mt-0.5"
-                style={{ background: "rgba(255,255,255,0.7)", backdropFilter: "blur(4px)" }}
-              >
-                {msg.user_flag ?? "🌍"}
-              </div>
-
-              {/* Content */}
-              <div
-                className="flex-1 min-w-0 rounded-2xl rounded-tl-sm px-3 py-2"
-                style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)" }}
-              >
-                <div className="flex items-baseline gap-1.5 mb-0.5">
-                  <span className="text-[11px] font-black truncate max-w-[120px]" style={{ color: "#1F2937" }}>
-                    {msg.username}
-                  </span>
-                  <span className="text-[10px] flex-none" style={{ color: "#9CA3AF" }}>
-                    {formatTime(msg.created_at)}
-                  </span>
+          {messages.map((msg) => {
+            const countryColor = getCountryInfo(msg.user_country).color;
+            return (
+              <div key={msg.id} className="flex items-start gap-2">
+                {/* Avatar / Flag */}
+                <div
+                  className="w-7 h-7 rounded-xl flex items-center justify-center text-sm flex-none mt-0.5"
+                  style={{ background: "rgba(255,255,255,0.7)", backdropFilter: "blur(4px)" }}
+                >
+                  {msg.user_flag ?? "🌍"}
                 </div>
-                <p className="text-sm leading-snug break-words" style={{ color: "#374151" }}>
-                  {msg.message}
-                </p>
+
+                {/* Content — colored by country */}
+                <div
+                  className="flex-1 min-w-0 rounded-2xl rounded-tl-sm px-3 py-2"
+                  style={{
+                    background: `${countryColor}28`, // Country color with 16% opacity
+                    borderLeft: `3px solid ${countryColor}`,
+                    backdropFilter: "blur(8px)",
+                  }}
+                >
+                  <div className="flex items-baseline gap-1.5 mb-0.5">
+                    <span
+                      className="text-[11px] font-black truncate max-w-[120px]"
+                      style={{ color: countryColor }}
+                    >
+                      {msg.username}
+                    </span>
+                    <span className="text-[10px] flex-none" style={{ color: "#9CA3AF" }}>
+                      {formatTime(msg.created_at)}
+                    </span>
+                  </div>
+                  <p className="text-sm leading-snug break-words" style={{ color: "#374151" }}>
+                    {msg.message}
+                  </p>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
 
           <div ref={messagesEndRef} />
         </div>
