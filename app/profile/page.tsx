@@ -30,6 +30,7 @@ export default function ProfilePage() {
   const country = profile?.country ?? null;
   const countryInfo = getCountryInfo(country);
   const accentColor = countryInfo.color;
+  const isTestbot = profile?.username?.toLowerCase() === "testbot";
 
   // Load progression stats
   useEffect(() => {
@@ -118,9 +119,17 @@ export default function ProfilePage() {
       {/* ── Identity hero ────────────────────────────────────────────── */}
       <div
         className="relative overflow-hidden px-4 pt-10 pb-8"
-        style={{
-          background: `linear-gradient(160deg, ${accentColor} 0%, ${accentColor}cc 100%)`,
-        }}
+        style={
+          isTestbot
+            ? {
+                backgroundImage: "url('/chat/achtergrond-brazil.png')",
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+              }
+            : {
+                background: `linear-gradient(160deg, ${accentColor} 0%, ${accentColor}cc 100%)`,
+              }
+        }
       >
         {/* Decorative circles */}
         <div
