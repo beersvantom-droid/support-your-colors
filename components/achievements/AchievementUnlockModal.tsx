@@ -21,6 +21,19 @@ export default function AchievementUnlockModal({ achievement, onDismiss }: Props
     return () => cancelAnimationFrame(t);
   }, []);
 
+  // Play Jannes sound when achievement unlocks
+  useEffect(() => {
+    if (achievement.id === "jannes_fan" && visible) {
+      try {
+        const audio = new Audio("/sounds/reveal/jannes.wav");
+        audio.volume = 0.7;
+        audio.play().catch(() => {});
+      } catch (err) {
+        // Silent fail
+      }
+    }
+  }, [achievement.id, visible]);
+
   function handleDismiss() {
     setVisible(false);
     setTimeout(onDismiss, 280);

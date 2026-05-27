@@ -275,6 +275,17 @@ export default function LockerScreen() {
         return;
       }
       next = [...equippedMascots, id];
+
+      // Play Jannes sound when equipping
+      if (id === "mascot_jannes") {
+        try {
+          const audio = new Audio("/sounds/reveal/jannes.wav");
+          audio.volume = 0.7;
+          audio.play().catch(() => {});
+        } catch (err) {
+          // Silent fail
+        }
+      }
     }
 
     setEquippedMascots(next);
