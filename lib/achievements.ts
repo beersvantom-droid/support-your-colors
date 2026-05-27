@@ -261,7 +261,7 @@ export const ALL_ACHIEVEMENTS: AchievementDef[] = [
     id: "jannes_fan",
     emoji: "🤪",
     name: "Clumsy Ref",
-    hint: "Commented with the word 'scheidsrechter'",
+    hint: "Commented with 'scheidsrechter' or 'scheids'",
     rarity: "secret",
     points: 0,
     unlocksCosmetic: "mascot_jannes",

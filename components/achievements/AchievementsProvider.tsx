@@ -185,11 +185,12 @@ export function AchievementsProvider({
           if (commentRows && commentRows.length > 0) {
             console.log("[Achievements] Found", commentRows.length, "comments");
 
-            // Check for scheidsrechter comment (simpler, no posts join needed)
+            // Check for scheidsrechter comment (or "scheids" shorthand)
             hasScheidrechterComment = commentRows.some((c: any) => {
-              const hasWord = c.comment_text && c.comment_text.toLowerCase().includes("scheidsrechter");
+              const text = c.comment_text && c.comment_text.toLowerCase();
+              const hasWord = text && (text.includes("scheidsrechter") || text.includes("scheids"));
               if (hasWord) {
-                console.log("[Achievements] Found scheidsrechter in comment:", c.comment_text);
+                console.log("[Achievements] Found scheidsrechter/scheids in comment:", c.comment_text);
               }
               return hasWord;
             });
