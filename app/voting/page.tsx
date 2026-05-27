@@ -451,9 +451,9 @@ export default function VotingPage() {
       <div className="px-4 space-y-5">
         {/* Status bar */}
         <div
-          className="flex items-center gap-2 px-4 py-2.5 rounded-2xl"
+          className="flex items-center gap-2 px-4 py-2.5 rounded-2xl relative overflow-hidden"
           style={{
-            background: ACCENT,
+            background: `linear-gradient(90deg, ${ACCENT} 0%, #1E5A96 50%, #C1272D 100%)`,
             boxShadow: "0 4px 16px rgba(0,104,71,0.25)",
           }}
         >
@@ -469,15 +469,21 @@ export default function VotingPage() {
 
         {/* Selection slots */}
         <div>
-          <p
-            className="text-xs font-black uppercase tracking-widest mb-3"
-            style={{ color: "#9CA3AF" }}
-          >
-            Your picks
-          </p>
+          <div className="flex items-center gap-2 mb-3">
+            <div style={{ flex: 1, height: "2px", background: "linear-gradient(90deg, #006847 0%, transparent 100%)" }} />
+            <p
+              className="text-xs font-black uppercase tracking-widest"
+              style={{ color: "#9CA3AF" }}
+            >
+              Your picks
+            </p>
+            <div style={{ flex: 1, height: "2px", background: "linear-gradient(90deg, transparent 0%, #C1272D 100%)" }} />
+          </div>
           <div className="grid grid-cols-3 gap-2">
             {MEDAL_CONFIG.map((medal, i) => {
               const pick = picks[i];
+              const accentColors = ["#006847", "#1E5A96", "#C1272D"]; // groen, blauw, rood
+              const accentColor = accentColors[i];
               return (
                 <div
                   key={i}
@@ -485,7 +491,8 @@ export default function VotingPage() {
                   style={{
                     background: pick ? medal.bg : "rgba(255,255,255,0.7)",
                     border: `2px solid ${pick ? medal.border : "rgba(0,0,0,0.08)"}`,
-                    boxShadow: pick ? `0 4px 16px ${medal.glow}` : "none",
+                    borderLeft: `4px solid ${pick ? medal.border : accentColor}40`,
+                    boxShadow: pick ? `0 4px 16px ${medal.glow}` : `0 0 12px ${accentColor}15`,
                     backdropFilter: pick ? "none" : "blur(8px)",
                     minHeight: "84px",
                   }}
@@ -516,12 +523,16 @@ export default function VotingPage() {
 
         {/* Supporter list */}
         <div>
-          <p
-            className="text-xs font-black uppercase tracking-widest mb-3"
-            style={{ color: "#9CA3AF" }}
-          >
-            {supporters.length} supporter{supporters.length !== 1 ? "s" : ""} · tap to select
-          </p>
+          <div className="flex items-center gap-2 mb-3">
+            <div style={{ flex: 1, height: "2px", background: "linear-gradient(90deg, #1E5A96 0%, transparent 100%)" }} />
+            <p
+              className="text-xs font-black uppercase tracking-widest"
+              style={{ color: "#9CA3AF" }}
+            >
+              {supporters.length} supporter{supporters.length !== 1 ? "s" : ""} · tap
+            </p>
+            <div style={{ flex: 1, height: "2px", background: "linear-gradient(90deg, transparent 0%, #006847 100%)" }} />
+          </div>
 
           <div className="space-y-2">
             {supporters.map((supporter, index) => {
