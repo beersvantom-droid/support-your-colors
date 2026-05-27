@@ -32,6 +32,7 @@ export default function ProfilePage() {
   const accentColor = countryInfo.color;
   const isTestbot = profile?.username?.toLowerCase() === "testbot";
   const isTom = profile?.username?.toLowerCase() === "tom (built)";
+  const isTobias = profile?.username?.toLowerCase() === "tobias";
 
   // Load progression stats
   useEffect(() => {
@@ -130,6 +131,12 @@ export default function ProfilePage() {
             : isTom
             ? {
                 backgroundImage: "url('/chat/achtergrond-canada.png')",
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+              }
+            : isTobias
+            ? {
+                backgroundImage: "url('/chat/achtergrond-curacao.png')",
                 backgroundSize: "cover",
                 backgroundPosition: "center",
               }
