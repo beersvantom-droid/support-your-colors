@@ -153,7 +153,7 @@ export default function VotingPage() {
 
   function playVoteSound() {
     try {
-      const audio = new Audio("/sounds/voting/complete-vote.mp3");
+      const audio = new Audio("/sounds/voting/complete-vote.wav");
       audio.volume = 0.6;
       audio.play().catch(() => {
         // Silent fail if audio doesn't play (common on some mobile devices)
