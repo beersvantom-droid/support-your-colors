@@ -39,6 +39,7 @@ export default function ProfilePage() {
   const isTuur = profile?.username?.toLowerCase() === "tuur";
   const isSiem = profile?.username?.toLowerCase() === "siem";
   const isKas = profile?.username?.toLowerCase() === "kas";
+  const isRoel = profile?.username?.toLowerCase() === "roel";
 
   // Load progression stats
   useEffect(() => {
@@ -179,6 +180,12 @@ export default function ProfilePage() {
             : isKas
             ? {
                 backgroundImage: "url('/chat/achtergrond-tunesie.png')",
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+              }
+            : isRoel
+            ? {
+                backgroundImage: "url('/chat/achtergrond-uruguay.png')",
                 backgroundSize: "cover",
                 backgroundPosition: "center",
               }
