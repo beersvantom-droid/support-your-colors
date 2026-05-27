@@ -3,6 +3,12 @@
 import { Camera } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState, useCallback } from "react";
+import dynamic from "next/dynamic";
+
+const LiveChatModal = dynamic(
+  () => import("@/components/live-chat/LiveChatModal"),
+  { ssr: false }
+);
 
 const COOLDOWN_MS = 24 * 60 * 60 * 1000;
 
@@ -80,12 +86,50 @@ function formatCooldown(ms: number) {
   return `${m}m`;
 }
 
+function useMatchStatus() {
+  const [isMatchLive, setIsMatchLive] = useState(false);
+  const [activeUsers, setActiveUsers] = useState(0);
+  const [nextMatchDate, setNextMatchDate] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function check() {
+      try {
+        const res = await fetch("/api/live-chat/messages");
+        if (!res.ok) return;
+        const data = await res.json();
+        setIsMatchLive(data.isMatchLive ?? false);
+        setActiveUsers(data.activeUsers ?? 0);
+        setNextMatchDate(data.nextMatchDate ?? null);
+      } catch {
+        // Silent fail
+      }
+    }
+    check();
+    const id = setInterval(check, 30_000); // Check every 30s in header
+    return () => clearInterval(id);
+  }, []);
+
+  return { isMatchLive, activeUsers, nextMatchDate };
+}
+
+function formatNextMatchDate(dateStr: string): string {
+  const matchDate = new Date(dateStr + "T12:00:00Z");
+  const now = new Date();
+  const diffDays = Math.ceil((matchDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+  if (diffDays <= 0) return "Vandaag";
+  if (diffDays === 1) return "Morgen";
+  return matchDate.toLocaleDateString("nl-NL", { day: "numeric", month: "short" });
+}
+
 export default function AppHeader() {
   const remaining = useCooldown();
   const onCooldown = remaining > 0;
   const { balance, loading: balanceLoading } = useCoinBalance();
+  const { isMatchLive, activeUsers, nextMatchDate } = useMatchStatus();
+  const [chatOpen, setChatOpen] = useState(false);
 
   return (
+    <>
     <header className="sticky top-0 z-30 w-full max-w-md mx-auto">
       <style>{`
         @keyframes wheelPulse {
@@ -95,6 +139,10 @@ export default function AppHeader() {
         @keyframes wheelBounce {
           0%, 100% { transform: scale(1); }
           50%       { transform: scale(1.18); }
+        }
+        @keyframes liveChatPulse {
+          0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.6); }
+          50%       { box-shadow: 0 0 0 6px rgba(239,68,68,0.0); }
         }
       `}</style>
 
@@ -124,13 +172,50 @@ export default function AppHeader() {
             <span style={{ fontSize: 14 }}>🪙</span>
           </div>
 
-          {/* Live badge */}
-          <div className="flex items-center gap-1 bg-[#D52B1E]/10 rounded-full px-2 py-0.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#D52B1E] animate-pulse" />
-            <span className="text-[10px] font-bold tracking-wide text-[#D52B1E]">
-              LIVE
-            </span>
-          </div>
+          {/* Live Chat button */}
+          <button
+            onClick={() => setChatOpen(true)}
+            className="flex items-center gap-1.5 rounded-xl px-2.5 py-1.5 transition-all active:scale-95"
+            style={
+              isMatchLive
+                ? {
+                    background: "#EF4444",
+                    animation: "liveChatPulse 2s ease-in-out infinite",
+                  }
+                : {
+                    background: "rgba(213,43,30,0.10)",
+                  }
+            }
+          >
+            <span
+              className="w-1.5 h-1.5 rounded-full flex-none"
+              style={{
+                background: isMatchLive ? "white" : "#D52B1E",
+                animation: isMatchLive ? "none" : "pulse 2s infinite",
+              }}
+            />
+            <div className="flex flex-col leading-none">
+              <span
+                className="text-[10px] font-black tracking-wide"
+                style={{ color: isMatchLive ? "white" : "#D52B1E" }}
+              >
+                {isMatchLive ? "LIVE" : "CHAT"}
+              </span>
+              {activeUsers > 0 && (
+                <span
+                  className="text-[8px] font-bold"
+                  style={{ color: isMatchLive ? "rgba(255,255,255,0.8)" : "#9CA3AF" }}
+                >
+                  {activeUsers} online
+                </span>
+              )}
+              {!isMatchLive && nextMatchDate && (
+                <span className="text-[8px] font-bold" style={{ color: "#9CA3AF" }}>
+                  {formatNextMatchDate(nextMatchDate)}
+                </span>
+              )}
+            </div>
+          </button>
 
           {/* Quick post button */}
           <Link
@@ -184,5 +269,9 @@ export default function AppHeader() {
         </div>
       </div>
     </header>
+
+    {/* Live Chat Modal — rendered outside header so it overlays full screen */}
+    {chatOpen && <LiveChatModal onClose={() => setChatOpen(false)} />}
+    </>
   );
 }
