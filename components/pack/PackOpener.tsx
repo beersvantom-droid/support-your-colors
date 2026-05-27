@@ -276,7 +276,7 @@ export default function PackOpener({ pack, onReset }: PackOpenerProps) {
 
   // Play special sound for Jannes when revealed
   useEffect(() => {
-    if (phase === "reveal" && item?.cosmetic_id === "mascot_jannes") {
+    if (phase === "reveal" && item?.id === "mascot_jannes") {
       try {
         const audio = new Audio("/sounds/reveal/jannes.wav");
         audio.volume = 0.7;
@@ -285,7 +285,7 @@ export default function PackOpener({ pack, onReset }: PackOpenerProps) {
         // Silent fail
       }
     }
-  }, [phase, item?.cosmetic_id]);
+  }, [phase, item?.id]);
 
   // ── RESULT SHEET ──────────────────────────────────────────────────────────
   if (phase === "result") {
