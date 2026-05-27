@@ -8,7 +8,7 @@ import { useAuth } from "@/components/auth/AuthProvider";
 import { useAchievements } from "@/components/achievements/AchievementsProvider";
 import { maybeFireCommentary } from "@/lib/commentator-engine";
 import { getTitleByRank } from "@/lib/leaderboard-titles";
-import { getCountryFlag } from "@/lib/countries";
+import { getCountryFlag, getCountryInfo } from "@/lib/countries";
 import { getVotingDay } from "@/lib/voting";
 import { Zap, RefreshCw } from "lucide-react";
 import type { Profile, DailyVote } from "@/lib/supabase";
@@ -228,8 +228,8 @@ export default function VotingPage() {
   // ── Loading ────────────────────────────────────────────────────────────────
   if (loading || authLoading) {
     return (
-      <div className="min-h-full flex items-center justify-center">
-        <div className="text-center">
+      <div className="min-h-full flex items-center justify-center" style={{ backgroundImage: "url('/chat/achtergrond-chat.png')", backgroundSize: "cover", backgroundAttachment: "fixed" }}>
+        <div style={{ background: "rgba(255,255,255,0.7)", backdropFilter: "blur(12px)", borderRadius: "20px", padding: "24px", textAlign: "center" }}>
           <div className="text-3xl mb-2">⚽</div>
           <p className="text-sm font-semibold" style={{ color: "#9CA3AF" }}>
             Loading vote…
@@ -242,7 +242,7 @@ export default function VotingPage() {
   // ── Load error ─────────────────────────────────────────────────────────────
   if (loadError) {
     return (
-      <div className="min-h-full pb-24" style={{ background: "#F0F2F5" }}>
+      <div className="min-h-full pb-24" style={{ backgroundImage: "url('/chat/achtergrond-chat.png')", backgroundSize: "cover", backgroundAttachment: "fixed", backgroundColor: "#F0F2F5" }}>
         <PageHeader title="Vote" subtitle={dateLabel} accentColor={ACCENT} />
         <div className="px-4">
           <div
@@ -278,7 +278,7 @@ export default function VotingPage() {
   // ── Not signed in ──────────────────────────────────────────────────────────
   if (!user) {
     return (
-      <div className="min-h-full pb-24" style={{ background: "#F0F2F5" }}>
+      <div className="min-h-full pb-24" style={{ backgroundImage: "url('/chat/achtergrond-chat.png')", backgroundSize: "cover", backgroundAttachment: "fixed", backgroundColor: "#F0F2F5" }}>
         <PageHeader title="Vote" subtitle={dateLabel} accentColor={ACCENT} />
         <div className="px-4 space-y-3">
           <div
@@ -317,7 +317,7 @@ export default function VotingPage() {
     ];
 
     return (
-      <div className="min-h-full pb-24" style={{ background: "#F0F2F5" }}>
+      <div className="min-h-full pb-24" style={{ backgroundImage: "url('/chat/achtergrond-chat.png')", backgroundSize: "cover", backgroundAttachment: "fixed", backgroundColor: "#F0F2F5" }}>
         <PageHeader title="Vote" subtitle={dateLabel} accentColor={ACCENT} />
 
         <div className="px-4 space-y-4">
@@ -416,7 +416,7 @@ export default function VotingPage() {
   // ── No supporters found ────────────────────────────────────────────────────
   if (supporters.length === 0) {
     return (
-      <div className="min-h-full pb-24" style={{ background: "#F0F2F5" }}>
+      <div className="min-h-full pb-24" style={{ backgroundImage: "url('/chat/achtergrond-chat.png')", backgroundSize: "cover", backgroundAttachment: "fixed", backgroundColor: "#F0F2F5" }}>
         <PageHeader title="Vote" subtitle={dateLabel} accentColor={ACCENT} />
         <div className="px-4">
           <div
@@ -441,7 +441,7 @@ export default function VotingPage() {
 
   // ── Main voting UI ─────────────────────────────────────────────────────────
   return (
-    <div className="min-h-full pb-56" style={{ background: "#F0F2F5" }}>
+    <div className="min-h-full pb-56" style={{ backgroundImage: "url('/chat/achtergrond-chat.png')", backgroundSize: "cover", backgroundAttachment: "fixed", backgroundColor: "#F0F2F5" }}>
       <PageHeader
         title="Vote"
         subtitle="Choose your top 3 supporters"
@@ -483,9 +483,10 @@ export default function VotingPage() {
                   key={i}
                   className="rounded-2xl p-3 text-center transition-all"
                   style={{
-                    background: pick ? medal.bg : "#FFFFFF",
-                    border: `2px solid ${pick ? medal.border : "rgba(0,0,0,0.07)"}`,
+                    background: pick ? medal.bg : "rgba(255,255,255,0.7)",
+                    border: `2px solid ${pick ? medal.border : "rgba(0,0,0,0.08)"}`,
                     boxShadow: pick ? `0 4px 16px ${medal.glow}` : "none",
+                    backdropFilter: pick ? "none" : "blur(8px)",
                     minHeight: "84px",
                   }}
                 >
@@ -528,6 +529,7 @@ export default function VotingPage() {
               const isSelected = pickSlot !== -1;
               const medal = isSelected ? MEDAL_CONFIG[pickSlot] : null;
               const supporterFlag = getCountryFlag(supporter.country);
+              const supporterColor = getCountryInfo(supporter.country).color;
               const titleData = getTitleByRank(index + 1);
               const isDisabled = !isSelected && filledCount === 3;
 
@@ -544,7 +546,10 @@ export default function VotingPage() {
                       ? "#FAFAFA"
                       : "#FFFFFF",
                     border: `2px solid ${
-                      isSelected ? medal!.border : "rgba(0,0,0,0.06)"
+                      isSelected ? medal!.border : supporterColor + "20"
+                    }`,
+                    borderLeft: `4px solid ${
+                      isSelected ? medal!.border : supporterColor + "60"
                     }`,
                     boxShadow: isSelected
                       ? `0 4px 20px ${medal!.glow}`
