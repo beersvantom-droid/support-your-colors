@@ -31,7 +31,7 @@ export default function ProfilePage() {
   const countryInfo = getCountryInfo(country);
   const accentColor = countryInfo.color;
   const isTestbot = profile?.username?.toLowerCase() === "testbot";
-  const isTom = profile?.username?.toLowerCase() === "tom";
+  const isTom = profile?.username?.toLowerCase() === "tom (built)";
 
   // Load progression stats
   useEffect(() => {
