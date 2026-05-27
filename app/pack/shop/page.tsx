@@ -40,6 +40,18 @@ export default function ShopPage() {
     }
   };
 
+  const playCoinPaymentSound = () => {
+    try {
+      const audio = new Audio("/sounds/pack/coin-payment.wav");
+      audio.volume = 0.6;
+      audio.play().catch(() => {
+        // Silent fail if audio doesn't play
+      });
+    } catch (err) {
+      // Silent fail — don't interrupt purchase flow
+    }
+  };
+
   const handlePurchase = async (packId: string) => {
     try {
       setError(null);
@@ -60,6 +72,9 @@ export default function ShopPage() {
       const data = await response.json();
 
       if (data.success) {
+        // Play coin payment sound
+        playCoinPaymentSound();
+
         // Update local coin balance
         setCoinBalance(data.balance);
 
