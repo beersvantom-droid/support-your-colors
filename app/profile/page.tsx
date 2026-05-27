@@ -136,7 +136,7 @@ export default function ProfilePage() {
               }
             : isTobias
             ? {
-                backgroundImage: "url('/chat/achtergrond-curacao.png')",
+                backgroundImage: "url('/chat/achtergrond-curacau.png')",
                 backgroundSize: "cover",
                 backgroundPosition: "center",
               }
