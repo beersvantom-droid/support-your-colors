@@ -540,7 +540,6 @@ export default function VotingPage() {
               const isSelected = pickSlot !== -1;
               const medal = isSelected ? MEDAL_CONFIG[pickSlot] : null;
               const supporterFlag = getCountryFlag(supporter.country);
-              const supporterColor = getCountryInfo(supporter.country).color;
               const titleData = getTitleByRank(index + 1);
               const isDisabled = !isSelected && filledCount === 3;
 
@@ -557,10 +556,7 @@ export default function VotingPage() {
                       ? "#FAFAFA"
                       : "#FFFFFF",
                     border: `2px solid ${
-                      isSelected ? medal!.border : supporterColor + "20"
-                    }`,
-                    borderLeft: `4px solid ${
-                      isSelected ? medal!.border : supporterColor + "60"
+                      isSelected ? medal!.border : "rgba(0,0,0,0.06)"
                     }`,
                     boxShadow: isSelected
                       ? `0 4px 20px ${medal!.glow}`
