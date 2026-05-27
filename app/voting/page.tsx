@@ -151,6 +151,18 @@ export default function VotingPage() {
     setPicks(next);
   }
 
+  function playVoteSound() {
+    try {
+      const audio = new Audio("/sounds/voting/complete-vote.mp3");
+      audio.volume = 0.6;
+      audio.play().catch(() => {
+        // Silent fail if audio doesn't play (common on some mobile devices)
+      });
+    } catch (err) {
+      // Silent fail — don't interrupt voting flow
+    }
+  }
+
   async function handleSubmit() {
     const first = picks[0];
     const second = picks[1];
@@ -182,6 +194,9 @@ export default function VotingPage() {
       setSubmitting(false);
       return;
     }
+
+    // ── Play vote complete sound ─────────────────────────────────────────────
+    playVoteSound();
 
     // ── Award points via DB function ─────────────────────────────────────────
     const [r1, r2, r3] = await Promise.allSettled([
