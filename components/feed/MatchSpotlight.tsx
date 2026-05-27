@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { GROUPS, TEAMS, SUPPORTERS } from "@/lib/wc2026-data";
 import type { WCFixture } from "@/lib/wc2026-data";
+import PredictionStats from "@/components/predictions/PredictionStats";
 
 const MONTH_INDEX: Record<string, number> = {
   Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5,
@@ -36,6 +37,17 @@ function formatCountdown(target: Date, now: Date): string {
   const days = Math.floor(hours / 24);
   if (days === 1) return "Tomorrow";
   return `In ${days} days`;
+}
+
+function formatFixtureDateForDb(fixtureDate: string): string {
+  // Convert "Jun 11" to "2026-06-11"
+  const [monthStr, dayStr] = fixtureDate.split(" ");
+  const month = MONTH_INDEX[monthStr] ?? 5;
+  const day = parseInt(dayStr, 10);
+  return `2026-${String(month + 1).padStart(2, "0")}-${String(day).padStart(
+    2,
+    "0"
+  )}`;
 }
 
 interface EnrichedFixture {
@@ -265,6 +277,16 @@ export default function MatchSpotlight() {
               }}
             />
           </div>
+        </div>
+
+        {/* Prediction stats */}
+        <div className="px-3 pb-3 pt-2">
+          <PredictionStats
+            homeTeam={fixture.home}
+            awayTeam={fixture.away}
+            matchDate={formatFixtureDateForDb(fixture.date)}
+            compact
+          />
         </div>
       </div>
     </div>
