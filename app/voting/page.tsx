@@ -228,7 +228,8 @@ export default function VotingPage() {
   // ── Loading ────────────────────────────────────────────────────────────────
   if (loading || authLoading) {
     return (
-      <div className="min-h-full flex items-center justify-center" style={{ backgroundImage: "url('/chat/achtergrond-chat.png')", backgroundSize: "cover", backgroundAttachment: "fixed" }}>
+      <div className="min-h-full flex items-center justify-center relative" style={{ backgroundImage: "url('/chat/achtergrond-chat.png')", backgroundSize: "cover", backgroundAttachment: "fixed" }}>
+        <div className="absolute inset-0 pointer-events-none" style={{ background: "linear-gradient(135deg, rgba(0,104,71,0.04) 0%, rgba(30,90,150,0.04) 50%, rgba(193,39,45,0.04) 100%)" }} />
         <div style={{ background: "rgba(255,255,255,0.7)", backdropFilter: "blur(12px)", borderRadius: "20px", padding: "24px", textAlign: "center" }}>
           <div className="text-3xl mb-2">⚽</div>
           <p className="text-sm font-semibold" style={{ color: "#9CA3AF" }}>
@@ -242,9 +243,10 @@ export default function VotingPage() {
   // ── Load error ─────────────────────────────────────────────────────────────
   if (loadError) {
     return (
-      <div className="min-h-full pb-24" style={{ backgroundImage: "url('/chat/achtergrond-chat.png')", backgroundSize: "cover", backgroundAttachment: "fixed", backgroundColor: "#F0F2F5" }}>
+      <div className="min-h-full pb-24 relative" style={{ backgroundImage: "url('/chat/achtergrond-chat.png')", backgroundSize: "cover", backgroundAttachment: "fixed", backgroundColor: "#F0F2F5" }}>
+        <div className="absolute inset-0 pointer-events-none" style={{ background: "linear-gradient(135deg, rgba(0,104,71,0.04) 0%, rgba(30,90,150,0.04) 50%, rgba(193,39,45,0.04) 100%)" }} />
         <PageHeader title="Vote" subtitle={dateLabel} accentColor={ACCENT} />
-        <div className="px-4">
+        <div className="px-4 relative z-10">
           <div
             className="rounded-2xl p-6 text-center"
             style={{ background: "#FFFFFF", border: "1px solid rgba(0,0,0,0.06)" }}
@@ -278,9 +280,10 @@ export default function VotingPage() {
   // ── Not signed in ──────────────────────────────────────────────────────────
   if (!user) {
     return (
-      <div className="min-h-full pb-24" style={{ backgroundImage: "url('/chat/achtergrond-chat.png')", backgroundSize: "cover", backgroundAttachment: "fixed", backgroundColor: "#F0F2F5" }}>
+      <div className="min-h-full pb-24 relative" style={{ backgroundImage: "url('/chat/achtergrond-chat.png')", backgroundSize: "cover", backgroundAttachment: "fixed", backgroundColor: "#F0F2F5" }}>
+        <div className="absolute inset-0 pointer-events-none" style={{ background: "linear-gradient(135deg, rgba(0,104,71,0.04) 0%, rgba(30,90,150,0.04) 50%, rgba(193,39,45,0.04) 100%)" }} />
         <PageHeader title="Vote" subtitle={dateLabel} accentColor={ACCENT} />
-        <div className="px-4 space-y-3">
+        <div className="px-4 space-y-3 relative z-10">
           <div
             className="rounded-2xl p-6 text-center"
             style={{ background: "#FFFFFF", border: "1px solid rgba(0,0,0,0.06)" }}
@@ -317,10 +320,11 @@ export default function VotingPage() {
     ];
 
     return (
-      <div className="min-h-full pb-24" style={{ backgroundImage: "url('/chat/achtergrond-chat.png')", backgroundSize: "cover", backgroundAttachment: "fixed", backgroundColor: "#F0F2F5" }}>
+      <div className="min-h-full pb-24 relative" style={{ backgroundImage: "url('/chat/achtergrond-chat.png')", backgroundSize: "cover", backgroundAttachment: "fixed", backgroundColor: "#F0F2F5" }}>
+        <div className="absolute inset-0 pointer-events-none" style={{ background: "linear-gradient(135deg, rgba(0,104,71,0.04) 0%, rgba(30,90,150,0.04) 50%, rgba(193,39,45,0.04) 100%)" }} />
         <PageHeader title="Vote" subtitle={dateLabel} accentColor={ACCENT} />
 
-        <div className="px-4 space-y-4">
+        <div className="px-4 space-y-4 relative z-10">
           {/* Success hero */}
           <div
             className="rounded-3xl p-6 text-center"
@@ -441,14 +445,15 @@ export default function VotingPage() {
 
   // ── Main voting UI ─────────────────────────────────────────────────────────
   return (
-    <div className="min-h-full pb-56" style={{ backgroundImage: "url('/chat/achtergrond-chat.png')", backgroundSize: "cover", backgroundAttachment: "fixed", backgroundColor: "#F0F2F5" }}>
+    <div className="min-h-full pb-56 relative" style={{ backgroundImage: "url('/chat/achtergrond-chat.png')", backgroundSize: "cover", backgroundAttachment: "fixed", backgroundColor: "#F0F2F5" }}>
+      <div className="absolute inset-0 pointer-events-none" style={{ background: "linear-gradient(135deg, rgba(0,104,71,0.04) 0%, rgba(30,90,150,0.04) 50%, rgba(193,39,45,0.04) 100%)" }} />
       <PageHeader
         title="Vote"
         subtitle="Choose your top 3 supporters"
         accentColor={ACCENT}
       />
 
-      <div className="px-4 space-y-5">
+      <div className="px-4 space-y-5 relative z-10">
         {/* Status bar */}
         <div
           className="flex items-center gap-2 px-4 py-2.5 rounded-2xl relative overflow-hidden"
