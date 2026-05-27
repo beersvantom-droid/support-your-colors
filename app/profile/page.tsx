@@ -31,6 +31,7 @@ export default function ProfilePage() {
   const countryInfo = getCountryInfo(country);
   const accentColor = countryInfo.color;
   const isTestbot = profile?.username?.toLowerCase() === "testbot";
+  const isTom = profile?.username?.toLowerCase() === "tom";
 
   // Load progression stats
   useEffect(() => {
@@ -123,6 +124,12 @@ export default function ProfilePage() {
           isTestbot
             ? {
                 backgroundImage: "url('/chat/achtergrond-brazil.png')",
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+              }
+            : isTom
+            ? {
+                backgroundImage: "url('/chat/achtergrond-canada.png')",
                 backgroundSize: "cover",
                 backgroundPosition: "center",
               }
