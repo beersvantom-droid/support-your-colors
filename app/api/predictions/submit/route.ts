@@ -42,14 +42,12 @@ export async function POST(req: NextRequest) {
     // Upsert prediction (update if exists, insert if not)
     const { error } = await db
       .from("match_predictions")
-      .upsert(
-        {
-          user_id: userData.user.id,
-          match_id,
-          prediction,
-        },
-        { onConflict: "user_id,match_id" }
-      );
+      .upsert({
+        user_id: userData.user.id,
+        match_id,
+        prediction,
+        updated_at: new Date().toISOString(),
+      });
 
     if (error) {
       console.error("[predictions/submit] error:", error);
