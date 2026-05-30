@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import { convertETToNL } from "@/lib/wc2026-data";
+import { createClient } from "@supabase/supabase-js";
 
 interface Match {
   id: string;
@@ -24,22 +25,34 @@ interface Props {
 export default function PredictionModal({ match, onClose, onSubmit }: Props) {
   const [selected, setSelected] = useState<"home_win" | "draw" | "away_win" | null>(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async () => {
     if (!selected) return;
     setLoading(true);
+    setError(null);
 
     try {
-      const token = localStorage.getItem("sb-token") ||
-                   document.cookie.split("; ").find(c => c.startsWith("sb-token="))?.split("=")[1];
+      // Get Supabase client
+      const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      );
+
+      // Get current session
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+
+      if (sessionError || !session) {
+        setError("Please log in to make predictions");
+        return;
+      }
 
       const response = await fetch("/api/predictions/submit", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${session.access_token}`,
         },
-        credentials: "include",
         body: JSON.stringify({
           match_id: match.id,
           prediction: selected,
@@ -47,13 +60,15 @@ export default function PredictionModal({ match, onClose, onSubmit }: Props) {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to submit prediction");
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to submit prediction");
       }
 
       onSubmit?.(selected);
       onClose();
     } catch (err) {
       console.error("Prediction error:", err);
+      setError(err instanceof Error ? err.message : "Failed to submit prediction");
     } finally {
       setLoading(false);
     }
@@ -140,6 +155,13 @@ export default function PredictionModal({ match, onClose, onSubmit }: Props) {
               {match.away_team} Wins
             </button>
           </div>
+
+          {/* Error message */}
+          {error && (
+            <div className="px-4 py-3 mx-4 rounded-lg" style={{ background: "#FEE2E2", color: "#DC2626" }}>
+              <p className="text-sm font-bold">{error}</p>
+            </div>
+          )}
 
           {/* Submit */}
           <div className="px-4 pb-6">
