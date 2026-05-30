@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { X } from "lucide-react";
 import { convertETToNL } from "@/lib/wc2026-data";
 import { createClient } from "@supabase/supabase-js";
@@ -26,6 +26,23 @@ export default function PredictionModal({ match, onClose, onSubmit }: Props) {
   const [selected, setSelected] = useState<"home_win" | "draw" | "away_win" | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const sessionRef = useRef<any>(null);
+
+  // Listen to auth state changes
+  useEffect(() => {
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+
+    // Listen to auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log("[Prediction] Auth state changed:", { event, hasSession: !!session });
+      sessionRef.current = session;
+    });
+
+    return () => subscription?.unsubscribe();
+  }, []);
 
   const handleSubmit = async () => {
     if (!selected) return;
@@ -33,31 +50,22 @@ export default function PredictionModal({ match, onClose, onSubmit }: Props) {
     setError(null);
 
     try {
-      // Get Supabase client
-      const supabase = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-      );
+      console.log("[Prediction] Current session:", { hasSession: !!sessionRef.current, user: sessionRef.current?.user?.id });
 
-      // Get current session
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-
-      console.log("[Prediction] Session check:", { session: !!session, error: sessionError });
-
-      if (sessionError || !session) {
-        console.error("[Prediction] No session:", sessionError?.message);
+      if (!sessionRef.current) {
+        console.error("[Prediction] No session available");
         setError("Please log in to make predictions");
         setLoading(false);
         return;
       }
 
-      console.log("[Prediction] User ID:", session.user?.id);
+      console.log("[Prediction] User ID:", sessionRef.current.user?.id);
 
       const response = await fetch("/api/predictions/submit", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${session.access_token}`,
+          Authorization: `Bearer ${sessionRef.current.access_token}`,
         },
         body: JSON.stringify({
           match_id: match.id,
