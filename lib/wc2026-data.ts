@@ -1,3 +1,37 @@
+// ─── Time Conversion Helpers ──────────────────────────────────────────────────
+
+/**
+ * Convert ET (Eastern Time) to CET (Central European Time / Nederlandse tijd)
+ * During June 2026: EDT (UTC-4) → CEST (UTC+2) = +6 hours
+ * Examples: 3:00 PM ET → 21:00 CET, 9:00 PM ET → 03:00 CET (next day)
+ */
+export function convertETToNL(timeString: string): string {
+  // Parse ET time: "3:00 PM ET" → extract hours and AM/PM
+  const match = timeString.match(/(\d+):(\d+)\s*(AM|PM)/i);
+  if (!match) return timeString;
+
+  let hours = parseInt(match[1], 10);
+  const minutes = match[2];
+  const period = match[3].toUpperCase();
+
+  // Convert to 24-hour format
+  if (period === "AM" && hours === 12) hours = 0;
+  if (period === "PM" && hours !== 12) hours += 12;
+
+  // Add 6 hours for ET → NL conversion (June 2026)
+  let nlHours = hours + 6;
+  let nextDay = false;
+
+  if (nlHours >= 24) {
+    nlHours -= 24;
+    nextDay = true;
+  }
+
+  // Format as HH:MM CET
+  const nlTimeStr = `${String(nlHours).padStart(2, "0")}:${minutes}`;
+  return nextDay ? `${nlTimeStr} CET (+1)` : `${nlTimeStr} CET`;
+}
+
 // ─── WC 2026 Team Registry ────────────────────────────────────────────────────
 
 export interface TeamInfo {

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import PredictionModal from "@/components/predictions/PredictionModal";
 import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
+import { convertETToNL } from "@/lib/wc2026-data";
 
 interface Match {
   id: string;
@@ -95,7 +96,10 @@ export default function PredictionsPage() {
                 </div>
                 {match.match_time && (
                   <div className="text-xs text-gray-500">
-                    {match.match_time} · {match.city}
+                    <span style={{ color: "#FF6600", fontWeight: "bold" }}>
+                      {convertETToNL(match.match_time)}
+                    </span>
+                    {match.city && <span> · {match.city}</span>}
                   </div>
                 )}
               </button>

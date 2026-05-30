@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { GROUPS } from "@/lib/wc2026-data";
+import { GROUPS, convertETToNL } from "@/lib/wc2026-data";
 
 export const runtime = "nodejs";
 
@@ -35,6 +35,7 @@ export async function GET(req: NextRequest) {
           away_team: f.away,
           match_date: f.date,
           match_time: f.time,
+          match_time_nl: convertETToNL(f.time),
           status: f.status,
           venue: f.venue,
           city: f.city,

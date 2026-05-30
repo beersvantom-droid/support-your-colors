@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { X } from "lucide-react";
+import { convertETToNL } from "@/lib/wc2026-data";
 
 interface Match {
   id: string;
@@ -93,6 +94,11 @@ export default function PredictionModal({ match, onClose, onSubmit }: Props) {
                 {match.home_team} vs {match.away_team}
               </p>
               <p className="text-xs text-gray-500">{dateStr}</p>
+              {match.match_time && (
+                <p style={{ fontSize: "12px", color: "#FF6600", fontWeight: "bold", marginTop: "4px" }}>
+                  {convertETToNL(match.match_time)}
+                </p>
+              )}
             </div>
           </div>
 
