@@ -73,11 +73,18 @@ export default function PredictionStats({
         const response = await fetch(
           `/api/predictions/stats?match_id=${resolvedMatchId}`
         );
-        if (!response.ok) throw new Error("Failed to fetch stats");
+        if (!response.ok) {
+          // Silently fail if no stats found - this is normal for new matches
+          setStats(null);
+          setLoading(false);
+          return;
+        }
         const data = await response.json();
         setStats(data);
       } catch (err) {
-        console.error("Error fetching prediction stats:", err);
+        // Silently fail on network errors - don't break the UI
+        console.debug("Debug: Could not fetch prediction stats (this is normal):", err);
+        setStats(null);
       } finally {
         setLoading(false);
       }
