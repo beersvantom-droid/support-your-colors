@@ -17,17 +17,25 @@ function makeUserClient(token: string) {
 export async function POST(req: NextRequest) {
   try {
     const token = req.headers.get("Authorization")?.replace("Bearer ", "");
+    console.log("[predictions/submit] Token present:", !!token);
+
     if (!token) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      console.error("[predictions/submit] No token in Authorization header");
+      return NextResponse.json({ error: "Unauthorized - no token" }, { status: 401 });
     }
 
     const db = makeUserClient(token);
 
     // Get user
     const { data: userData, error: userError } = await db.auth.getUser();
+    console.log("[predictions/submit] Auth check:", { user: !!userData.user, error: userError?.message });
+
     if (userError || !userData.user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      console.error("[predictions/submit] Auth failed:", userError?.message);
+      return NextResponse.json({ error: "Unauthorized - auth failed" }, { status: 401 });
     }
+
+    console.log("[predictions/submit] User authenticated:", userData.user.id);
 
     const { match_id, prediction } = await req.json();
 

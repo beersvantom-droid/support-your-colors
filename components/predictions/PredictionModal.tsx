@@ -42,11 +42,16 @@ export default function PredictionModal({ match, onClose, onSubmit }: Props) {
       // Get current session
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
 
+      console.log("[Prediction] Session check:", { session: !!session, error: sessionError });
+
       if (sessionError || !session) {
+        console.error("[Prediction] No session:", sessionError?.message);
         setError("Please log in to make predictions");
         setLoading(false);
         return;
       }
+
+      console.log("[Prediction] User ID:", session.user?.id);
 
       const response = await fetch("/api/predictions/submit", {
         method: "POST",
