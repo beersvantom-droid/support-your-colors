@@ -7,8 +7,11 @@ interface Match {
   id: string;
   home_team: string;
   away_team: string;
-  match_date: string;
+  match_date: string;      // e.g. "Jun 12"
   match_time?: string;
+  status?: string;
+  venue?: string;
+  city?: string;
 }
 
 interface Props {
@@ -55,12 +58,8 @@ export default function PredictionModal({ match, onClose, onSubmit }: Props) {
     }
   };
 
-  const matchDate = new Date(match.match_date + "T12:00:00Z");
-  const dateStr = matchDate.toLocaleDateString("nl-NL", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-  });
+  // Parse fixture date like "Jun 12"
+  const dateStr = match.match_date;
 
   return (
     <>

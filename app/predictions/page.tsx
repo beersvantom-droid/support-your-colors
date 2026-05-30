@@ -9,9 +9,11 @@ interface Match {
   id: string;
   home_team: string;
   away_team: string;
-  match_date: string;
+  match_date: string;      // e.g. "Jun 12"
   match_time?: string;
   status: string;
+  venue?: string;
+  city?: string;
 }
 
 export default function PredictionsPage() {
@@ -76,13 +78,6 @@ export default function PredictionsPage() {
           </div>
         ) : (
           matches.map((match) => {
-            const matchDate = new Date(match.match_date + "T12:00:00Z");
-            const dateStr = matchDate.toLocaleDateString("nl-NL", {
-              weekday: "short",
-              day: "numeric",
-              month: "short",
-            });
-
             return (
               <button
                 key={match.id}
@@ -90,14 +85,19 @@ export default function PredictionsPage() {
                 className="w-full text-left p-4 rounded-2xl bg-white border border-gray-200 hover:border-gray-300 hover:shadow-sm transition-all active:scale-95"
               >
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-bold text-gray-500 uppercase">{dateStr}</span>
+                  <span className="text-xs font-bold text-gray-500 uppercase">{match.match_date}</span>
                   <span className="text-xs font-bold text-blue-600">🎯 Predict</span>
                 </div>
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between mb-1">
                   <span className="text-sm font-bold text-gray-900">{match.home_team}</span>
                   <span className="text-xs text-gray-400">vs</span>
                   <span className="text-sm font-bold text-gray-900">{match.away_team}</span>
                 </div>
+                {match.match_time && (
+                  <div className="text-xs text-gray-500">
+                    {match.match_time} · {match.city}
+                  </div>
+                )}
               </button>
             );
           })

@@ -1,40 +1,53 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { GROUPS } from "@/lib/wc2026-data";
 
 export const runtime = "nodejs";
 
-function makeServiceClient() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    { auth: { autoRefreshToken: false, persistSession: false } }
-  );
+// Convert fixture date like "Jun 12" to Date object
+function parseFixtureDate(date: string, year = 2026): Date {
+  const months: Record<string, number> = {
+    Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5,
+    Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11,
+  };
+  const [monthStr, dayStr] = date.split(" ");
+  const month = months[monthStr] ?? 5;
+  const day = parseInt(dayStr, 10);
+  return new Date(Date.UTC(year, month, day));
 }
 
 export async function GET(req: NextRequest) {
   try {
-    const db = makeServiceClient();
     const today = new Date();
     const in18Days = new Date(today.getTime() + 18 * 24 * 60 * 60 * 1000);
 
-    // Get next 18 upcoming matches within 18 days
-    const { data: matches, error } = await db
-      .from("match_results")
-      .select("*")
-      .eq("status", "upcoming")
-      .gte("match_date", today.toISOString().split("T")[0])
-      .lte("match_date", in18Days.toISOString().split("T")[0])
-      .order("match_date", { ascending: true })
-      .limit(18);
-
-    if (error) {
-      console.error("[predictions/upcoming] error:", error);
-      return NextResponse.json({ error: "Failed to fetch matches" }, { status: 500 });
-    }
+    // Get all upcoming matches from static data within 18 days
+    const matches = GROUPS.flatMap((group) =>
+      group.fixtures
+        .filter(
+          (f) =>
+            f.status === "upcoming" &&
+            parseFixtureDate(f.date) >= today &&
+            parseFixtureDate(f.date) <= in18Days
+        )
+        .map((f) => ({
+          id: `${group.id}-${f.home}-${f.away}-${f.date}`,
+          home_team: f.home,
+          away_team: f.away,
+          match_date: f.date,
+          match_time: f.time,
+          status: f.status,
+          venue: f.venue,
+          city: f.city,
+        }))
+    ).sort((a, b) => {
+      const dateA = parseFixtureDate(a.match_date);
+      const dateB = parseFixtureDate(b.match_date);
+      return dateA.getTime() - dateB.getTime();
+    }).slice(0, 18);
 
     return NextResponse.json({
-      matches: matches ?? [],
-      total: matches?.length ?? 0,
+      matches,
+      total: matches.length,
     });
   } catch (err) {
     console.error("[predictions/upcoming] unexpected error:", err);
