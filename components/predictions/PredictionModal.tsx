@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { X } from "lucide-react";
 import { convertETToNL } from "@/lib/wc2026-data";
 import { createClient } from "@supabase/supabase-js";
@@ -44,6 +44,7 @@ export default function PredictionModal({ match, onClose, onSubmit }: Props) {
 
       if (sessionError || !session) {
         setError("Please log in to make predictions");
+        setLoading(false);
         return;
       }
 
@@ -171,7 +172,7 @@ export default function PredictionModal({ match, onClose, onSubmit }: Props) {
               className="w-full py-3 rounded-2xl font-black text-white transition-all active:scale-95"
               style={{
                 background: selected && !loading ? "#D52B1E" : "#D1D5DB",
-                opacity: !selected || loading ? 0.5 : 1,
+                opacity: (!selected || loading) ? 0.5 : 1,
               }}
             >
               {loading ? "Submitting..." : "Submit Prediction"}
