@@ -30,9 +30,38 @@ interface StandingRow {
   drawn: number;
   lost: number;
   points: number;
+  gd?: number;
 }
 
-function buildStandings(teams: string[]): StandingRow[] {
+interface MatchResult {
+  home_team: string;
+  away_team: string;
+  home_score: number | null;
+  away_score: number | null;
+  status: string;
+}
+
+async function getGroupStandings(groupId: string): Promise<StandingRow[]> {
+  const { data } = await supabase
+    .from("group_standings")
+    .select("team, won, drawn, lost, points, gd")
+    .eq("group_id", groupId)
+    .order("rank", { ascending: true });
+
+  return data ?? [];
+}
+
+async function getMatchResults(teams: string[]): Promise<MatchResult[]> {
+  const { data } = await supabase
+    .from("match_results")
+    .select("home_team, away_team, home_score, away_score, status")
+    .in("home_team", teams)
+    .in("away_team", teams);
+
+  return data ?? [];
+}
+
+function buildDefaultStandings(teams: string[]): StandingRow[] {
   return teams.map((team) => ({ team, won: 0, drawn: 0, lost: 0, points: 0 }));
 }
 
@@ -80,7 +109,23 @@ export default async function GroupDetailPage({
   const supporters = await buildSupporterMap();
 
   const accentColor = GROUP_COLORS[groupId] ?? "#1A3A6E";
-  const standings = buildStandings(group.teams);
+
+  // Get live standings from database, fall back to empty if not available
+  const liveStandings = await getGroupStandings(groupId);
+  const standings = liveStandings.length > 0 ? liveStandings : buildDefaultStandings(group.teams);
+
+  // Get live match results
+  const matchResults = await getMatchResults(group.teams);
+
+  // Teams currently playing a live match (for the "live" indicator dot)
+  const liveTeams = new Set<string>();
+  for (const m of matchResults) {
+    if (m.status === "live") {
+      liveTeams.add(m.home_team);
+      liveTeams.add(m.away_team);
+    }
+  }
+
   const matchdays = groupByMatchday(group.fixtures);
   const hasFixtures = group.fixtures.length > 0;
   const hasFriends = group.teams.some((t) => supporters[t]);
@@ -275,8 +320,17 @@ export default async function GroupDetailPage({
                     >
                       <td className="py-2.5">
                         <div className="flex items-center gap-2">
-                          <span className="text-base leading-none">
+                          <span className="relative text-base leading-none">
                             {team?.flag ?? "🏳️"}
+                            {liveTeams.has(row.team) && (
+                              <span
+                                className="absolute -top-0.5 -right-1 w-2 h-2 rounded-full animate-pulse"
+                                style={{
+                                  background: "#D52B1E",
+                                  boxShadow: "0 0 0 2px #FFFFFF",
+                                }}
+                              />
+                            )}
                           </span>
                           <div>
                             <p className="text-xs font-bold text-gray-800">
@@ -362,9 +416,23 @@ export default async function GroupDetailPage({
                     </span>
                   </div>
                   <div className="space-y-2">
-                    {fixtures.map((f, i) => (
-                      <MatchCard key={i} fixture={f} supporters={supporters} />
-                    ))}
+                    {fixtures.map((f, i) => {
+                      // Find live score for this match
+                      const liveScore = matchResults.find(
+                        (m) =>
+                          (m.home_team === f.home && m.away_team === f.away) ||
+                          (m.home_team === f.away && m.away_team === f.home)
+                      );
+
+                      return (
+                        <MatchCard
+                          key={i}
+                          fixture={f}
+                          supporters={supporters}
+                          liveScore={liveScore}
+                        />
+                      );
+                    })}
                   </div>
                 </div>
               ))}

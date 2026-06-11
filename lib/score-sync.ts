@@ -129,13 +129,13 @@ async function recalculateStandings(db: SupabaseClient, groupId: string) {
     ])
   );
 
-  // Fetch every finished result that involves two teams from this group
+  // Fetch every result (finished or live) that involves two teams from this group
   const { data: results } = await db
     .from("match_results")
-    .select("home_team, away_team, home_score, away_score, winner")
+    .select("home_team, away_team, home_score, away_score, status")
     .in("home_team", group.teams)
     .in("away_team", group.teams)
-    .eq("status", "finished");
+    .in("status", ["finished", "live"]);
 
   for (const r of results ?? []) {
     const h = rows.get(r.home_team);
@@ -146,9 +146,10 @@ async function recalculateStandings(db: SupabaseClient, groupId: string) {
     h.gf += r.home_score; h.ga += r.away_score;
     a.gf += r.away_score; a.ga += r.home_score;
 
-    if (r.winner === r.home_team)      { h.won++; a.lost++; h.points += 3; }
-    else if (r.winner === r.away_team) { a.won++; h.lost++; a.points += 3; }
-    else                               { h.drawn++; a.drawn++; h.points += 1; a.points += 1; }
+    // Determine result from the live score itself (works for live + finished)
+    if (r.home_score > r.away_score)      { h.won++; a.lost++; h.points += 3; }
+    else if (r.away_score > r.home_score) { a.won++; h.lost++; a.points += 3; }
+    else                                   { h.drawn++; a.drawn++; h.points += 1; a.points += 1; }
   }
 
   // Sort: points → GD → GF (head-to-head is omitted for simplicity)
@@ -327,14 +328,20 @@ export async function runScoreSync(): Promise<SyncResult> {
       // Nothing useful to record yet if the match hasn't started and has no score
       if (!finished && event.intHomeScore == null) continue;
 
-      // Guard: skip if already fully processed (bracket logic already ran)
-      const { data: existing } = await db
+      // Guard: skip if already fully processed (bracket logic already ran).
+      // Match against (home_team, away_team, match_date) rather than
+      // external_id, because pre-seeded fixture rows use a placeholder
+      // external_id that won't match TheSportsDB's numeric event id —
+      // matching by teams+date prevents duplicate rows being created.
+      const { data: existingRow } = await db
         .from("match_results")
-        .select("processed")
-        .eq("external_id", event.idEvent)
+        .select("id, processed")
+        .eq("home_team", homeTeam)
+        .eq("away_team", awayTeam)
+        .eq("match_date", event.dateEvent)
         .maybeSingle();
 
-      if (existing?.processed) continue;
+      if (existingRow?.processed) continue;
 
       // ── Upsert the score ──────────────────────────────────────────────────
       const homeScore = event.intHomeScore != null ? parseInt(event.intHomeScore, 10) : null;
@@ -347,32 +354,41 @@ export async function runScoreSync(): Promise<SyncResult> {
         else                            winner = "draw";
       }
 
-      await db.from("match_results").upsert(
-        {
-          external_id: event.idEvent,
-          home_team:   homeTeam,
-          away_team:   awayTeam,
-          match_date:  event.dateEvent,
-          home_score:  homeScore,
-          away_score:  awayScore,
-          status:      finished ? "finished" : "live",
-          winner,
-          updated_at:  new Date().toISOString(),
-        },
-        { onConflict: "external_id" }
-      );
+      const matchPayload = {
+        external_id: event.idEvent,
+        home_team:   homeTeam,
+        away_team:   awayTeam,
+        match_date:  event.dateEvent,
+        home_score:  homeScore,
+        away_score:  awayScore,
+        status:      finished ? "finished" : "live",
+        winner,
+        updated_at:  new Date().toISOString(),
+      };
+
+      if (existingRow) {
+        await db.from("match_results").update(matchPayload).eq("id", existingRow.id);
+      } else {
+        await db.from("match_results").insert(matchPayload);
+      }
       result.updated++;
 
-      // ── Post-processing (only on first finish) ────────────────────────────
-      if (!finished) continue;
-
+      // ── Post-processing: always recalculate standings if there's a score ────
       const groupId = findGroupId(homeTeam, awayTeam);
 
-      if (groupId) {
-        // Group stage: recalculate standings then try to seed R32 slots
+      if (groupId && homeScore != null && awayScore != null) {
+        // Group stage: always recalculate standings when there are scores
         await recalculateStandings(db, groupId);
         await tryPopulateR32Slots(db);
-      } else {
+      }
+
+      // Only do knockout advancement if match is finished
+      if (!finished) {
+        result.processed++;
+        continue;
+      }
+
+      if (!groupId) {
         // Knockout: advance winner (and loser to 3rd-place if applicable)
         if (winner && winner !== "draw") {
           const { data: koMatch } = await db
@@ -399,7 +415,9 @@ export async function runScoreSync(): Promise<SyncResult> {
       await db
         .from("match_results")
         .update({ processed: true })
-        .eq("external_id", event.idEvent);
+        .eq("home_team", homeTeam)
+        .eq("away_team", awayTeam)
+        .eq("match_date", event.dateEvent);
 
       result.processed++;
     } catch (err) {

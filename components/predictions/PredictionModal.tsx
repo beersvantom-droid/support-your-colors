@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import { convertETToNL } from "@/lib/wc2026-data";
-import { createClient } from "@supabase/supabase-js";
+import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/components/auth/AuthProvider";
 
 interface Match {
   id: string;
@@ -26,23 +27,47 @@ export default function PredictionModal({ match, onClose, onSubmit }: Props) {
   const [selected, setSelected] = useState<"home_win" | "draw" | "away_win" | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const sessionRef = useRef<any>(null);
+  const [existingPrediction, setExistingPrediction] = useState<"home_win" | "draw" | "away_win" | null>(null);
+  const [loadingExisting, setLoadingExisting] = useState(true);
+  const { user } = useAuth();
 
-  // Listen to auth state changes
+  // Load existing prediction when modal opens
   useEffect(() => {
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    );
+    if (!user) {
+      setLoadingExisting(false);
+      return;
+    }
 
-    // Listen to auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log("[Prediction] Auth state changed:", { event, hasSession: !!session });
-      sessionRef.current = session;
-    });
+    const fetchExistingPrediction = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+          setLoadingExisting(false);
+          return;
+        }
 
-    return () => subscription?.unsubscribe();
-  }, []);
+        const response = await fetch(`/api/predictions/get?match_id=${match.id}`, {
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.prediction) {
+            setExistingPrediction(data.prediction);
+            setSelected(data.prediction);
+          }
+        }
+      } catch (err) {
+        console.debug("Could not fetch existing prediction:", err);
+      } finally {
+        setLoadingExisting(false);
+      }
+    };
+
+    fetchExistingPrediction();
+  }, [user, match.id]);
 
   const handleSubmit = async () => {
     if (!selected) return;
@@ -50,22 +75,26 @@ export default function PredictionModal({ match, onClose, onSubmit }: Props) {
     setError(null);
 
     try {
-      console.log("[Prediction] Current session:", { hasSession: !!sessionRef.current, user: sessionRef.current?.user?.id });
-
-      if (!sessionRef.current) {
-        console.error("[Prediction] No session available");
+      if (!user) {
         setError("Please log in to make predictions");
         setLoading(false);
         return;
       }
 
-      console.log("[Prediction] User ID:", sessionRef.current.user?.id);
+      // Get the current session to access the token
+      const { data: { session } } = await supabase.auth.getSession();
+
+      if (!session) {
+        setError("Please log in to make predictions");
+        setLoading(false);
+        return;
+      }
 
       const response = await fetch("/api/predictions/submit", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${sessionRef.current.access_token}`,
+          Authorization: `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({
           match_id: match.id,
@@ -82,7 +111,8 @@ export default function PredictionModal({ match, onClose, onSubmit }: Props) {
       onClose();
     } catch (err) {
       console.error("Prediction error:", err);
-      setError(err instanceof Error ? err.message : "Failed to submit prediction");
+      const errorMsg = err instanceof Error ? err.message : "Failed to submit prediction";
+      setError(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -132,43 +162,82 @@ export default function PredictionModal({ match, onClose, onSubmit }: Props) {
           </div>
 
           {/* Predictions */}
-          <div className="px-4 py-6 space-y-3">
-            <button
-              onClick={() => setSelected("home_win")}
-              className="w-full py-3 rounded-2xl font-bold text-center transition-all"
-              style={{
-                background: selected === "home_win" ? "#D52B1E" : "#F3F4F6",
-                color: selected === "home_win" ? "white" : "#374151",
-                border: selected === "home_win" ? "2px solid #B91F15" : "2px solid transparent",
-              }}
-            >
-              {match.home_team} Wins
-            </button>
+          {existingPrediction ? (
+            // Already voted - show read-only state
+            <div className="px-4 py-6 space-y-3 opacity-60 pointer-events-none">
+              <button
+                className="w-full py-3 rounded-2xl font-bold text-center"
+                style={{
+                  background: existingPrediction === "home_win" ? "#D52B1E" : "#F3F4F6",
+                  color: existingPrediction === "home_win" ? "white" : "#374151",
+                  border: existingPrediction === "home_win" ? "2px solid #B91F15" : "2px solid transparent",
+                }}
+              >
+                {match.home_team} Wins
+              </button>
 
-            <button
-              onClick={() => setSelected("draw")}
-              className="w-full py-3 rounded-2xl font-bold text-center transition-all"
-              style={{
-                background: selected === "draw" ? "#3B82F6" : "#F3F4F6",
-                color: selected === "draw" ? "white" : "#374151",
-                border: selected === "draw" ? "2px solid #2563EB" : "2px solid transparent",
-              }}
-            >
-              Draw
-            </button>
+              <button
+                className="w-full py-3 rounded-2xl font-bold text-center"
+                style={{
+                  background: existingPrediction === "draw" ? "#3B82F6" : "#F3F4F6",
+                  color: existingPrediction === "draw" ? "white" : "#374151",
+                  border: existingPrediction === "draw" ? "2px solid #2563EB" : "2px solid transparent",
+                }}
+              >
+                Draw
+              </button>
 
-            <button
-              onClick={() => setSelected("away_win")}
-              className="w-full py-3 rounded-2xl font-bold text-center transition-all"
-              style={{
-                background: selected === "away_win" ? "#10B981" : "#F3F4F6",
-                color: selected === "away_win" ? "white" : "#374151",
-                border: selected === "away_win" ? "2px solid #059669" : "2px solid transparent",
-              }}
-            >
-              {match.away_team} Wins
-            </button>
-          </div>
+              <button
+                className="w-full py-3 rounded-2xl font-bold text-center"
+                style={{
+                  background: existingPrediction === "away_win" ? "#10B981" : "#F3F4F6",
+                  color: existingPrediction === "away_win" ? "white" : "#374151",
+                  border: existingPrediction === "away_win" ? "2px solid #059669" : "2px solid transparent",
+                }}
+              >
+                {match.away_team} Wins
+              </button>
+            </div>
+          ) : (
+            // Not voted yet - show interactive buttons
+            <div className="px-4 py-6 space-y-3">
+              <button
+                onClick={() => setSelected("home_win")}
+                className="w-full py-3 rounded-2xl font-bold text-center transition-all"
+                style={{
+                  background: selected === "home_win" ? "#D52B1E" : "#F3F4F6",
+                  color: selected === "home_win" ? "white" : "#374151",
+                  border: selected === "home_win" ? "2px solid #B91F15" : "2px solid transparent",
+                }}
+              >
+                {match.home_team} Wins
+              </button>
+
+              <button
+                onClick={() => setSelected("draw")}
+                className="w-full py-3 rounded-2xl font-bold text-center transition-all"
+                style={{
+                  background: selected === "draw" ? "#3B82F6" : "#F3F4F6",
+                  color: selected === "draw" ? "white" : "#374151",
+                  border: selected === "draw" ? "2px solid #2563EB" : "2px solid transparent",
+                }}
+              >
+                Draw
+              </button>
+
+              <button
+                onClick={() => setSelected("away_win")}
+                className="w-full py-3 rounded-2xl font-bold text-center transition-all"
+                style={{
+                  background: selected === "away_win" ? "#10B981" : "#F3F4F6",
+                  color: selected === "away_win" ? "white" : "#374151",
+                  border: selected === "away_win" ? "2px solid #059669" : "2px solid transparent",
+                }}
+              >
+                {match.away_team} Wins
+              </button>
+            </div>
+          )}
 
           {/* Error message */}
           {error && (
@@ -177,18 +246,32 @@ export default function PredictionModal({ match, onClose, onSubmit }: Props) {
             </div>
           )}
 
+          {/* Existing prediction indicator */}
+          {!loadingExisting && existingPrediction && (
+            <div className="px-4 py-3 mx-4 rounded-lg" style={{ background: "#DBEAFE", color: "#1E40AF" }}>
+              <p className="text-sm font-bold">
+                ✓ Your prediction: <strong>{
+                  existingPrediction === "home_win" ? match.home_team + " wins" :
+                  existingPrediction === "away_win" ? match.away_team + " wins" :
+                  "Draw"
+                }</strong>
+              </p>
+              <p className="text-xs text-gray-500 mt-1">You can only vote once per match</p>
+            </div>
+          )}
+
           {/* Submit */}
           <div className="px-4 pb-6">
             <button
               onClick={handleSubmit}
-              disabled={!selected || loading}
+              disabled={!selected || loading || loadingExisting || !!existingPrediction}
               className="w-full py-3 rounded-2xl font-black text-white transition-all active:scale-95"
               style={{
-                background: selected && !loading ? "#D52B1E" : "#D1D5DB",
-                opacity: (!selected || loading) ? 0.5 : 1,
+                background: selected && !loading && !loadingExisting && !existingPrediction ? "#D52B1E" : "#D1D5DB",
+                opacity: (!selected || loading || loadingExisting || existingPrediction) ? 0.5 : 1,
               }}
             >
-              {loading ? "Submitting..." : "Submit Prediction"}
+              {loadingExisting ? "Loading..." : loading ? "Submitting..." : existingPrediction ? "Already voted" : "Submit Prediction"}
             </button>
           </div>
         </div>

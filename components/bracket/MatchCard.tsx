@@ -3,12 +3,19 @@ import type { WCFixture } from "@/lib/wc2026-data";
 import { TEAMS } from "@/lib/wc2026-data";
 import type { SupporterMap } from "./GroupCard";
 
+interface LiveScore {
+  home_score: number | null;
+  away_score: number | null;
+  status: string;
+}
+
 interface MatchCardProps {
   fixture: WCFixture;
   supporters: SupporterMap;
+  liveScore?: LiveScore;
 }
 
-export default function MatchCard({ fixture, supporters }: MatchCardProps) {
+export default function MatchCard({ fixture, supporters, liveScore }: MatchCardProps) {
   const homeTeam = TEAMS[fixture.home];
   const awayTeam = TEAMS[fixture.away];
   const homeSupporter = supporters[fixture.home];
@@ -25,12 +32,14 @@ export default function MatchCard({ fixture, supporters }: MatchCardProps) {
     ? (supporterIsHome ? homeTeam?.flag : awayTeam?.flag)
     : null;
 
-  const statusLabel =
-    fixture.status === "live"
-      ? "LIVE"
-      : fixture.status === "finished"
-      ? "FT"
-      : null;
+  // Use live score if available, otherwise fall back to fixture status
+  const matchStatus = liveScore?.status || fixture.status;
+  const homeScore = liveScore?.home_score ?? fixture.homeScore;
+  const awayScore = liveScore?.away_score ?? fixture.awayScore;
+  const isFinished = matchStatus === "finished";
+  const isLive = matchStatus === "live";
+
+  const statusLabel = isLive ? "LIVE" : isFinished ? "FT" : null;
 
   return (
     <div
@@ -117,22 +126,22 @@ export default function MatchCard({ fixture, supporters }: MatchCardProps) {
 
         {/* Score / VS */}
         <div className="flex flex-col items-center justify-center px-3 py-3 gap-1 min-w-[64px]">
-          {fixture.status === "finished" || fixture.status === "live" ? (
+          {isFinished || isLive ? (
             <>
               <div className="flex items-center gap-2">
                 <span className="text-2xl font-black" style={{ color: "#111827" }}>
-                  {fixture.homeScore ?? 0}
+                  {homeScore ?? 0}
                 </span>
                 <span className="text-sm font-bold text-text-muted">–</span>
                 <span className="text-2xl font-black" style={{ color: "#111827" }}>
-                  {fixture.awayScore ?? 0}
+                  {awayScore ?? 0}
                 </span>
               </div>
               {statusLabel && (
                 <span
                   className="text-[10px] font-black px-2 py-0.5 rounded-full"
                   style={{
-                    background: fixture.status === "live" ? "#D52B1E" : "#6B7280",
+                    background: isLive ? "#D52B1E" : "#6B7280",
                     color: "#FFFFFF",
                   }}
                 >

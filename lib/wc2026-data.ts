@@ -122,6 +122,14 @@ export const SUPPORTERS: Record<string, Supporter> = {
   "Tunisia":                { name: "Kas" },
 };
 
+/**
+ * Check if a match is a "derby" - a game between two supporter countries
+ */
+export function isDerby(homeTeam: string, awayTeam: string): boolean {
+  const supportedCountries = Object.keys(SUPPORTERS);
+  return supportedCountries.includes(homeTeam) && supportedCountries.includes(awayTeam);
+}
+
 // ─── Fixture & Group Types ────────────────────────────────────────────────────
 
 export type MatchStatus = "upcoming" | "live" | "finished";

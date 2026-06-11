@@ -2,7 +2,10 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 export async function proxy(request: NextRequest) {
-  if (request.nextUrl.pathname.startsWith("/api/process-commentary")) {
+  if (
+    request.nextUrl.pathname.startsWith("/api/process-commentary") ||
+    request.nextUrl.pathname.startsWith("/api/sync-scores")
+  ) {
     return NextResponse.next();
   }
 

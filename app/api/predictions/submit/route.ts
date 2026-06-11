@@ -47,14 +47,31 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid prediction" }, { status: 400 });
     }
 
-    // Upsert prediction (update if exists, insert if not)
+    // Check if user already has a prediction for this match
+    const { data: existingPrediction, error: checkError } = await db
+      .from("match_predictions")
+      .select("id")
+      .eq("user_id", userData.user.id)
+      .eq("match_id", match_id)
+      .maybeSingle();
+
+    if (checkError) {
+      console.error("[predictions/submit] error checking existing:", checkError);
+      return NextResponse.json({ error: "Failed to check prediction" }, { status: 500 });
+    }
+
+    if (existingPrediction) {
+      console.log("[predictions/submit] User already voted for this match");
+      return NextResponse.json({ error: "You have already voted for this match" }, { status: 409 });
+    }
+
+    // Insert new prediction (no updates allowed)
     const { error } = await db
       .from("match_predictions")
-      .upsert({
+      .insert({
         user_id: userData.user.id,
         match_id,
         prediction,
-        updated_at: new Date().toISOString(),
       });
 
     if (error) {

@@ -1,5 +1,6 @@
 import AppHeader from "@/components/AppHeader";
 import MatchSpotlight from "@/components/feed/MatchSpotlight";
+import LiveScoresBar from "@/components/feed/LiveScoresBar";
 import VotingReminder from "@/components/feed/VotingReminder";
 import RealFeedPost from "@/components/feed/RealFeedPost";
 import CommentatorCard from "@/components/feed/CommentatorCard";
@@ -56,6 +57,9 @@ export default async function HomePage() {
   return (
     <div className="min-h-full">
       <AppHeader />
+
+      {/* Live scores — only shown when a match is currently live */}
+      <LiveScoresBar />
 
       {/* 1. Compact supporter match spotlight */}
       <MatchSpotlight />

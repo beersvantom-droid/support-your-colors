@@ -4,6 +4,8 @@ import "./globals.css";
 import BottomNav from "@/components/BottomNav";
 import { AuthProvider } from "@/components/auth/AuthProvider";
 import { AchievementsProvider } from "@/components/achievements/AchievementsProvider";
+import { ChatNotificationProvider } from "@/components/chat/ChatNotificationProvider";
+import { LiveSyncTrigger } from "@/components/LiveSyncTrigger";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -30,10 +32,13 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <AuthProvider>
           <AchievementsProvider>
-            <main className="flex-1 w-full max-w-md mx-auto pb-28">
-              {children}
-            </main>
-            <BottomNav />
+            <ChatNotificationProvider>
+              <LiveSyncTrigger />
+              <main className="flex-1 w-full max-w-md mx-auto pb-28">
+                {children}
+              </main>
+              <BottomNav />
+            </ChatNotificationProvider>
           </AchievementsProvider>
         </AuthProvider>
       </body>
