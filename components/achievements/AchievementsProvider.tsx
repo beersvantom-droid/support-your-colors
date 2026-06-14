@@ -304,6 +304,44 @@ export function AchievementsProvider({
           console.error("[Achievements] Error counting progression stats:", err);
         }
 
+        // Onderbuikgevoel: an "underdog pick" (≤25% of voters) that turned
+        // out to match the actual finished result.
+        let hasUnderdogCorrectPick = false;
+        try {
+          const { data: underdogPicks } = await supabase
+            .from("match_predictions")
+            .select("match_id, prediction")
+            .eq("user_id", user!.id)
+            .eq("was_underdog_pick", true);
+
+          if (underdogPicks && underdogPicks.length > 0) {
+            const matchIds = underdogPicks.map((p: any) => p.match_id);
+            const { data: finishedMatches } = await supabase
+              .from("match_results")
+              .select("id, home_score, away_score, status")
+              .in("id", matchIds)
+              .eq("status", "finished");
+
+            const resultMap = new Map(
+              (finishedMatches ?? []).map((m: any) => [m.id, m])
+            );
+
+            hasUnderdogCorrectPick = underdogPicks.some((p: any) => {
+              const match = resultMap.get(p.match_id);
+              if (!match || match.home_score == null || match.away_score == null) return false;
+              const actual =
+                match.home_score > match.away_score
+                  ? "home_win"
+                  : match.home_score < match.away_score
+                  ? "away_win"
+                  : "draw";
+              return p.prediction === actual;
+            });
+          }
+        } catch (err) {
+          console.error("[Achievements] Error checking underdog picks:", err);
+        }
+
         const stats = {
           postCount,
           commentCount,
@@ -323,6 +361,7 @@ export function AchievementsProvider({
           packsOpenedCount,
           cosmeticsOwnedCount,
           mascotsOwnedCount,
+          hasUnderdogCorrectPick,
         };
 
         const newUnlocks = resolveNewUnlocks(stats, unlockedIdsRef.current);

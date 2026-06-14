@@ -409,6 +409,7 @@ export default function ProfilePage() {
                     packsOpenedCount: progressStats.packsOpenedCount,
                     cosmeticsOwnedCount: progressStats.cosmeticsOwnedCount,
                     mascotsOwnedCount: progressStats.mascotsOwnedCount,
+                    hasUnderdogCorrectPick: false,
                   };
 
                   const currentTier = getCurrentTierLevel(achievement, stats);

@@ -65,6 +65,19 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "You have already voted for this match" }, { status: 409 });
     }
 
+    // Determine if this is an "underdog pick": ≤25% of existing voters (with
+    // at least a few votes already in) picked the same outcome.
+    const { data: existingVotes } = await db
+      .from("match_predictions")
+      .select("prediction")
+      .eq("match_id", match_id);
+
+    const totalExisting = existingVotes?.length ?? 0;
+    const sameCount = (existingVotes ?? []).filter((v) => v.prediction === prediction).length;
+    const totalAfter = totalExisting + 1;
+    const sameAfter = sameCount + 1;
+    const wasUnderdogPick = totalAfter >= 4 && sameAfter / totalAfter <= 0.25;
+
     // Insert new prediction (no updates allowed)
     const { error } = await db
       .from("match_predictions")
@@ -72,6 +85,7 @@ export async function POST(req: NextRequest) {
         user_id: userData.user.id,
         match_id,
         prediction,
+        was_underdog_pick: wasUnderdogPick,
       });
 
     if (error) {

@@ -157,6 +157,14 @@ export const ALL_ACHIEVEMENTS: AchievementDef[] = [
     rarity: "medium",
     points: 300,
   },
+  {
+    id: "onderbuikgevoel",
+    emoji: "🔮",
+    name: "Onderbuikgevoel",
+    hint: "Correctly predicted an outcome picked by 25% or fewer voters",
+    rarity: "medium",
+    points: 300,
+  },
   // ── Hard — 500 pts ───────────────────────────────────────────────────────────
   {
     id: "stadium_presence",
@@ -375,6 +383,7 @@ export interface AchievementStats {
   packsOpenedCount: number;         // unique pack types opened
   cosmeticsOwnedCount: number;      // total unique cosmetics
   mascotsOwnedCount: number;        // total unique mascots
+  hasUnderdogCorrectPick: boolean;  // correctly predicted a ≤25% outcome
 }
 
 export function resolveNewUnlocks(
@@ -391,6 +400,7 @@ export function resolveNewUnlocks(
     ["daily_presence",    stats.consecutiveActivityDays >= 5],
     ["fast_responder",    stats.hasFastResponse],
     ["democracy_enjoyer", stats.voteDayCount >= 7],
+    ["onderbuikgevoel",   stats.hasUnderdogCorrectPick],
     ["stadium_presence",  stats.consecutiveActivityDays >= 10],
     ["around_the_clock",  stats.hasAroundTheClock],
     ["night_shift",       stats.nightPostCount >= 3],
