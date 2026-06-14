@@ -524,5 +524,20 @@ export async function runScoreSync(): Promise<SyncResult> {
     }
   }
 
+  // Always recompute every group's standings, even if no new events came in
+  // this run. This keeps group_standings correct if a previous run's upsert
+  // failed silently (e.g. the table didn't exist yet when a match was first
+  // marked "processed", so it was never recalculated again).
+  for (const group of GROUPS) {
+    try {
+      await recalculateStandings(db, group.id);
+    } catch (err) {
+      const msg = `recalculate ${group.id}: ${err instanceof Error ? err.message : String(err)}`;
+      result.errors.push(msg);
+      console.error("[score-sync]", msg);
+    }
+  }
+  await tryPopulateR32Slots(db);
+
   return result;
 }
