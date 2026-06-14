@@ -136,15 +136,26 @@ export default function ProfilePage() {
     loadFlames();
   }, [profile?.username]);
 
-  // Load total comments this user has made
+  // Load total comments received on this user's posts
   useEffect(() => {
     if (!profile?.username) return;
 
     async function loadComments() {
+      const { data: posts } = await supabase
+        .from("posts")
+        .select("id")
+        .eq("username", profile!.username);
+
+      const postIds = (posts ?? []).map((p: { id: string }) => p.id);
+      if (postIds.length === 0) {
+        setCommentCount(0);
+        return;
+      }
+
       const { count } = await supabase
         .from("comments")
         .select("*", { count: "exact", head: true })
-        .eq("username", profile!.username);
+        .in("post_id", postIds);
 
       setCommentCount(count ?? 0);
     }
