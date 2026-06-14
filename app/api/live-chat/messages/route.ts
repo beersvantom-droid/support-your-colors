@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { cleanupOldChatMessages } from "@/lib/chat-reset";
 
 export const runtime = "nodejs";
 
@@ -14,6 +15,10 @@ function makeServiceClient() {
 export async function GET(_req: NextRequest) {
   try {
     const db = makeServiceClient();
+
+    // Clear out messages from before today's 05:00 Amsterdam reset, so the
+    // chat resets daily without needing any external cron job.
+    await cleanupOldChatMessages(db);
 
     // Fetch last 50 messages (newest last so UI can reverse)
     const { data: messages, error: msgError } = await db
