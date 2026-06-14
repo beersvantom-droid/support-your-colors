@@ -326,6 +326,58 @@ const NEXT_SLOT: Record<string, { match: number; pos: "home" | "away" }> = {
   L93: { match: 95, pos: "home" }, L94: { match: 95, pos: "away" },
 };
 
+// ─── Tournament points update ─────────────────────────────────────────────────
+// Awards tournament points to supporters based on match results.
+
+const TOURNAMENT_POINTS = { win: 500, draw: 250, loss: 100 } as const;
+
+async function updateTournamentPoints(
+  db: SupabaseClient,
+  homeTeam: string,
+  awayTeam: string,
+  homeScore: number,
+  awayScore: number
+) {
+  // Determine the outcome
+  let homeOutcome: "win" | "draw" | "loss";
+  let awayOutcome: "win" | "draw" | "loss";
+
+  if (homeScore > awayScore) {
+    homeOutcome = "win";
+    awayOutcome = "loss";
+  } else if (awayScore > homeScore) {
+    homeOutcome = "loss";
+    awayOutcome = "win";
+  } else {
+    homeOutcome = "draw";
+    awayOutcome = "draw";
+  }
+
+  // Fetch all supporters of each team
+  const [{ data: homeSupporters }, { data: awaySupporters }] = await Promise.all([
+    db.from("profiles").select("id").eq("country", homeTeam),
+    db.from("profiles").select("id").eq("country", awayTeam),
+  ]);
+
+  // Award points in batch
+  const updates: { id: string; pointsToAdd: number }[] = [];
+
+  for (const supporter of homeSupporters ?? []) {
+    updates.push({ id: supporter.id, pointsToAdd: TOURNAMENT_POINTS[homeOutcome] });
+  }
+  for (const supporter of awaySupporters ?? []) {
+    updates.push({ id: supporter.id, pointsToAdd: TOURNAMENT_POINTS[awayOutcome] });
+  }
+
+  // Execute all updates in parallel
+  for (const { id, pointsToAdd } of updates) {
+    await db.rpc("increment_tournament_points", {
+      user_id: id,
+      amount: pointsToAdd,
+    });
+  }
+}
+
 // Tries to populate R32 team slots once a group's standings are known
 async function tryPopulateR32Slots(db: SupabaseClient) {
   for (const seed of R32_SEEDINGS) {
@@ -474,10 +526,15 @@ export async function runScoreSync(): Promise<SyncResult> {
       // ── Post-processing: always recalculate standings if there's a score ────
       const groupId = findGroupId(homeTeam, awayTeam);
 
-      if (groupId && homeScore != null && awayScore != null) {
-        // Group stage: always recalculate standings when there are scores
-        await recalculateStandings(db, groupId);
-        await tryPopulateR32Slots(db);
+      if (homeScore != null && awayScore != null) {
+        // Award tournament points to supporters
+        await updateTournamentPoints(db, homeTeam, awayTeam, homeScore, awayScore);
+
+        if (groupId) {
+          // Group stage: always recalculate standings when there are scores
+          await recalculateStandings(db, groupId);
+          await tryPopulateR32Slots(db);
+        }
       }
 
       // Only do knockout advancement if match is finished
