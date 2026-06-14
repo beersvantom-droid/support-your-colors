@@ -175,16 +175,33 @@ async function fetchEventsForPendingTeams(db: SupabaseClient): Promise<TSDBEvent
   return extraEvents;
 }
 
+// eventspastleague.php returns recently-finished matches for the league —
+// TheSportsDB sometimes updates this before eventsseason.php catches up.
+async function fetchRecentPastLeagueEvents(): Promise<TSDBEvent[]> {
+  try {
+    const body = await tsdbFetch<{ events: TSDBEvent[] | null }>(
+      `eventspastleague.php?id=${WC2026_LEAGUE_ID}`
+    );
+    return (body.events ?? []).filter(isWorldCup);
+  } catch (err) {
+    console.error("[score-sync] failed to fetch eventspastleague:", err);
+    return [];
+  }
+}
+
 export async function fetchWCEvents(db: SupabaseClient): Promise<TSDBEvent[]> {
   const body = await tsdbFetch<{ events: TSDBEvent[] | null }>(
     `eventsseason.php?id=${WC2026_LEAGUE_ID}&s=${WC2026_SEASON}`
   );
   const seasonEvents = (body.events ?? []).filter(isWorldCup);
 
-  const extraEvents = await fetchEventsForPendingTeams(db);
+  const [pastLeagueEvents, extraEvents] = await Promise.all([
+    fetchRecentPastLeagueEvents(),
+    fetchEventsForPendingTeams(db),
+  ]);
 
   const seen = new Set(seasonEvents.map((e) => e.idEvent));
-  for (const e of extraEvents) {
+  for (const e of [...pastLeagueEvents, ...extraEvents]) {
     if (!seen.has(e.idEvent)) {
       seasonEvents.push(e);
       seen.add(e.idEvent);
