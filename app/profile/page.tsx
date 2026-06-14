@@ -26,6 +26,7 @@ export default function ProfilePage() {
     mascotsOwnedCount: number;
   } | null>(null);
   const [flamesReceived, setFlamesReceived] = useState(0);
+  const [commentCount, setCommentCount] = useState(0);
   const [expandedChallenges, setExpandedChallenges] = useState(false);
 
   const country = profile?.country ?? null;
@@ -133,6 +134,22 @@ export default function ProfilePage() {
     }
 
     loadFlames();
+  }, [profile?.username]);
+
+  // Load total comments this user has made
+  useEffect(() => {
+    if (!profile?.username) return;
+
+    async function loadComments() {
+      const { count } = await supabase
+        .from("comments")
+        .select("*", { count: "exact", head: true })
+        .eq("username", profile!.username);
+
+      setCommentCount(count ?? 0);
+    }
+
+    loadComments();
   }, [profile?.username]);
 
   async function handleSignOut() {
@@ -278,7 +295,7 @@ export default function ProfilePage() {
         <div className="grid grid-cols-3 gap-3">
           {[
             { icon: Flame, label: "Flames", value: flamesReceived, color: "#EF4444" },
-            { icon: MessageCircle, label: "Comments", value: 0, color: "#3B82F6" },
+            { icon: MessageCircle, label: "Comments", value: commentCount, color: "#3B82F6" },
             { icon: Trophy, label: "Points", value: profile?.supporter_points ?? 0, color: "#F59E0B" },
           ].map(({ icon: Icon, label, value, color }) => (
             <div
