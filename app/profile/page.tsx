@@ -25,6 +25,7 @@ export default function ProfilePage() {
     cosmeticsOwnedCount: number;
     mascotsOwnedCount: number;
   } | null>(null);
+  const [flamesReceived, setFlamesReceived] = useState(0);
   const [expandedChallenges, setExpandedChallenges] = useState(false);
 
   const country = profile?.country ?? null;
@@ -106,6 +107,33 @@ export default function ProfilePage() {
 
     loadStats();
   }, [user?.id]);
+
+  // Load total flames received across all of this user's posts
+  useEffect(() => {
+    if (!profile?.username) return;
+
+    async function loadFlames() {
+      const { data: posts } = await supabase
+        .from("posts")
+        .select("id")
+        .eq("username", profile!.username);
+
+      const postIds = (posts ?? []).map((p: { id: string }) => p.id);
+      if (postIds.length === 0) {
+        setFlamesReceived(0);
+        return;
+      }
+
+      const { count } = await supabase
+        .from("post_reactions")
+        .select("*", { count: "exact", head: true })
+        .in("post_id", postIds);
+
+      setFlamesReceived(count ?? 0);
+    }
+
+    loadFlames();
+  }, [profile?.username]);
 
   async function handleSignOut() {
     await signOut();
@@ -249,7 +277,7 @@ export default function ProfilePage() {
         {/* ── Stats row ────────────────────────────────────────────── */}
         <div className="grid grid-cols-3 gap-3">
           {[
-            { icon: Flame, label: "Flames", value: profile?.supporter_points ?? 0, color: "#EF4444" },
+            { icon: Flame, label: "Flames", value: flamesReceived, color: "#EF4444" },
             { icon: MessageCircle, label: "Comments", value: 0, color: "#3B82F6" },
             { icon: Trophy, label: "Points", value: profile?.supporter_points ?? 0, color: "#F59E0B" },
           ].map(({ icon: Icon, label, value, color }) => (
