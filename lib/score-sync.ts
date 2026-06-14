@@ -89,15 +89,17 @@ function findGroupId(home: string, away: string): string | null {
 }
 
 // ─── TheSportsDB fetch ────────────────────────────────────────────────────────
-// Fetches all Soccer events for today (Amsterdam local date) and filters for
-// FIFA World Cup matches only.
+// Fetches the entire FIFA World Cup 2026 season schedule in one call. Unlike
+// TheSportsDB's per-date `eventsday.php` endpoint (which is sparse and misses
+// most World Cup fixtures), `eventsseason.php` returns every match in the
+// season along with its current score/status — so every finished or live
+// result is always picked up, regardless of which date it falls on.
 
-export async function fetchTodayWCEvents(): Promise<TSDBEvent[]> {
-  // Use Amsterdam time (UTC+2) so "today" aligns with European viewing hours
-  const amsterdamNow = new Date(Date.now() + 2 * 60 * 60 * 1000);
-  const today = amsterdamNow.toISOString().split("T")[0];
+const WC2026_LEAGUE_ID = "4429";
+const WC2026_SEASON = "2026";
 
-  const url = `https://www.thesportsdb.com/api/v1/json/3/eventsday.php?d=${today}&s=Soccer`;
+export async function fetchWCEvents(_db: SupabaseClient): Promise<TSDBEvent[]> {
+  const url = `https://www.thesportsdb.com/api/v1/json/3/eventsseason.php?id=${WC2026_LEAGUE_ID}&s=${WC2026_SEASON}`;
 
   const res = await fetch(url, {
     signal: AbortSignal.timeout(15_000),
@@ -316,7 +318,7 @@ export async function runScoreSync(): Promise<SyncResult> {
   const db = adminClient();
   const result: SyncResult = { eventsFound: 0, updated: 0, processed: 0, errors: [] };
 
-  const events = await fetchTodayWCEvents();
+  const events = await fetchWCEvents(db);
   result.eventsFound = events.length;
 
   for (const event of events) {
@@ -329,17 +331,18 @@ export async function runScoreSync(): Promise<SyncResult> {
       if (!finished && event.intHomeScore == null) continue;
 
       // Guard: skip if already fully processed (bracket logic already ran).
-      // Match against (home_team, away_team, match_date) rather than
-      // external_id, because pre-seeded fixture rows use a placeholder
-      // external_id that won't match TheSportsDB's numeric event id —
-      // matching by teams+date prevents duplicate rows being created.
-      const { data: existingRow } = await db
+      // Match against (home_team, away_team) only — NOT match_date or
+      // external_id. Pre-seeded fixture rows use a placeholder external_id
+      // and our fixture date can be off by a day vs. TheSportsDB's
+      // dateEvent (timezone differences), so matching on teams alone is
+      // what prevents duplicate rows from being created.
+      const { data: existingRows } = await db
         .from("match_results")
         .select("id, processed")
         .eq("home_team", homeTeam)
-        .eq("away_team", awayTeam)
-        .eq("match_date", event.dateEvent)
-        .maybeSingle();
+        .eq("away_team", awayTeam);
+
+      const existingRow = existingRows?.[0] ?? null;
 
       if (existingRow?.processed) continue;
 
@@ -416,8 +419,7 @@ export async function runScoreSync(): Promise<SyncResult> {
         .from("match_results")
         .update({ processed: true })
         .eq("home_team", homeTeam)
-        .eq("away_team", awayTeam)
-        .eq("match_date", event.dateEvent);
+        .eq("away_team", awayTeam);
 
       result.processed++;
     } catch (err) {

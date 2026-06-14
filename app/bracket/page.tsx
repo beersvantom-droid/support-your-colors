@@ -7,6 +7,20 @@ import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
+async function getLiveTeams(): Promise<Set<string>> {
+  const { data } = await supabase
+    .from("match_results")
+    .select("home_team, away_team")
+    .eq("status", "live");
+
+  const teams = new Set<string>();
+  for (const m of data ?? []) {
+    teams.add(m.home_team);
+    teams.add(m.away_team);
+  }
+  return teams;
+}
+
 async function buildSupporterMap(): Promise<SupporterMap> {
   const [profilesResult, sessionResult] = await Promise.all([
     supabase.from("profiles").select("id, username, country"),
@@ -44,8 +58,10 @@ function countDerbies(supporters: SupporterMap) {
 
 export default async function BracketPage() {
   const supporters = await buildSupporterMap();
+  const liveTeams = await getLiveTeams();
   const friendGroupCount = countFriendGroups(supporters);
   const derbyCount = countDerbies(supporters);
+  const hasLiveMatches = liveTeams.size > 0;
 
   return (
     <div className="min-h-full">
@@ -234,15 +250,21 @@ export default async function BracketPage() {
             </p>
           </div>
           <div
-            className="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wide"
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wide"
             style={{ background: "#D52B1E18", color: "#D52B1E" }}
           >
-            Upcoming
+            {hasLiveMatches && (
+              <span
+                className="w-1.5 h-1.5 rounded-full"
+                style={{ background: "#D52B1E", animation: "pulse 2s ease-in-out infinite" }}
+              />
+            )}
+            {hasLiveMatches ? "Live" : "Upcoming"}
           </div>
         </div>
 
         {GROUPS.map((group) => (
-          <GroupCard key={group.id} group={group} supporters={supporters} />
+          <GroupCard key={group.id} group={group} supporters={supporters} liveTeams={liveTeams} />
         ))}
 
         <div className="h-4" />

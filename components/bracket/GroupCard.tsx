@@ -23,9 +23,11 @@ const GROUP_COLORS: Record<string, string> = {
 export default function GroupCard({
   group,
   supporters,
+  liveTeams,
 }: {
   group: WCGroup;
   supporters: SupporterMap;
+  liveTeams?: Set<string>;
 }) {
   const accentColor = GROUP_COLORS[group.id] ?? "#1A3A6E";
   const hasFriends = group.teams.some((t) => supporters[t]);
@@ -77,8 +79,14 @@ export default function GroupCard({
           <div className="flex items-center gap-2 flex-shrink-0">
             <div className="flex items-center gap-0.5">
               {group.teams.map((t) => (
-                <span key={t} className="text-xl leading-none">
+                <span key={t} className="relative text-xl leading-none">
                   {TEAMS[t]?.flag ?? "🏳️"}
+                  {liveTeams?.has(t) && (
+                    <span
+                      className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full animate-pulse"
+                      style={{ background: "#D52B1E", boxShadow: "0 0 0 1.5px #FFFFFF" }}
+                    />
+                  )}
                 </span>
               ))}
             </div>
