@@ -97,23 +97,101 @@ function findGroupId(home: string, away: string): string | null {
 
 const WC2026_LEAGUE_ID = "4429";
 const WC2026_SEASON = "2026";
+const TSDB_BASE = "https://www.thesportsdb.com/api/v1/json/3";
 
-export async function fetchWCEvents(_db: SupabaseClient): Promise<TSDBEvent[]> {
-  const url = `https://www.thesportsdb.com/api/v1/json/3/eventsseason.php?id=${WC2026_LEAGUE_ID}&s=${WC2026_SEASON}`;
-
-  const res = await fetch(url, {
+async function tsdbFetch<T>(path: string): Promise<T> {
+  const res = await fetch(`${TSDB_BASE}/${path}`, {
     signal: AbortSignal.timeout(15_000),
     headers: { "User-Agent": "SupportYourColors/1.0" },
   });
-
   if (!res.ok) throw new Error(`TheSportsDB HTTP ${res.status}`);
+  return res.json() as Promise<T>;
+}
 
-  const body = await res.json() as { events: TSDBEvent[] | null };
-  const events = body.events ?? [];
+const isWorldCup = (e: TSDBEvent) =>
+  e.strLeague?.toLowerCase().includes("world cup");
 
-  return events.filter((e) =>
-    e.strLeague?.toLowerCase().includes("world cup")
+// Names to try against searchteams.php for a given normalized team name —
+// includes the canonical name plus any TheSportsDB aliases that map to it.
+function searchNamesFor(team: string): string[] {
+  const aliases = Object.entries(TEAM_ALIASES)
+    .filter(([, normalized]) => normalized === team)
+    .map(([raw]) => raw);
+  return [team, ...aliases];
+}
+
+// eventsseason.php misses some results entirely (TheSportsDB updates it on
+// its own schedule). For matches we still consider "pending", fall back to
+// each team's eventslast.php, which TheSportsDB tends to update sooner.
+// Bound how many teams we look up per run — each lookup costs up to two
+// TheSportsDB requests, and the free API rate-limits aggressively.
+const MAX_PENDING_TEAM_LOOKUPS = 2;
+
+async function fetchEventsForPendingTeams(db: SupabaseClient): Promise<TSDBEvent[]> {
+  const amsterdamNow = new Date(Date.now() + 2 * 60 * 60 * 1000);
+  const today = amsterdamNow.toISOString().split("T")[0];
+  const yesterday = new Date(amsterdamNow.getTime() - 24 * 60 * 60 * 1000)
+    .toISOString().split("T")[0];
+
+  // Only matches recent enough that a result is plausible — oldest first, so
+  // long-pending matches get checked before today's (likely not-yet-played) ones.
+  const { data: pending } = await db
+    .from("match_results")
+    .select("home_team, away_team")
+    .neq("status", "finished")
+    .gte("match_date", yesterday)
+    .lte("match_date", today)
+    .order("match_date", { ascending: true });
+
+  const teams = new Set<string>();
+  for (const row of pending ?? []) {
+    if (row.home_team) teams.add(row.home_team);
+    if (row.away_team) teams.add(row.away_team);
+  }
+
+  const extraEvents: TSDBEvent[] = [];
+
+  for (const team of [...teams].slice(0, MAX_PENDING_TEAM_LOOKUPS)) {
+    try {
+      let teamId: string | null = null;
+      for (const name of searchNamesFor(team)) {
+        const body = await tsdbFetch<{ teams: { idTeam: string; strSport: string }[] | null }>(
+          `searchteams.php?t=${encodeURIComponent(name)}`
+        );
+        const match = (body.teams ?? []).find((t) => t.strSport === "Soccer");
+        if (match) { teamId = match.idTeam; break; }
+      }
+      if (!teamId) continue;
+
+      const body = await tsdbFetch<{ results: TSDBEvent[] | null }>(
+        `eventslast.php?id=${teamId}`
+      );
+      extraEvents.push(...(body.results ?? []).filter(isWorldCup));
+    } catch (err) {
+      console.error(`[score-sync] failed to fetch last events for ${team}:`, err);
+    }
+  }
+
+  return extraEvents;
+}
+
+export async function fetchWCEvents(db: SupabaseClient): Promise<TSDBEvent[]> {
+  const body = await tsdbFetch<{ events: TSDBEvent[] | null }>(
+    `eventsseason.php?id=${WC2026_LEAGUE_ID}&s=${WC2026_SEASON}`
   );
+  const seasonEvents = (body.events ?? []).filter(isWorldCup);
+
+  const extraEvents = await fetchEventsForPendingTeams(db);
+
+  const seen = new Set(seasonEvents.map((e) => e.idEvent));
+  for (const e of extraEvents) {
+    if (!seen.has(e.idEvent)) {
+      seasonEvents.push(e);
+      seen.add(e.idEvent);
+    }
+  }
+
+  return seasonEvents;
 }
 
 // ─── Group standings ──────────────────────────────────────────────────────────
