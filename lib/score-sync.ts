@@ -581,6 +581,60 @@ export async function runScoreSync(): Promise<SyncResult> {
     }
   }
 
+  // ── Catch up on results already in our DB but never fully processed ──────
+  // TheSportsDB doesn't always return the same match twice (e.g. once a
+  // match is no longer "pending" it may vanish from every source we poll).
+  // So a match can end up "finished" in match_results with processed=false
+  // and never get picked up by the loop above again. Handle those directly.
+  const { data: stragglers } = await db
+    .from("match_results")
+    .select("home_team, away_team, home_score, away_score, winner")
+    .eq("status", "finished")
+    .eq("processed", false);
+
+  for (const row of stragglers ?? []) {
+    try {
+      const { home_team: homeTeam, away_team: awayTeam, home_score: homeScore, away_score: awayScore, winner } = row;
+      if (homeScore == null || awayScore == null) continue;
+
+      await updateTournamentPoints(db, homeTeam, awayTeam, homeScore, awayScore);
+
+      const groupId = findGroupId(homeTeam, awayTeam);
+      if (groupId) {
+        await recalculateStandings(db, groupId);
+        await tryPopulateR32Slots(db);
+      } else if (winner && winner !== "draw") {
+        const { data: koMatch } = await db
+          .from("knockout_matches")
+          .select("match_number")
+          .eq("home_team", homeTeam)
+          .eq("away_team", awayTeam)
+          .maybeSingle();
+
+        if (koMatch) {
+          const loser = winner === homeTeam ? awayTeam : homeTeam;
+          await advanceInBracket(db, koMatch.match_number, winner, loser);
+          await db
+            .from("knockout_matches")
+            .update({ winner, status: "finished", processed: true, updated_at: new Date().toISOString() })
+            .eq("match_number", koMatch.match_number);
+        }
+      }
+
+      await db
+        .from("match_results")
+        .update({ processed: true })
+        .eq("home_team", homeTeam)
+        .eq("away_team", awayTeam);
+
+      result.processed++;
+    } catch (err) {
+      const msg = `straggler ${row.home_team} vs ${row.away_team}: ${err instanceof Error ? err.message : String(err)}`;
+      result.errors.push(msg);
+      console.error("[score-sync]", msg);
+    }
+  }
+
   // Always recompute every group's standings, even if no new events came in
   // this run. This keeps group_standings correct if a previous run's upsert
   // failed silently (e.g. the table didn't exist yet when a match was first
