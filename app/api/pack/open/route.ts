@@ -30,37 +30,16 @@ export async function POST(req: NextRequest) {
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   // ── Validate pack id ───────────────────────────────────────────────────────
-  const body        = await req.json() as { packId?: string; inventoryId?: string };
-  const pack        = body.packId ? getPack(body.packId) : undefined;
-  const inventoryId = body.inventoryId;
+  const body   = await req.json() as { packId?: string };
+  const pack   = body.packId ? getPack(body.packId) : undefined;
   console.log(`[pack/open] Pack request: ${body.packId}, Found: ${pack ? "yes" : "NO"}`);
   if (!pack) {
     console.error(`[pack/open] Pack not found: ${body.packId}`);
     return NextResponse.json({ error: "Unknown pack" }, { status: 400 });
   }
 
-  // ── Inventory item: validate ownership, skip cooldown entirely ─────────────
-  if (inventoryId) {
-    const { data: invItem, error: invError } = await db
-      .from("user_pack_inventory")
-      .select("id, pack_id, opened_at")
-      .eq("id", inventoryId)
-      .eq("user_id", user.id)
-      .maybeSingle();
-
-    if (invError || !invItem || invItem.pack_id !== pack.id || invItem.opened_at) {
-      return NextResponse.json({ error: "Invalid inventory item" }, { status: 400 });
-    }
-
-    // Consume the inventory slot now — opening always produces a result
-    await db
-      .from("user_pack_inventory")
-      .update({ opened_at: new Date().toISOString() })
-      .eq("id", inventoryId);
-  }
-
   // ── Cooldown check ─────────────────────────────────────────────────────────
-  const skipCooldown = !!inventoryId || NO_COOLDOWN_USERS.has(user.id);
+  const skipCooldown = NO_COOLDOWN_USERS.has(user.id);
 
   if (pack.cooldownMinutes > 0 && !skipCooldown) {
     const { data: cd } = await db

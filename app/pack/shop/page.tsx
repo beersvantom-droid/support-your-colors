@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { SHOP_PACKS } from "@/lib/packs";
+import { SHOP_PACKS, type Pack } from "@/lib/packs";
 import ShopCard from "@/components/pack/ShopCard";
+import PackOpener from "@/components/pack/PackOpener";
 
 export default function ShopPage() {
   const router = useRouter();
@@ -11,7 +12,7 @@ export default function ShopPage() {
   const [loading, setLoading] = useState(true);
   const [purchasingPackId, setPurchasingPackId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [purchasedLabel, setPurchasedLabel] = useState<string | null>(null);
+  const [openingPack, setOpeningPack] = useState<Pack | null>(null);
 
   useEffect(() => {
     fetchCoinBalance();
@@ -80,9 +81,11 @@ export default function ShopPage() {
         // Dispatch custom event for AppHeader to refresh
         window.dispatchEvent(new Event("pack-opened"));
 
-        // Pack lands in "Jouw Packs" on the packs page — show confirmation
+        // Find the pack and open it directly (don't navigate away)
         const purchasedPack = SHOP_PACKS.find(p => p.id === packId);
-        setPurchasedLabel(purchasedPack?.label ?? "Pack");
+        if (purchasedPack) {
+          setOpeningPack(purchasedPack);
+        }
       } else {
         throw new Error(data.error || "Purchase failed");
       }
@@ -95,36 +98,22 @@ export default function ShopPage() {
     }
   };
 
-  // Show confirmation if a pack was just purchased
-  if (purchasedLabel) {
+  // Show PackOpener if a pack was purchased
+  if (openingPack) {
     return (
-      <div
-        className="min-h-screen w-full max-w-md mx-auto flex flex-col items-center justify-center gap-5 px-6 text-center"
-        style={{
-          background: "linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%)",
-        }}
-      >
-        <div style={{ fontSize: 64 }}>📦</div>
-        <h2 className="text-2xl font-black text-white">{purchasedLabel} toegevoegd!</h2>
-        <p className="text-sm text-white/60">
-          Je nieuwe pack staat klaar in <span className="font-bold text-amber-300">Jouw Packs</span> op de packs pagina.
-        </p>
-        <div className="flex gap-3 w-full">
-          <button
-            onClick={() => setPurchasedLabel(null)}
-            className="flex-1 py-3 rounded-2xl font-black text-sm"
-            style={{ background: "rgba(255,255,255,0.06)", color: "#9CA3AF", border: "1px solid rgba(255,255,255,0.10)" }}
-          >
-            Terug naar shop
-          </button>
-          <button
-            onClick={() => router.push("/pack")}
-            className="flex-1 py-3 rounded-2xl font-black text-sm text-white"
-            style={{ background: "linear-gradient(135deg, #B45309 0%, #FBBF24 100%)" }}
-          >
-            Naar Jouw Packs →
-          </button>
-        </div>
+      <div style={{
+        minHeight: "100dvh",
+        background: "radial-gradient(ellipse at 50% 30%, #08122A 0%, #040810 55%, #020508 100%)",
+        display: "flex", flexDirection: "column", alignItems: "center",
+      }}>
+        <PackOpener
+          pack={openingPack}
+          onReset={() => {
+            setOpeningPack(null);
+            // Refresh coin balance after pack opens
+            fetchCoinBalance();
+          }}
+        />
       </div>
     );
   }

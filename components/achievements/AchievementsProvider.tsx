@@ -342,26 +342,6 @@ export function AchievementsProvider({
           console.error("[Achievements] Error checking underdog picks:", err);
         }
 
-        // Fire Pack achievements: total flames received on the user's posts
-        let flamesReceivedCount = 0;
-        try {
-          const { data: myPostsForFlames } = await supabase
-            .from("posts")
-            .select("id")
-            .eq("username", profile!.username);
-
-          const flamePostIds = (myPostsForFlames ?? []).map((p: { id: string }) => p.id);
-          if (flamePostIds.length > 0) {
-            const { count } = await supabase
-              .from("post_reactions")
-              .select("*", { count: "exact", head: true })
-              .in("post_id", flamePostIds);
-            flamesReceivedCount = count ?? 0;
-          }
-        } catch (err) {
-          console.error("[Achievements] Error counting flames received:", err);
-        }
-
         const stats = {
           postCount,
           commentCount,
@@ -382,7 +362,6 @@ export function AchievementsProvider({
           cosmeticsOwnedCount,
           mascotsOwnedCount,
           hasUnderdogCorrectPick,
-          flamesReceivedCount,
         };
 
         const newUnlocks = resolveNewUnlocks(stats, unlockedIdsRef.current);
@@ -455,23 +434,6 @@ export function AchievementsProvider({
             console.log(`[Achievements] Awarded ${coinTotal} coins`);
           } catch (err) {
             console.error("[Achievements] Error awarding coins:", err);
-          }
-        }
-
-        // Grant packs into "Jouw Packs" inventory for achievements that unlock one
-        const packUnlocks = newUnlocks.filter((a) => a.unlocksPack);
-        if (packUnlocks.length > 0) {
-          const { error: packGrantError } = await supabase
-            .from("user_pack_inventory")
-            .insert(
-              packUnlocks.map((a) => ({
-                user_id: user!.id,
-                pack_id: a.unlocksPack,
-                source: `achievement:${a.id}`,
-              }))
-            );
-          if (packGrantError) {
-            console.error("[Achievements] Error granting pack:", packGrantError.message);
           }
         }
 

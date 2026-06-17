@@ -466,7 +466,6 @@ export default function ProfilePage() {
                     cosmeticsOwnedCount: progressStats.cosmeticsOwnedCount,
                     mascotsOwnedCount: progressStats.mascotsOwnedCount,
                     hasUnderdogCorrectPick: false,
-                    flamesReceivedCount: 0,
                   };
 
                   const currentTier = getCurrentTierLevel(achievement, stats);

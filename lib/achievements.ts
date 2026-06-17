@@ -15,7 +15,6 @@ export interface AchievementDef {
   points: number;
   coins?: number; // coins awarded (for progression achievements)
   unlocksCosmetic?: string; // cosmetic_id if this achievement unlocks a cosmetic
-  unlocksPack?: string; // pack_id granted into user_pack_inventory on unlock
   tiers?: AchievementTier[]; // For tiered achievements (bronze/silver/gold)
 }
 
@@ -303,44 +302,6 @@ export const ALL_ACHIEVEMENTS: AchievementDef[] = [
     unlocksCosmetic: "mascot_udo",
   },
 
-  // ── Fire Pack Achievements (flames received → Fire Pack reward) ─────────────────
-  {
-    id: "fire_pack_20",
-    emoji: "🔥",
-    name: "Vlammenvanger",
-    hint: "20 vlammen ontvangen op je posts",
-    rarity: "easy",
-    points: 150,
-    unlocksPack: "fire_pack",
-  },
-  {
-    id: "fire_pack_50",
-    emoji: "🔥",
-    name: "Vuurzee",
-    hint: "50 vlammen ontvangen op je posts",
-    rarity: "medium",
-    points: 300,
-    unlocksPack: "fire_pack",
-  },
-  {
-    id: "fire_pack_75",
-    emoji: "🔥",
-    name: "Vlammenstorm",
-    hint: "75 vlammen ontvangen op je posts",
-    rarity: "hard",
-    points: 500,
-    unlocksPack: "fire_pack",
-  },
-  {
-    id: "fire_pack_100",
-    emoji: "🔥",
-    name: "Inferno",
-    hint: "100 vlammen ontvangen op je posts",
-    rarity: "secret",
-    points: 1000,
-    unlocksPack: "fire_pack",
-  },
-
   // ── Tiered Progression Achievements (visible progress with coin rewards) ───────────────────
   {
     id: "login_challenge",
@@ -423,7 +384,6 @@ export interface AchievementStats {
   cosmeticsOwnedCount: number;      // total unique cosmetics
   mascotsOwnedCount: number;        // total unique mascots
   hasUnderdogCorrectPick: boolean;  // correctly predicted a ≤25% outcome
-  flamesReceivedCount: number;      // total flames received on the user's posts
 }
 
 export function resolveNewUnlocks(
@@ -441,10 +401,6 @@ export function resolveNewUnlocks(
     ["fast_responder",    stats.hasFastResponse],
     ["democracy_enjoyer", stats.voteDayCount >= 7],
     ["onderbuikgevoel",   stats.hasUnderdogCorrectPick],
-    ["fire_pack_20",      stats.flamesReceivedCount >= 20],
-    ["fire_pack_50",      stats.flamesReceivedCount >= 50],
-    ["fire_pack_75",      stats.flamesReceivedCount >= 75],
-    ["fire_pack_100",     stats.flamesReceivedCount >= 100],
     ["stadium_presence",  stats.consecutiveActivityDays >= 10],
     ["around_the_clock",  stats.hasAroundTheClock],
     ["night_shift",       stats.nightPostCount >= 3],

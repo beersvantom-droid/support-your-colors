@@ -59,7 +59,7 @@ export default function FanSupportRanking() {
           return (
             <div
               key={profile.id}
-              className={`flex items-center gap-2 rounded-2xl p-3 relative overflow-hidden ${bdrProps.className}`}
+              className={`flex items-center gap-3 rounded-2xl p-3 relative overflow-hidden ${bdrProps.className}`}
               style={{ background: "#FFFFFF", ...bdrProps.style }}
             >
               {/* Card background layer (patterns / animations) */}
@@ -77,7 +77,7 @@ export default function FanSupportRanking() {
               </div>
 
               {/* Flag, badge & username */}
-              <div className="flex items-center gap-2 min-w-0 relative">
+              <div className="flex items-center gap-2 flex-1 min-w-0 relative">
                 <span className="text-xl">{countryFlag}</span>
                 <div className="min-w-0">
                   <p className="text-sm font-bold truncate flex items-center gap-1">
@@ -96,12 +96,12 @@ export default function FanSupportRanking() {
 
               {/* Mascots — side by side between name and points */}
               {mascots.length > 0 && (
-                <div className="flex items-end gap-0.5 flex-shrink-0" style={{ minWidth: mascots.length * 32 }}>
+                <div className="flex items-end gap-0.5 flex-shrink-0" style={{ minWidth: mascots.length * 40 }}>
                   {mascots.map((id, i) => (
                     <MascotSprite
                       key={id}
                       id={id}
-                      size={32}
+                      size={36}
                       animationDelay={i * 1200}
                     />
                   ))}

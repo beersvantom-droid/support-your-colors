@@ -1,17 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { PACKS, type Pack } from "@/lib/packs";
+import { PACKS, SHOP_PACKS, type Pack } from "@/lib/packs";
 import PackOpener from "@/components/pack/PackOpener";
-
-interface InventoryItem {
-  inventoryId: string;
-  pack: Pack;
-  source: string;
-  createdAt: string;
-}
 
 // ── Pack selector card ────────────────────────────────────────────────────────
 
@@ -68,36 +61,6 @@ function PackCard({ pack, onSelect }: { pack: Pack; onSelect: () => void }) {
 
 export default function PackPage() {
   const [selectedPack, setSelectedPack] = useState<Pack | null>(null);
-  const [selectedInventoryId, setSelectedInventoryId] = useState<string | undefined>(undefined);
-  const [inventory, setInventory] = useState<InventoryItem[]>([]);
-
-  useEffect(() => {
-    fetchInventory();
-  }, []);
-
-  async function fetchInventory() {
-    try {
-      const res = await fetch("/api/pack/inventory", { credentials: "include" });
-      if (!res.ok) return;
-      const data = await res.json();
-      setInventory(data.items ?? []);
-    } catch {
-      // Silent fail — section just stays empty
-    }
-  }
-
-  function openInventoryItem(item: InventoryItem) {
-    setSelectedInventoryId(item.inventoryId);
-    setSelectedPack(item.pack);
-  }
-
-  function closeOpener() {
-    setSelectedPack(null);
-    if (selectedInventoryId) {
-      setSelectedInventoryId(undefined);
-      fetchInventory();
-    }
-  }
 
   // Opening a pack
   if (selectedPack) {
@@ -109,8 +72,7 @@ export default function PackPage() {
       }}>
         <PackOpener
           pack={selectedPack}
-          inventoryId={selectedInventoryId}
-          onReset={closeOpener}
+          onReset={() => setSelectedPack(null)}
         />
       </div>
     );
@@ -147,43 +109,6 @@ export default function PackPage() {
           <p style={{ color: "#6B7280", fontSize: 12 }}>Open een pack voor cosmetica &amp; mascots</p>
         </div>
       </div>
-
-      {/* Jouw Packs — earned via achievements or bought in de shop, klaar om te openen */}
-      {inventory.length > 0 && (
-        <div style={{ maxWidth: 500, margin: "0 auto", padding: "20px 20px 0" }}>
-          <p style={{ color: "#FBBF24", fontWeight: 900, fontSize: 13, letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 10 }}>
-            🎁 Jouw Packs
-          </p>
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {inventory.map(item => (
-              <button
-                key={item.inventoryId}
-                onClick={() => openInventoryItem(item)}
-                style={{
-                  width: "100%", padding: "14px 16px", borderRadius: 16,
-                  background: "linear-gradient(135deg, rgba(251,191,36,0.12), rgba(251,191,36,0.04))",
-                  border: "1.5px solid rgba(251,191,36,0.35)",
-                  display: "flex", alignItems: "center", gap: 14,
-                  cursor: "pointer", textAlign: "left" as const,
-                }}
-              >
-                <div style={{ fontSize: 32, lineHeight: 1 }}>{item.pack.emoji}</div>
-                <div style={{ flex: 1 }}>
-                  <p style={{ color: "#fff", fontWeight: 900, fontSize: 14 }}>{item.pack.label}</p>
-                  <p style={{ color: "#9CA3AF", fontSize: 12 }}>Klaar om te openen</p>
-                </div>
-                <div style={{
-                  padding: "8px 16px", borderRadius: 12,
-                  background: "linear-gradient(135deg, #B45309 0%, #FBBF24 100%)",
-                  color: "#fff", fontWeight: 900, fontSize: 12,
-                }}>
-                  Open
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
 
       {/* Pack list */}
       <div style={{
