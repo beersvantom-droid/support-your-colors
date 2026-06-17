@@ -527,8 +527,10 @@ export async function runScoreSync(): Promise<SyncResult> {
       const groupId = findGroupId(homeTeam, awayTeam);
 
       if (homeScore != null && awayScore != null) {
-        // Award tournament points to supporters
-        await updateTournamentPoints(db, homeTeam, awayTeam, homeScore, awayScore);
+        if (finished) {
+          // Award tournament points only once when match is finished
+          await updateTournamentPoints(db, homeTeam, awayTeam, homeScore, awayScore);
+        }
 
         if (groupId) {
           // Group stage: always recalculate standings when there are scores
