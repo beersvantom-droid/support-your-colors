@@ -94,9 +94,9 @@ export default function FanSupportRanking() {
                 </div>
               </div>
 
-              {/* Mascots — side by side between name and points */}
+              {/* Mascots — hidden on mobile, visible on larger screens */}
               {mascots.length > 0 && (
-                <div className="flex items-end gap-0.5 flex-shrink-0" style={{ minWidth: mascots.length * 32 }}>
+                <div className="hidden sm:flex items-end gap-0.5 flex-shrink-0" style={{ minWidth: mascots.length * 32 }}>
                   {mascots.map((id, i) => (
                     <MascotSprite
                       key={id}
