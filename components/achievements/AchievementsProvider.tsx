@@ -280,21 +280,21 @@ export function AchievementsProvider({
             }
             villain_arc_max_comments = Math.max(0, ...counts.values());
 
-            // Get like counts per post
-            const { data: likeCounts } = await supabase
-              .from("post_likes")
+            // Get flame/reaction counts per post
+            const { data: reactions } = await supabase
+              .from("post_reactions")
               .select("post_id")
               .in("post_id", postIds);
 
-            const likeMap = new Map<string, number>();
-            for (const lc of likeCounts ?? []) {
-              const row = lc as { post_id: string };
-              likeMap.set(row.post_id, (likeMap.get(row.post_id) ?? 0) + 1);
+            const reactionMap = new Map<string, number>();
+            for (const r of reactions ?? []) {
+              const row = r as { post_id: string };
+              reactionMap.set(row.post_id, (reactionMap.get(row.post_id) ?? 0) + 1);
             }
 
-            if (likeMap.size > 0) {
-              maxLikesOnPost = Math.max(...likeMap.values());
-              totalLikesReceived = Array.from(likeMap.values()).reduce((sum, n) => sum + n, 0);
+            if (reactionMap.size > 0) {
+              maxLikesOnPost = Math.max(...reactionMap.values());
+              totalLikesReceived = Array.from(reactionMap.values()).reduce((sum, n) => sum + n, 0);
             }
           }
         } catch {}
