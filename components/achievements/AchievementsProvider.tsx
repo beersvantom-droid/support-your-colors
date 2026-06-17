@@ -246,9 +246,12 @@ export function AchievementsProvider({
         }
 
         // Villain Arc: received 25+ comments on a single post
+        // Also: Viral Post (8+ likes on one post), and total likes received
         let villain_arc_max_comments = 0;
         let djDerksenCommentCount    = 0;
         let abuHarbCommentCount      = 0;
+        let maxLikesOnPost           = 0;
+        let totalLikesReceived       = 0;
         try {
           const { data: myPosts } = await supabase
             .from("posts")
@@ -257,6 +260,8 @@ export function AchievementsProvider({
 
           if (myPosts && myPosts.length > 0) {
             const postIds = myPosts.map((p: { id: string }) => p.id);
+
+            // Get comment counts
             const { data: commentCounts } = await supabase
               .from("comments")
               .select("post_id, username")
@@ -266,16 +271,31 @@ export function AchievementsProvider({
             for (const c of commentCounts ?? []) {
               const row = c as { post_id: string; username: string };
               counts.set(row.post_id, (counts.get(row.post_id) ?? 0) + 1);
-              // Count DJ Derksen fan comments on user's posts
               if (row.username.toLowerCase().trim() === "dj derksen") {
                 djDerksenCommentCount++;
               }
-              // Count Abu Harb fan comments on user's posts
               if (row.username.toLowerCase().trim() === "abu harb") {
                 abuHarbCommentCount++;
               }
             }
             villain_arc_max_comments = Math.max(0, ...counts.values());
+
+            // Get like counts per post
+            const { data: likeCounts } = await supabase
+              .from("post_likes")
+              .select("post_id")
+              .in("post_id", postIds);
+
+            const likeMap = new Map<string, number>();
+            for (const lc of likeCounts ?? []) {
+              const row = lc as { post_id: string };
+              likeMap.set(row.post_id, (likeMap.get(row.post_id) ?? 0) + 1);
+            }
+
+            if (likeMap.size > 0) {
+              maxLikesOnPost = Math.max(...likeMap.values());
+              totalLikesReceived = Array.from(likeMap.values()).reduce((sum, n) => sum + n, 0);
+            }
           }
         } catch {}
 
@@ -362,6 +382,8 @@ export function AchievementsProvider({
           cosmeticsOwnedCount,
           mascotsOwnedCount,
           hasUnderdogCorrectPick,
+          maxLikesOnPost,
+          totalLikesReceived,
         };
 
         const newUnlocks = resolveNewUnlocks(stats, unlockedIdsRef.current);

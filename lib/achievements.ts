@@ -248,6 +248,46 @@ export const ALL_ACHIEVEMENTS: AchievementDef[] = [
     points: 1000,
   },
   {
+    id: "viral_post",
+    emoji: "🚀",
+    name: "Viral Post",
+    hint: "One of your posts received 8 likes",
+    rarity: "hard",
+    points: 500,
+  },
+  {
+    id: "flame_starter",
+    emoji: "🔥",
+    name: "Flame Starter",
+    hint: "Received 50 likes total",
+    rarity: "medium",
+    points: 300,
+  },
+  {
+    id: "flame_master",
+    emoji: "🌟",
+    name: "Flame Master",
+    hint: "Received 75 likes total",
+    rarity: "hard",
+    points: 500,
+  },
+  {
+    id: "flame_legend",
+    emoji: "💎",
+    name: "Flame Legend",
+    hint: "...",
+    rarity: "secret",
+    points: 1000,
+  },
+  {
+    id: "content_monster",
+    emoji: "📹",
+    name: "Content Monster",
+    hint: "Created 30 posts",
+    rarity: "secret",
+    points: 1000,
+  },
+  {
     id: "dj_derksen_fan",
     emoji: "🎧",
     name: "DJ Approved",
@@ -384,6 +424,8 @@ export interface AchievementStats {
   cosmeticsOwnedCount: number;      // total unique cosmetics
   mascotsOwnedCount: number;        // total unique mascots
   hasUnderdogCorrectPick: boolean;  // correctly predicted a ≤25% outcome
+  maxLikesOnPost: number;           // max likes received on a single post
+  totalLikesReceived: number;       // total likes received across all posts
 }
 
 export function resolveNewUnlocks(
@@ -406,6 +448,11 @@ export function resolveNewUnlocks(
     ["night_shift",       stats.nightPostCount >= 3],
     ["media_veteran",     stats.postCount >= 10],
     ["content_machine",   stats.postCount >= 15],
+    ["content_monster",   stats.postCount >= 30],
+    ["viral_post",        stats.maxLikesOnPost >= 8],
+    ["flame_starter",     stats.totalLikesReceived >= 50],
+    ["flame_master",      stats.totalLikesReceived >= 75],
+    ["flame_legend",      stats.totalLikesReceived >= 150],
     ["democracy_addict",  stats.consecutiveVoteDays >= 14],
     ["villain_arc",       stats.villain_arc_max_comments >= 25],
     ["golden_cor_fan",    stats.villain_arc_max_comments >= 20],
