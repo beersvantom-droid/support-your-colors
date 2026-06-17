@@ -19,6 +19,7 @@ type Phase =
 
 interface PackOpenerProps {
   pack: Pack;
+  inventoryId?: string; // when set, opens this "Jouw Packs" item (no cost/cooldown)
   onReset: () => void; // go back to selector
 }
 
@@ -174,7 +175,7 @@ function ConfettiRain({ rarity }: { rarity: Rarity }) {
 
 // ── Main component ────────────────────────────────────────────────────────────
 
-export default function PackOpener({ pack, onReset }: PackOpenerProps) {
+export default function PackOpener({ pack, inventoryId, onReset }: PackOpenerProps) {
   const [phase,    setPhase]    = useState<Phase>("idle");
   const [rarity,   setRarity]   = useState<Rarity | null>(null);
   const [item,     setItem]     = useState<Cosmetic | Mascot | null>(null);
@@ -204,7 +205,7 @@ export default function PackOpener({ pack, onReset }: PackOpenerProps) {
     const apiPromise = fetch("/api/pack/open", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ packId: pack.id }),
+      body: JSON.stringify({ packId: pack.id, inventoryId }),
     }).then(r => r.json()).then((data: Record<string, unknown>) => {
       if (data.onCooldown) {
         setStatus("cooldown");

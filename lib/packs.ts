@@ -49,7 +49,27 @@ export const PACKS: Pack[] = [
 ];
 
 export function getPack(id: string): Pack | undefined {
-  return PACKS.find(p => p.id === id) || SHOP_PACKS.find(p => p.id === id);
+  return PACKS.find(p => p.id === id) || SHOP_PACKS.find(p => p.id === id) || REWARD_PACKS.find(p => p.id === id);
+}
+
+// ── Reward Packs (earned via achievements, never shown in Daily/Shop lists) ──
+// Granted into user_pack_inventory and opened from the "Jouw Packs" section.
+
+export const REWARD_PACKS: Pack[] = [
+  {
+    id:              "fire_pack",
+    label:           "Fire Pack",
+    description:     "Geen common items! Hogere kansen op rare, epic, legendary en mascots.",
+    emoji:           "🔥",
+    imagePath:       undefined,
+    cost:            null,
+    rarityPool:      { rare: 43, epic: 26, legendary: 13, mascots: 17 },
+    cooldownMinutes: 0,
+  },
+];
+
+export function getRewardPack(id: string): Pack | undefined {
+  return REWARD_PACKS.find(p => p.id === id);
 }
 
 // ── Shop Packs (purchasable with coins) ────────────────────────────────────

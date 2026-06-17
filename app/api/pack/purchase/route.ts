@@ -126,6 +126,23 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Add the pack to "Jouw Packs" — opened later from the packs page
+    const { error: invError } = await serviceDb
+      .from("user_pack_inventory")
+      .insert({
+        user_id: user.id,
+        pack_id: pack.id,
+        source: "shop_purchase",
+      });
+
+    if (invError) {
+      console.error("Error adding pack to inventory:", invError);
+      return NextResponse.json(
+        { error: "Failed to add pack to inventory" },
+        { status: 500 }
+      );
+    }
+
     // Success — return new balance
     return NextResponse.json({
       success: true,
