@@ -59,7 +59,7 @@ export default function FanSupportRanking() {
           return (
             <div
               key={profile.id}
-              className={`flex items-center gap-3 rounded-2xl p-3 relative overflow-hidden ${bdrProps.className}`}
+              className={`flex items-center gap-2 rounded-2xl p-3 relative overflow-hidden ${bdrProps.className}`}
               style={{ background: "#FFFFFF", ...bdrProps.style }}
             >
               {/* Card background layer (patterns / animations) */}
@@ -76,10 +76,10 @@ export default function FanSupportRanking() {
                 <p className="text-xl">{titleData.emoji}</p>
               </div>
 
-              {/* Flag, badge & username */}
-              <div className="flex items-center gap-2 min-w-0 relative">
-                <span className="text-xl">{countryFlag}</span>
-                <div className="min-w-0">
+              {/* Flag, badge & username — stays compact, never grows */}
+              <div className="flex items-center gap-1 flex-shrink-0 min-w-0">
+                <span className="text-xl flex-shrink-0">{countryFlag}</span>
+                <div className="min-w-0 truncate">
                   <p className="text-sm font-bold truncate flex items-center gap-1">
                     {badge && (
                       <span className={`text-sm leading-none ${badge.className}`}>
@@ -90,16 +90,16 @@ export default function FanSupportRanking() {
                       {profile.username}
                     </span>
                   </p>
-                  <p className="text-xs text-text-muted">{titleData.title}</p>
+                  <p className="text-xs text-text-muted truncate">{titleData.title}</p>
                 </div>
               </div>
 
-              {/* Mascots — smaller on mobile to preserve name space */}
+              {/* Spacer to push mascots and points to right */}
+              <div className="flex-1 min-w-0" />
+
+              {/* Mascots — smaller size to preserve space */}
               {mascots.length > 0 && (
-                <div
-                  className="flex items-end gap-0.5 flex-shrink-0"
-                  style={{ minWidth: `calc(${mascots.length} * 24px)` }}
-                >
+                <div className="flex items-end gap-0.5 flex-shrink-0">
                   {mascots.map((id, i) => (
                     <MascotSprite
                       key={id}
