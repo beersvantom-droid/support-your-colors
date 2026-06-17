@@ -77,9 +77,9 @@ export default function FanSupportRanking() {
               </div>
 
               {/* Flag, badge & username */}
-              <div className="flex items-center gap-2 min-w-0 relative" style={{ flex: "0 1 auto" }}>
-                <span className="text-xl flex-shrink-0">{countryFlag}</span>
-                <div className="min-w-0 overflow-hidden">
+              <div className="flex items-center gap-2 min-w-0 relative">
+                <span className="text-xl">{countryFlag}</span>
+                <div className="min-w-0">
                   <p className="text-sm font-bold truncate flex items-center gap-1">
                     {badge && (
                       <span className={`text-sm leading-none ${badge.className}`}>
@@ -96,12 +96,12 @@ export default function FanSupportRanking() {
 
               {/* Mascots — side by side between name and points */}
               {mascots.length > 0 && (
-                <div className="flex items-end gap-0.5 flex-shrink-0" style={{ minWidth: mascots.length * 40 }}>
+                <div className="flex items-end gap-0.5 flex-shrink-0" style={{ minWidth: mascots.length * 32 }}>
                   {mascots.map((id, i) => (
                     <MascotSprite
                       key={id}
                       id={id}
-                      size={36}
+                      size={32}
                       animationDelay={i * 1200}
                     />
                   ))}
