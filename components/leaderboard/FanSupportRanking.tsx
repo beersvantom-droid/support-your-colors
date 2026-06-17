@@ -77,9 +77,9 @@ export default function FanSupportRanking() {
               </div>
 
               {/* Flag, badge & username */}
-              <div className="flex items-center gap-2 flex-1 min-w-0 relative">
-                <span className="text-xl">{countryFlag}</span>
-                <div className="min-w-0">
+              <div className="flex items-center gap-2 min-w-0 relative" style={{ flex: "0 1 auto" }}>
+                <span className="text-xl flex-shrink-0">{countryFlag}</span>
+                <div className="min-w-0 overflow-hidden">
                   <p className="text-sm font-bold truncate flex items-center gap-1">
                     {badge && (
                       <span className={`text-sm leading-none ${badge.className}`}>
