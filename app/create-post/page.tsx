@@ -41,6 +41,28 @@ export default function CreatePostPage() {
     if (fileInputRef.current) fileInputRef.current.value = "";
   }
 
+  async function compressImage(file: File): Promise<Blob> {
+    return new Promise((resolve) => {
+      const img = new window.Image();
+      const url = URL.createObjectURL(file);
+      img.onload = () => {
+        URL.revokeObjectURL(url);
+        const MAX = 1200;
+        let { width, height } = img;
+        if (width > MAX || height > MAX) {
+          if (width > height) { height = Math.round((height * MAX) / width); width = MAX; }
+          else { width = Math.round((width * MAX) / height); height = MAX; }
+        }
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        canvas.getContext("2d")!.drawImage(img, 0, 0, width, height);
+        canvas.toBlob((blob) => resolve(blob!), "image/jpeg", 0.82);
+      };
+      img.src = url;
+    });
+  }
+
   async function handleSubmit() {
     if (!image) {
       setError("Please select an image first.");
@@ -54,12 +76,12 @@ export default function CreatePostPage() {
     setError(null);
 
     try {
-      const ext = image.name.split(".").pop();
-      const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const compressed = await compressImage(image);
+      const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.jpg`;
 
       const { error: uploadError } = await supabase.storage
         .from("posts-images")
-        .upload(fileName, image, { contentType: image.type });
+        .upload(fileName, compressed, { contentType: "image/jpeg" });
 
       if (uploadError) throw new Error(`Storage upload failed: ${uploadError.message}`);
 
