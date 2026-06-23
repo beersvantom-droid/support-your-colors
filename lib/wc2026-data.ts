@@ -164,22 +164,26 @@ export const GROUPS: WCGroup[] = [
       {
         matchday: 1, date: "Jun 11", time: "3:00 PM ET",
         home: "Mexico", away: "South Africa",
-        venue: "Estadio Azteca", city: "Mexico City", status: "upcoming",
+        venue: "Estadio Azteca", city: "Mexico City", status: "finished",
+        homeScore: 2, awayScore: 0,
       },
       {
         matchday: 1, date: "Jun 11", time: "10:00 PM ET",
         home: "South Korea", away: "Czechia",
-        venue: "Estadio Akron", city: "Guadalajara", status: "upcoming",
+        venue: "Estadio Akron", city: "Guadalajara", status: "finished",
+        homeScore: 2, awayScore: 1,
       },
       {
         matchday: 2, date: "Jun 18", time: "12:00 PM ET",
         home: "Czechia", away: "South Africa",
-        venue: "Mercedes-Benz Stadium", city: "Atlanta", status: "upcoming",
+        venue: "Mercedes-Benz Stadium", city: "Atlanta", status: "finished",
+        homeScore: 1, awayScore: 1,
       },
       {
         matchday: 2, date: "Jun 18", time: "9:00 PM ET",
         home: "Mexico", away: "South Korea",
-        venue: "Estadio Akron", city: "Guadalajara", status: "upcoming",
+        venue: "Estadio Akron", city: "Guadalajara", status: "finished",
+        homeScore: 1, awayScore: 0,
       },
       {
         matchday: 3, date: "Jun 24", time: "9:00 PM ET",
@@ -202,22 +206,26 @@ export const GROUPS: WCGroup[] = [
       {
         matchday: 1, date: "Jun 12", time: "3:00 PM ET",
         home: "Canada", away: "Bosnia and Herzegovina",
-        venue: "BMO Field", city: "Toronto", status: "upcoming",
+        venue: "BMO Field", city: "Toronto", status: "finished",
+        homeScore: 1, awayScore: 1,
       },
       {
         matchday: 1, date: "Jun 13", time: "3:00 PM ET",
         home: "Qatar", away: "Switzerland",
-        venue: "Levi's Stadium", city: "Santa Clara", status: "upcoming",
+        venue: "Levi's Stadium", city: "Santa Clara", status: "finished",
+        homeScore: 1, awayScore: 1,
       },
       {
         matchday: 2, date: "Jun 18", time: "3:00 PM ET",
         home: "Switzerland", away: "Bosnia and Herzegovina",
-        venue: "SoFi Stadium", city: "Los Angeles", status: "upcoming",
+        venue: "SoFi Stadium", city: "Los Angeles", status: "finished",
+        homeScore: 4, awayScore: 1,
       },
       {
         matchday: 2, date: "Jun 18", time: "6:00 PM ET",
         home: "Canada", away: "Qatar",
-        venue: "BC Place", city: "Vancouver", status: "upcoming",
+        venue: "BC Place", city: "Vancouver", status: "finished",
+        homeScore: 6, awayScore: 0,
       },
       {
         matchday: 3, date: "Jun 24", time: "3:00 PM ET",
@@ -240,22 +248,26 @@ export const GROUPS: WCGroup[] = [
       {
         matchday: 1, date: "Jun 13", time: "6:00 PM ET",
         home: "Brazil", away: "Morocco",
-        venue: "MetLife Stadium", city: "East Rutherford", status: "upcoming",
+        venue: "MetLife Stadium", city: "East Rutherford", status: "finished",
+        homeScore: 1, awayScore: 1,
       },
       {
         matchday: 1, date: "Jun 13", time: "9:00 PM ET",
         home: "Haiti", away: "Scotland",
-        venue: "Gillette Stadium", city: "Foxborough", status: "upcoming",
+        venue: "Gillette Stadium", city: "Foxborough", status: "finished",
+        homeScore: 0, awayScore: 1,
       },
       {
         matchday: 2, date: "Jun 19", time: "6:00 PM ET",
         home: "Scotland", away: "Morocco",
-        venue: "Gillette Stadium", city: "Foxborough", status: "upcoming",
+        venue: "Gillette Stadium", city: "Foxborough", status: "finished",
+        homeScore: 0, awayScore: 1,
       },
       {
         matchday: 2, date: "Jun 19", time: "8:30 PM ET",
         home: "Brazil", away: "Haiti",
-        venue: "Lincoln Financial Field", city: "Philadelphia", status: "upcoming",
+        venue: "Lincoln Financial Field", city: "Philadelphia", status: "finished",
+        homeScore: 3, awayScore: 0,
       },
       {
         matchday: 3, date: "Jun 24", time: "6:00 PM ET",
@@ -278,22 +290,26 @@ export const GROUPS: WCGroup[] = [
       {
         matchday: 1, date: "Jun 12", time: "9:00 PM ET",
         home: "United States", away: "Paraguay",
-        venue: "SoFi Stadium", city: "Los Angeles", status: "upcoming",
+        venue: "SoFi Stadium", city: "Los Angeles", status: "finished",
+        homeScore: 4, awayScore: 1,
       },
       {
         matchday: 1, date: "Jun 14", time: "12:00 AM ET",
         home: "Australia", away: "Türkiye",
-        venue: "BC Place", city: "Vancouver", status: "upcoming",
+        venue: "BC Place", city: "Vancouver", status: "finished",
+        homeScore: 2, awayScore: 0,
       },
       {
         matchday: 2, date: "Jun 19", time: "3:00 PM ET",
         home: "United States", away: "Australia",
-        venue: "Lumen Field", city: "Seattle", status: "upcoming",
+        venue: "Lumen Field", city: "Seattle", status: "finished",
+        homeScore: 2, awayScore: 0,
       },
       {
         matchday: 2, date: "Jun 20", time: "12:00 AM ET",
         home: "Türkiye", away: "Paraguay",
-        venue: "Levi's Stadium", city: "Santa Clara", status: "upcoming",
+        venue: "Levi's Stadium", city: "Santa Clara", status: "finished",
+        homeScore: 0, awayScore: 1,
       },
       {
         matchday: 3, date: "Jun 25", time: "10:00 PM ET",
@@ -316,22 +332,26 @@ export const GROUPS: WCGroup[] = [
       {
         matchday: 1, date: "Jun 14", time: "1:00 PM ET",
         home: "Germany", away: "Curaçao",
-        venue: "NRG Stadium", city: "Houston", status: "upcoming",
+        venue: "NRG Stadium", city: "Houston", status: "finished",
+        homeScore: 7, awayScore: 1,
       },
       {
         matchday: 1, date: "Jun 14", time: "7:00 PM ET",
         home: "Ivory Coast", away: "Ecuador",
-        venue: "Lincoln Financial Field", city: "Philadelphia", status: "upcoming",
+        venue: "Lincoln Financial Field", city: "Philadelphia", status: "finished",
+        homeScore: 1, awayScore: 0,
       },
       {
         matchday: 2, date: "Jun 20", time: "4:00 PM ET",
         home: "Germany", away: "Ivory Coast",
-        venue: "BMO Field", city: "Toronto", status: "upcoming",
+        venue: "BMO Field", city: "Toronto", status: "finished",
+        homeScore: 2, awayScore: 1,
       },
       {
         matchday: 2, date: "Jun 20", time: "8:00 PM ET",
         home: "Ecuador", away: "Curaçao",
-        venue: "Arrowhead Stadium", city: "Kansas City", status: "upcoming",
+        venue: "Arrowhead Stadium", city: "Kansas City", status: "finished",
+        homeScore: 0, awayScore: 0,
       },
       {
         matchday: 3, date: "Jun 25", time: "4:00 PM ET",
@@ -354,22 +374,26 @@ export const GROUPS: WCGroup[] = [
       {
         matchday: 1, date: "Jun 14", time: "4:00 PM ET",
         home: "Netherlands", away: "Japan",
-        venue: "AT&T Stadium", city: "Arlington", status: "upcoming",
+        venue: "AT&T Stadium", city: "Arlington", status: "finished",
+        homeScore: 2, awayScore: 2,
       },
       {
         matchday: 1, date: "Jun 14", time: "10:00 PM ET",
         home: "Sweden", away: "Tunisia",
-        venue: "Estadio BBVA", city: "Monterrey", status: "upcoming",
+        venue: "Estadio BBVA", city: "Monterrey", status: "finished",
+        homeScore: 5, awayScore: 1,
       },
       {
         matchday: 2, date: "Jun 20", time: "1:00 PM ET",
         home: "Netherlands", away: "Sweden",
-        venue: "NRG Stadium", city: "Houston", status: "upcoming",
+        venue: "NRG Stadium", city: "Houston", status: "finished",
+        homeScore: 5, awayScore: 1,
       },
       {
         matchday: 2, date: "Jun 21", time: "12:00 AM ET",
         home: "Tunisia", away: "Japan",
-        venue: "Estadio BBVA", city: "Monterrey", status: "upcoming",
+        venue: "Estadio BBVA", city: "Monterrey", status: "finished",
+        homeScore: 0, awayScore: 4,
       },
       {
         matchday: 3, date: "Jun 25", time: "7:00 PM ET",
@@ -392,22 +416,26 @@ export const GROUPS: WCGroup[] = [
       {
         matchday: 1, date: "Jun 15", time: "3:00 PM ET",
         home: "Belgium", away: "Egypt",
-        venue: "Lumen Field", city: "Seattle", status: "upcoming",
+        venue: "Lumen Field", city: "Seattle", status: "finished",
+        homeScore: 1, awayScore: 1,
       },
       {
         matchday: 1, date: "Jun 15", time: "9:00 PM ET",
         home: "Iran", away: "New Zealand",
-        venue: "SoFi Stadium", city: "Los Angeles", status: "upcoming",
+        venue: "SoFi Stadium", city: "Los Angeles", status: "finished",
+        homeScore: 2, awayScore: 2,
       },
       {
         matchday: 2, date: "Jun 21", time: "3:00 PM ET",
         home: "Belgium", away: "Iran",
-        venue: "SoFi Stadium", city: "Los Angeles", status: "upcoming",
+        venue: "SoFi Stadium", city: "Los Angeles", status: "finished",
+        homeScore: 0, awayScore: 0,
       },
       {
         matchday: 2, date: "Jun 21", time: "9:00 PM ET",
         home: "New Zealand", away: "Egypt",
-        venue: "BC Place", city: "Vancouver", status: "upcoming",
+        venue: "BC Place", city: "Vancouver", status: "finished",
+        homeScore: 1, awayScore: 3,
       },
       {
         matchday: 3, date: "Jun 26", time: "11:00 PM ET",
@@ -430,22 +458,26 @@ export const GROUPS: WCGroup[] = [
       {
         matchday: 1, date: "Jun 15", time: "12:00 PM ET",
         home: "Spain", away: "Cape Verde",
-        venue: "Mercedes-Benz Stadium", city: "Atlanta", status: "upcoming",
+        venue: "Mercedes-Benz Stadium", city: "Atlanta", status: "finished",
+        homeScore: 0, awayScore: 0,
       },
       {
         matchday: 1, date: "Jun 15", time: "6:00 PM ET",
         home: "Saudi Arabia", away: "Uruguay",
-        venue: "Hard Rock Stadium", city: "Miami", status: "upcoming",
+        venue: "Hard Rock Stadium", city: "Miami", status: "finished",
+        homeScore: 1, awayScore: 1,
       },
       {
         matchday: 2, date: "Jun 21", time: "12:00 PM ET",
         home: "Spain", away: "Saudi Arabia",
-        venue: "Mercedes-Benz Stadium", city: "Atlanta", status: "upcoming",
+        venue: "Mercedes-Benz Stadium", city: "Atlanta", status: "finished",
+        homeScore: 4, awayScore: 0,
       },
       {
         matchday: 2, date: "Jun 21", time: "6:00 PM ET",
         home: "Uruguay", away: "Cape Verde",
-        venue: "Hard Rock Stadium", city: "Miami", status: "upcoming",
+        venue: "Hard Rock Stadium", city: "Miami", status: "finished",
+        homeScore: 2, awayScore: 2,
       },
       {
         matchday: 3, date: "Jun 26", time: "8:00 PM ET",
@@ -468,22 +500,26 @@ export const GROUPS: WCGroup[] = [
       {
         matchday: 1, date: "Jun 16", time: "3:00 PM ET",
         home: "France", away: "Senegal",
-        venue: "MetLife Stadium", city: "East Rutherford", status: "upcoming",
+        venue: "MetLife Stadium", city: "East Rutherford", status: "finished",
+        homeScore: 3, awayScore: 1,
       },
       {
         matchday: 1, date: "Jun 16", time: "6:00 PM ET",
         home: "Iraq", away: "Norway",
-        venue: "Gillette Stadium", city: "Foxborough", status: "upcoming",
+        venue: "Gillette Stadium", city: "Foxborough", status: "finished",
+        homeScore: 1, awayScore: 4,
       },
       {
         matchday: 2, date: "Jun 22", time: "5:00 PM ET",
         home: "France", away: "Iraq",
-        venue: "Lincoln Financial Field", city: "Philadelphia", status: "upcoming",
+        venue: "Lincoln Financial Field", city: "Philadelphia", status: "finished",
+        homeScore: 3, awayScore: 0,
       },
       {
         matchday: 2, date: "Jun 22", time: "8:00 PM ET",
         home: "Norway", away: "Senegal",
-        venue: "MetLife Stadium", city: "East Rutherford", status: "upcoming",
+        venue: "MetLife Stadium", city: "East Rutherford", status: "finished",
+        homeScore: 3, awayScore: 2,
       },
       {
         matchday: 3, date: "Jun 26", time: "3:00 PM ET",
@@ -506,17 +542,20 @@ export const GROUPS: WCGroup[] = [
       {
         matchday: 1, date: "Jun 16", time: "9:00 PM ET",
         home: "Argentina", away: "Algeria",
-        venue: "Arrowhead Stadium", city: "Kansas City", status: "upcoming",
+        venue: "Arrowhead Stadium", city: "Kansas City", status: "finished",
+        homeScore: 3, awayScore: 0,
       },
       {
         matchday: 1, date: "Jun 17", time: "12:00 AM ET",
         home: "Austria", away: "Jordan",
-        venue: "Levi's Stadium", city: "Santa Clara", status: "upcoming",
+        venue: "Levi's Stadium", city: "Santa Clara", status: "finished",
+        homeScore: 3, awayScore: 1,
       },
       {
         matchday: 2, date: "Jun 22", time: "1:00 PM ET",
         home: "Argentina", away: "Austria",
-        venue: "AT&T Stadium", city: "Arlington", status: "upcoming",
+        venue: "AT&T Stadium", city: "Arlington", status: "finished",
+        homeScore: 2, awayScore: 0,
       },
       {
         matchday: 2, date: "Jun 23", time: "11:00 PM ET",
@@ -544,12 +583,14 @@ export const GROUPS: WCGroup[] = [
       {
         matchday: 1, date: "Jun 17", time: "1:00 PM ET",
         home: "Portugal", away: "Congo DR",
-        venue: "NRG Stadium", city: "Houston", status: "upcoming",
+        venue: "NRG Stadium", city: "Houston", status: "finished",
+        homeScore: 1, awayScore: 1,
       },
       {
         matchday: 1, date: "Jun 17", time: "10:00 PM ET",
         home: "Uzbekistan", away: "Colombia",
-        venue: "Estadio Azteca", city: "Mexico City", status: "upcoming",
+        venue: "Estadio Azteca", city: "Mexico City", status: "finished",
+        homeScore: 1, awayScore: 3,
       },
       {
         matchday: 2, date: "Jun 23", time: "1:00 PM ET",
@@ -582,12 +623,14 @@ export const GROUPS: WCGroup[] = [
       {
         matchday: 1, date: "Jun 17", time: "4:00 PM ET",
         home: "England", away: "Croatia",
-        venue: "AT&T Stadium", city: "Arlington", status: "upcoming",
+        venue: "AT&T Stadium", city: "Arlington", status: "finished",
+        homeScore: 4, awayScore: 2,
       },
       {
         matchday: 1, date: "Jun 17", time: "7:00 PM ET",
         home: "Ghana", away: "Panama",
-        venue: "BMO Field", city: "Toronto", status: "upcoming",
+        venue: "BMO Field", city: "Toronto", status: "finished",
+        homeScore: 1, awayScore: 0,
       },
       {
         matchday: 2, date: "Jun 23", time: "4:00 PM ET",
