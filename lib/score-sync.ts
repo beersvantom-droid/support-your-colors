@@ -583,6 +583,41 @@ export async function runScoreSync(): Promise<SyncResult> {
     }
   }
 
+  // ── Auto-finish stale "live" matches the API never updated ──────────────
+  // A match lasts ~2 hours. If it's been "live" for 5+ hours (or its date
+  // is yesterday), the API missed the finish — mark it finished so the
+  // stragglers logic below can process tournament points & brackets.
+  {
+    const amsNow = new Date(Date.now() + 2 * 60 * 60 * 1000); // Amsterdam ~UTC+2
+    const today = amsNow.toISOString().split("T")[0];
+    const cutoff = new Date(amsNow.getTime() - 5 * 60 * 60 * 1000).toISOString();
+
+    const { data: staleLive } = await db
+      .from("match_results")
+      .select("id, home_team, away_team, home_score, away_score, match_date, updated_at")
+      .eq("status", "live");
+
+    for (const m of staleLive ?? []) {
+      const isOldDate = m.match_date < today;
+      const isStaleToday = m.match_date === today && m.updated_at < cutoff;
+      if (!isOldDate && !isStaleToday) continue;
+
+      let winner: string | null = null;
+      if (m.home_score != null && m.away_score != null) {
+        if (m.home_score > m.away_score) winner = m.home_team;
+        else if (m.away_score > m.home_score) winner = m.away_team;
+        else winner = "draw";
+      }
+
+      await db
+        .from("match_results")
+        .update({ status: "finished", winner, updated_at: new Date().toISOString() })
+        .eq("id", m.id);
+
+      console.log(`[score-sync] auto-finished stale live: ${m.home_team} vs ${m.away_team}`);
+    }
+  }
+
   // ── Catch up on results already in our DB but never fully processed ──────
   // TheSportsDB doesn't always return the same match twice (e.g. once a
   // match is no longer "pending" it may vanish from every source we poll).
