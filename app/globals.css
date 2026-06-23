@@ -933,3 +933,19 @@ body {
   50%  { transform: scale(1.15); }
   100% { transform: scale(1); opacity: 1; }
 }
+
+/* GOAT mascot: Golden tooth glow */
+@keyframes goatGoldenToothGlow {
+  0%, 100% {
+    filter: drop-shadow(0 0 4px #FFD700);
+    opacity: 1;
+  }
+  50% {
+    filter: drop-shadow(0 0 12px #FFA500) drop-shadow(0 0 8px #FFD700);
+    opacity: 0.95;
+  }
+}
+
+.mascot-goat {
+  animation: goatGoldenToothGlow 1.5s ease-in-out infinite;
+}

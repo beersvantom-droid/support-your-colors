@@ -19,7 +19,7 @@ export interface Cosmetic {
 export interface Mascot {
   id: string;
   type: "mascot";
-  rarity: "legendary" | "epic" | "rare";
+  rarity: "legendary" | "epic" | "rare" | "special";
   label: string;
   emoji: string;
   imagePath: string;       // path to PNG inside /public
@@ -226,6 +226,16 @@ export const MASCOTS: Mascot[] = [
     emoji:         "⚽",
     imagePath:     "/mascots/leren-bal.png",
     unlockHint:    "Spin the Wheel of Chaos (Mascots)",
+    wheelEligible: false,
+  },
+  {
+    id:            "mascot_goat",
+    type:          "mascot",
+    rarity:        "special",
+    label:         "GOAT",
+    emoji:         "🐐",
+    imagePath:     "/mascots/goat.png",
+    unlockHint:    "Earn as a Community Challenge reward",
     wheelEligible: false,
   },
 ];
