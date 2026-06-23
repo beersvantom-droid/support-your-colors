@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { PACKS, SHOP_PACKS, type Pack } from "@/lib/packs";
 import PackOpener from "@/components/pack/PackOpener";
+import ChallengeSection from "@/components/pack/ChallengeSection";
 
 // ── Pack selector card ────────────────────────────────────────────────────────
 
@@ -116,6 +117,9 @@ export default function PackPage() {
         padding: "28px 20px",
         display: "flex", flexDirection: "column", gap: 16, alignItems: "center",
       }}>
+        {/* Community Challenge */}
+        <ChallengeSection />
+
         {/* Daily packs only */}
         {PACKS.map(pack => (
           <PackCard

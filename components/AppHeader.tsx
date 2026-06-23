@@ -4,6 +4,7 @@ import { Camera } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState, useCallback } from "react";
 import dynamic from "next/dynamic";
+import { getActiveChallenge } from "@/lib/challenges";
 
 const LiveChatModal = dynamic(
   () => import("@/components/live-chat/LiveChatModal"),
@@ -263,6 +264,24 @@ export default function AppHeader() {
                 style={{ color: "#6B7280" }}
               >
                 {formatCooldown(remaining)}
+              </span>
+            )}
+
+            {/* Challenge badge — only when a challenge is active */}
+            {getActiveChallenge() && (
+              <span
+                className="absolute -top-1.5 -right-1.5 flex items-center justify-center"
+                style={{
+                  width: 16,
+                  height: 16,
+                  borderRadius: "50%",
+                  background: "linear-gradient(135deg, #FFD700, #FFA500)",
+                  boxShadow: "0 0 6px rgba(255,215,0,0.6)",
+                  fontSize: 9,
+                  lineHeight: 1,
+                }}
+              >
+                🐐
               </span>
             )}
           </Link>
