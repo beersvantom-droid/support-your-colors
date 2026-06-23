@@ -331,50 +331,41 @@ const NEXT_SLOT: Record<string, { match: number; pos: "home" | "away" }> = {
 
 const TOURNAMENT_POINTS = { win: 500, draw: 250, loss: 100 } as const;
 
-async function updateTournamentPoints(
-  db: SupabaseClient,
-  homeTeam: string,
-  awayTeam: string,
-  homeScore: number,
-  awayScore: number
-) {
-  // Determine the outcome
-  let homeOutcome: "win" | "draw" | "loss";
-  let awayOutcome: "win" | "draw" | "loss";
+async function recalculateAllTournamentPoints(db: SupabaseClient) {
+  const { data: finished } = await db
+    .from("match_results")
+    .select("home_team, away_team, home_score, away_score")
+    .eq("status", "finished")
+    .not("home_score", "is", null)
+    .not("away_score", "is", null);
 
-  if (homeScore > awayScore) {
-    homeOutcome = "win";
-    awayOutcome = "loss";
-  } else if (awayScore > homeScore) {
-    homeOutcome = "loss";
-    awayOutcome = "win";
-  } else {
-    homeOutcome = "draw";
-    awayOutcome = "draw";
+  const countryPoints = new Map<string, number>();
+
+  for (const m of finished ?? []) {
+    const home = m.home_team as string;
+    const away = m.away_team as string;
+    if (!countryPoints.has(home)) countryPoints.set(home, 0);
+    if (!countryPoints.has(away)) countryPoints.set(away, 0);
+
+    if (m.home_score > m.away_score) {
+      countryPoints.set(home, countryPoints.get(home)! + TOURNAMENT_POINTS.win);
+      countryPoints.set(away, countryPoints.get(away)! + TOURNAMENT_POINTS.loss);
+    } else if (m.away_score > m.home_score) {
+      countryPoints.set(home, countryPoints.get(home)! + TOURNAMENT_POINTS.loss);
+      countryPoints.set(away, countryPoints.get(away)! + TOURNAMENT_POINTS.win);
+    } else {
+      countryPoints.set(home, countryPoints.get(home)! + TOURNAMENT_POINTS.draw);
+      countryPoints.set(away, countryPoints.get(away)! + TOURNAMENT_POINTS.draw);
+    }
   }
 
-  // Fetch all supporters of each team
-  const [{ data: homeSupporters }, { data: awaySupporters }] = await Promise.all([
-    db.from("profiles").select("id").eq("country", homeTeam),
-    db.from("profiles").select("id").eq("country", awayTeam),
-  ]);
+  const { data: profiles } = await db
+    .from("profiles")
+    .select("id, country");
 
-  // Award points in batch
-  const updates: { id: string; pointsToAdd: number }[] = [];
-
-  for (const supporter of homeSupporters ?? []) {
-    updates.push({ id: supporter.id, pointsToAdd: TOURNAMENT_POINTS[homeOutcome] });
-  }
-  for (const supporter of awaySupporters ?? []) {
-    updates.push({ id: supporter.id, pointsToAdd: TOURNAMENT_POINTS[awayOutcome] });
-  }
-
-  // Execute all updates in parallel
-  for (const { id, pointsToAdd } of updates) {
-    await db.rpc("increment_tournament_points", {
-      user_id: id,
-      amount: pointsToAdd,
-    });
+  for (const p of profiles ?? []) {
+    const points = countryPoints.get(p.country as string) ?? 0;
+    await db.from("profiles").update({ tournament_points: points }).eq("id", p.id);
   }
 }
 
@@ -527,11 +518,6 @@ export async function runScoreSync(): Promise<SyncResult> {
       const groupId = findGroupId(homeTeam, awayTeam);
 
       if (homeScore != null && awayScore != null) {
-        if (finished) {
-          // Award tournament points only once when match is finished
-          await updateTournamentPoints(db, homeTeam, awayTeam, homeScore, awayScore);
-        }
-
         if (groupId) {
           // Group stage: always recalculate standings when there are scores
           await recalculateStandings(db, groupId);
@@ -634,8 +620,6 @@ export async function runScoreSync(): Promise<SyncResult> {
       const { home_team: homeTeam, away_team: awayTeam, home_score: homeScore, away_score: awayScore, winner } = row;
       if (homeScore == null || awayScore == null) continue;
 
-      await updateTournamentPoints(db, homeTeam, awayTeam, homeScore, awayScore);
-
       const groupId = findGroupId(homeTeam, awayTeam);
       if (groupId) {
         await recalculateStandings(db, groupId);
@@ -686,6 +670,10 @@ export async function runScoreSync(): Promise<SyncResult> {
     }
   }
   await tryPopulateR32Slots(db);
+
+  // Recalculate tournament points from scratch — idempotent, so no matter
+  // how many times sync runs the totals are always correct.
+  await recalculateAllTournamentPoints(db);
 
   return result;
 }
