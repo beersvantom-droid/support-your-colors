@@ -5,6 +5,13 @@ import { getActiveChallenge, ACTION_POINTS } from "@/lib/challenges";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+const BOT_USERNAMES = [
+  "Jeroen Bijma", "Sierd de Vos", "Fabrizio Romano",
+  "Udo de beatboxer", "Jannes", "Jan Boskampinho", "Ron Dans",
+  "DJ Derksen", "Ome corpinho", "أبو حرب", "Kung Fugway",
+  "Moffel", "Henk", "Huub Bosch", "Bram Stensen", "Hank Thunderman",
+];
+
 function adminClient() {
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -22,15 +29,10 @@ export async function GET() {
   const start = challenge.startDate + "T00:00:00+02:00";
   const end = challenge.endDate + "T23:59:59+02:00";
 
-  const [posts, comments, reactions, predictions, chatMessages, votes] =
+  const [posts, reactions, predictions, chatMessages, votes] =
     await Promise.all([
       db
         .from("posts")
-        .select("id", { count: "exact", head: true })
-        .gte("created_at", start)
-        .lte("created_at", end),
-      db
-        .from("comments")
         .select("id", { count: "exact", head: true })
         .gte("created_at", start)
         .lte("created_at", end),
@@ -56,9 +58,20 @@ export async function GET() {
         .lte("created_at", end),
     ]);
 
+  // Comments: fetch with username so we can exclude bots
+  const { data: commentRows } = await db
+    .from("comments")
+    .select("username")
+    .gte("created_at", start)
+    .lte("created_at", end);
+
+  const realCommentCount = (commentRows ?? []).filter(
+    (c) => !BOT_USERNAMES.includes(c.username)
+  ).length;
+
   const totalPoints =
     (posts.count ?? 0) * ACTION_POINTS.post +
-    (comments.count ?? 0) * ACTION_POINTS.comment +
+    realCommentCount * ACTION_POINTS.comment +
     (reactions.count ?? 0) * ACTION_POINTS.reaction +
     (predictions.count ?? 0) * ACTION_POINTS.prediction +
     (chatMessages.count ?? 0) * ACTION_POINTS.chat_message +

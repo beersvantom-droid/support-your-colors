@@ -30,7 +30,7 @@ export const CHALLENGES: Challenge[] = [
     mascotLabel: "GOAT",
     mascotEmoji: "🐐",
     mascotImage: "/mascots/goat.png",
-    targetPoints: 10_000,
+    targetPoints: 12_500,
     startDate: "2026-06-23",
     endDate: "2026-06-29",
     rewards: {
