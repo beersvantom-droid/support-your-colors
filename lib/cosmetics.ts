@@ -1,7 +1,7 @@
 import type { CSSProperties } from "react";
 
 export type CosmeticType = "name_color" | "border" | "badge" | "card_bg";
-export type Rarity = "common" | "rare" | "epic" | "legendary";
+export type Rarity = "common" | "rare" | "epic" | "legendary" | "special";
 
 export interface Cosmetic {
   id: string;
@@ -511,6 +511,7 @@ export const RARITY_META: Record<Rarity, { color: string; glow: string; label: s
   rare:      { color: "#93C5FD", glow: "#3B82F6",  label: "Rare"      },
   epic:      { color: "#E9D5FF", glow: "#A855F7",  label: "Epic"      },
   legendary: { color: "#FDE68A", glow: "#F59E0B",  label: "Legendary" },
+  special:   { color: "#FFD700", glow: "#FFA500",  label: "Special"   },
 };
 
 // Rarity fallback order used when the target pool is fully owned
@@ -519,4 +520,5 @@ export const RARITY_FALLBACK: Record<Rarity, Rarity[]> = {
   epic:      ["epic", "rare", "common"],
   rare:      ["rare", "common"],
   common:    ["common"],
+  special:   ["special"],
 };
