@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { createServerClient } from "@supabase/ssr";
+import { cookies } from "next/headers";
 import { getActiveChallenge, ACTION_POINTS } from "@/lib/challenges";
 
 export const runtime = "nodejs";
@@ -29,36 +31,38 @@ export async function GET() {
   const start = challenge.startDate + "T00:00:00+02:00";
   const end = challenge.endDate + "T23:59:59+02:00";
 
+  // Get authenticated user to check claim status
+  let claimed = false;
+  try {
+    const cookieStore = await cookies();
+    const authClient = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      { cookies: { getAll: () => cookieStore.getAll(), setAll: () => {} } }
+    );
+    const { data: { user } } = await authClient.auth.getUser();
+    if (user) {
+      const { data: claimRow } = await db
+        .from("user_cosmetics")
+        .select("id")
+        .eq("user_id", user.id)
+        .eq("cosmetic_id", `challenge_${challenge.id}_claimed`)
+        .maybeSingle();
+      claimed = !!claimRow;
+    }
+  } catch {
+    // If auth fails, just show not claimed
+  }
+
   const [posts, reactions, predictions, chatMessages, votes] =
     await Promise.all([
-      db
-        .from("posts")
-        .select("id", { count: "exact", head: true })
-        .gte("created_at", start)
-        .lte("created_at", end),
-      db
-        .from("post_reactions")
-        .select("id", { count: "exact", head: true })
-        .gte("created_at", start)
-        .lte("created_at", end),
-      db
-        .from("match_predictions")
-        .select("id", { count: "exact", head: true })
-        .gte("created_at", start)
-        .lte("created_at", end),
-      db
-        .from("live_chat_messages")
-        .select("id", { count: "exact", head: true })
-        .gte("created_at", start)
-        .lte("created_at", end),
-      db
-        .from("daily_votes")
-        .select("id", { count: "exact", head: true })
-        .gte("created_at", start)
-        .lte("created_at", end),
+      db.from("posts").select("id", { count: "exact", head: true }).gte("created_at", start).lte("created_at", end),
+      db.from("post_reactions").select("id", { count: "exact", head: true }).gte("created_at", start).lte("created_at", end),
+      db.from("match_predictions").select("id", { count: "exact", head: true }).gte("created_at", start).lte("created_at", end),
+      db.from("live_chat_messages").select("id", { count: "exact", head: true }).gte("created_at", start).lte("created_at", end),
+      db.from("daily_votes").select("id", { count: "exact", head: true }).gte("created_at", start).lte("created_at", end),
     ]);
 
-  // Comments: fetch with username so we can exclude bots
   const { data: commentRows } = await db
     .from("comments")
     .select("username")
@@ -85,8 +89,10 @@ export async function GET() {
     mascotLabel: challenge.mascotLabel,
     mascotEmoji: challenge.mascotEmoji,
     mascotImage: challenge.mascotImage,
+    packImage: "/packs/goatpack.png",
     targetPoints: challenge.targetPoints,
     percentage,
     endDate: challenge.endDate,
+    claimed,
   });
 }
