@@ -430,80 +430,106 @@ export default function LockerScreen() {
           </div>
 
           {/* All mascots — owned + locked */}
-          {MASCOTS.length === 0 ? (
-            <div
-              className="rounded-2xl p-6 text-center"
-              style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)" }}
-            >
-              <p className="text-4xl mb-3">🎭</p>
-              <p className="text-sm font-black text-white">No mascots yet</p>
-              <p className="text-xs mt-1.5 font-semibold" style={{ color: "#6B7280" }}>
-                Spin the Wheel of Chaos or complete hidden achievements
-              </p>
-            </div>
-          ) : (
-            <div className="flex flex-wrap gap-3">
-              {MASCOTS.map((mascot, i) => {
-                const isOwned    = inventory.has(mascot.id);
-                const isEquipped = equippedMascots.includes(mascot.id);
-                const isFull     = !isEquipped && equippedMascots.length >= MAX_MASCOTS;
-                const rarityMeta = RARITY_META[mascot.rarity];
+          {(() => {
+            const regularMascots = MASCOTS.filter(m => m.rarity !== "special");
+            const specialMascots = MASCOTS.filter(m => m.rarity === "special");
 
-                return (
-                  <div key={mascot.id} className="relative">
-                    <button
-                      onClick={() => isOwned && toggleMascot(mascot.id)}
-                      disabled={!isOwned || isFull}
-                      className="flex flex-col items-center gap-2 p-3 rounded-2xl transition-all active:scale-95"
-                      style={{
-                        background: isOwned
-                          ? isEquipped
-                            ? "rgba(245,158,11,0.15)"
-                            : "rgba(255,255,255,0.04)"
-                          : "rgba(0,0,0,0.25)",
-                        border: isOwned
-                          ? isEquipped
-                            ? "1.5px solid rgba(245,158,11,0.6)"
-                            : "1.5px solid rgba(255,255,255,0.07)"
-                          : "1.5px solid rgba(100,100,100,0.30)",
-                        boxShadow: isOwned && isEquipped ? "0 0 14px rgba(245,158,11,0.2)" : "none",
-                        opacity: isOwned ? (isFull ? 0.4 : 1) : 0.5,
-                        minWidth: 80,
-                        cursor: isOwned ? "pointer" : "not-allowed",
-                      }}
+            const renderMascot = (mascot: Mascot, i: number) => {
+              const isOwned    = inventory.has(mascot.id);
+              const isEquipped = equippedMascots.includes(mascot.id);
+              const isFull     = !isEquipped && equippedMascots.length >= MAX_MASCOTS;
+              const rarityMeta = RARITY_META[mascot.rarity];
+
+              return (
+                <div key={mascot.id} className="relative">
+                  <button
+                    onClick={() => isOwned && toggleMascot(mascot.id)}
+                    disabled={!isOwned || isFull}
+                    className="flex flex-col items-center gap-2 p-3 rounded-2xl transition-all active:scale-95"
+                    style={{
+                      background: isOwned
+                        ? isEquipped
+                          ? "rgba(245,158,11,0.15)"
+                          : "rgba(255,255,255,0.04)"
+                        : "rgba(0,0,0,0.25)",
+                      border: isOwned
+                        ? isEquipped
+                          ? "1.5px solid rgba(245,158,11,0.6)"
+                          : "1.5px solid rgba(255,255,255,0.07)"
+                        : "1.5px solid rgba(100,100,100,0.30)",
+                      boxShadow: isOwned && isEquipped ? "0 0 14px rgba(245,158,11,0.2)" : "none",
+                      opacity: isOwned ? (isFull ? 0.4 : 1) : 0.5,
+                      minWidth: 80,
+                      cursor: isOwned ? "pointer" : "not-allowed",
+                    }}
+                  >
+                    <div style={{ opacity: isOwned ? 1 : 0.4 }}>
+                      <MascotSprite id={mascot.id} size={52} animationDelay={i * 800} />
+                    </div>
+                    <span
+                      className="text-[9px] font-black text-center"
+                      style={{ color: isOwned ? (isEquipped ? "#F59E0B" : "#9CA3AF") : "#6B7280" }}
                     >
-                      <div style={{ opacity: isOwned ? 1 : 0.4 }}>
-                        <MascotSprite id={mascot.id} size={52} animationDelay={i * 800} />
-                      </div>
-                      <span
-                        className="text-[9px] font-black text-center"
-                        style={{ color: isOwned ? (isEquipped ? "#F59E0B" : "#9CA3AF") : "#6B7280" }}
-                      >
-                        {mascot.label}
-                      </span>
-                      <span
-                        className="text-[8px] font-black uppercase tracking-wide"
-                        style={{ color: isOwned ? rarityMeta.color : "#4B5563" }}
-                      >
-                        {rarityMeta.label}
-                      </span>
-                      {isEquipped && (
-                        <span className="text-[8px] font-black" style={{ color: "#F59E0B" }}>✓ Active</span>
-                      )}
-                    </button>
-                    {!isOwned && (
-                      <div
-                        className="absolute inset-0 flex items-center justify-center rounded-2xl pointer-events-none"
-                        style={{ background: "rgba(0,0,0,0.4)" }}
-                      >
-                        <span className="text-xl">🔒</span>
-                      </div>
+                      {mascot.label}
+                    </span>
+                    <span
+                      className="text-[8px] font-black uppercase tracking-wide"
+                      style={{ color: isOwned ? rarityMeta.color : "#4B5563" }}
+                    >
+                      {rarityMeta.label}
+                    </span>
+                    {isEquipped && (
+                      <span className="text-[8px] font-black" style={{ color: "#F59E0B" }}>✓ Active</span>
                     )}
+                  </button>
+                  {!isOwned && (
+                    <div
+                      className="absolute inset-0 flex items-center justify-center rounded-2xl pointer-events-none"
+                      style={{ background: "rgba(0,0,0,0.4)" }}
+                    >
+                      <span className="text-xl">🔒</span>
+                    </div>
+                  )}
+                </div>
+              );
+            };
+
+            return (
+              <>
+                {regularMascots.length === 0 ? (
+                  <div
+                    className="rounded-2xl p-6 text-center"
+                    style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)" }}
+                  >
+                    <p className="text-4xl mb-3">🎭</p>
+                    <p className="text-sm font-black text-white">No mascots yet</p>
+                    <p className="text-xs mt-1.5 font-semibold" style={{ color: "#6B7280" }}>
+                      Spin the Wheel of Chaos or complete hidden achievements
+                    </p>
                   </div>
-                );
-              })}
-            </div>
-          )}
+                ) : (
+                  <div className="flex flex-wrap gap-3">
+                    {regularMascots.map((m, i) => renderMascot(m, i))}
+                  </div>
+                )}
+
+                {specialMascots.length > 0 && (
+                  <>
+                    <div className="flex items-center gap-3 mt-6 mb-2">
+                      <div className="flex-1 h-px" style={{ background: "linear-gradient(to right, transparent, #FFD70060, transparent)" }} />
+                      <span className="text-[10px] font-black uppercase tracking-widest" style={{ color: "#FFD700" }}>
+                        ⭐ Specials
+                      </span>
+                      <div className="flex-1 h-px" style={{ background: "linear-gradient(to right, transparent, #FFD70060, transparent)" }} />
+                    </div>
+                    <div className="flex flex-wrap gap-3">
+                      {specialMascots.map((m, i) => renderMascot(m, regularMascots.length + i))}
+                    </div>
+                  </>
+                )}
+              </>
+            );
+          })()}
         </div>
       )}
     </div>
