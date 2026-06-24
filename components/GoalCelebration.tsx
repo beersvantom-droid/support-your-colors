@@ -20,20 +20,22 @@ interface StoredScores {
   [key: string]: { home: number; away: number; updatedAt: string };
 }
 
-const FOOTBALL_SVG = `<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%"><circle cx="20" cy="20" r="19" fill="#fff" stroke="#222" stroke-width="1.5"/><path d="M20 5 L26 13 L24 22 L16 22 L14 13 Z" fill="#222"/><path d="M8 16 L14 13 L16 22 L10 27 L4 22 Z" fill="#222"/><path d="M32 16 L36 22 L30 27 L24 22 L26 13 Z" fill="#222"/><path d="M12 32 L10 27 L16 22 L24 22 L30 27 L28 32 Z" fill="#222" opacity="0.9"/></svg>`;
-
-function createBallElement(isFlag: boolean, flagEmoji: string, delay: number, containerHeight: number): HTMLDivElement {
+function createBallElement(isFlag: boolean, flagEmoji: string, delay: number): HTMLDivElement {
   const el = document.createElement("div");
   const left = Math.random() * 94 + 3;
-  const size = isFlag ? (22 + Math.random() * 10) : (24 + Math.random() * 14);
   const dur = 2.5 + Math.random() * 2.5;
 
   if (isFlag) {
+    const size = 22 + Math.random() * 10;
     el.textContent = flagEmoji;
-    el.style.cssText = `position:absolute;left:${left}%;top:-40px;font-size:${size}px;pointer-events:none;animation:goalFlagFall ${dur}s ${delay}s linear forwards;`;
+    el.style.cssText = `position:absolute;left:${left}%;top:-50px;font-size:${size}px;pointer-events:none;animation:goalFlagFall ${dur}s ${delay}s linear forwards;`;
   } else {
-    el.innerHTML = FOOTBALL_SVG;
-    el.style.cssText = `position:absolute;left:${left}%;top:-40px;width:${size}px;height:${size}px;pointer-events:none;animation:goalBallFall ${dur}s ${delay}s linear forwards;`;
+    const size = 30 + Math.random() * 18;
+    const img = document.createElement("img");
+    img.src = "/chat/wk-bal.png";
+    img.style.cssText = "width:100%;height:100%;object-fit:contain;";
+    el.appendChild(img);
+    el.style.cssText = `position:absolute;left:${left}%;top:-50px;width:${size}px;height:${size}px;pointer-events:none;animation:goalBallFall ${dur}s ${delay}s linear forwards;`;
   }
 
   return el;
@@ -146,7 +148,7 @@ export default function GoalCelebration() {
     for (let i = 0; i < count; i++) {
       const isFlag = goal.isOwnCountry && Math.random() < 0.35;
       const delay = Math.random() * 3.5;
-      balls.appendChild(createBallElement(isFlag, flag, delay, 0));
+      balls.appendChild(createBallElement(isFlag, flag, delay));
     }
 
     if (goal.isOwnCountry) {
