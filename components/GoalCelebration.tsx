@@ -10,7 +10,7 @@ interface GoalEvent {
   awayTeam: string;
   homeScore: number;
   awayScore: number;
-  isOwnCountry: boolean;
+  scoringTeamFlag: string;
   countryColor: string;
   homeFlag: string;
   awayFlag: string;
@@ -94,13 +94,15 @@ export default function GoalCelebration() {
             const isOwn = scoringTeam === userCountry;
             const teamInfo = TEAMS[scoringTeam as string];
 
+            const scoringFlag = teamInfo?.flag ?? "🏳️";
+
             newGoals.push({
               homeTeam: match.home_team as string,
               awayTeam: match.away_team as string,
               homeScore: currHome,
               awayScore: currAway,
-              isOwnCountry: isOwn,
-              countryColor: isOwn && teamInfo ? teamInfo.color : "#ffffff",
+              scoringTeamFlag: scoringFlag,
+              countryColor: teamInfo?.color ?? "#ffffff",
               homeFlag: TEAMS[match.home_team as string]?.flag ?? "🏳️",
               awayFlag: TEAMS[match.away_team as string]?.flag ?? "🏳️",
             });
@@ -140,24 +142,17 @@ export default function GoalCelebration() {
     balls.innerHTML = "";
     overlay.style.opacity = "1";
 
-    const count = goal.isOwnCountry ? 35 : 25;
-    const flag = goal.isOwnCountry
-      ? (TEAMS[userCountry!]?.flag ?? "🏳️")
-      : "";
-
-    for (let i = 0; i < count; i++) {
-      const isFlag = goal.isOwnCountry && Math.random() < 0.35;
+    for (let i = 0; i < 35; i++) {
+      const isFlag = Math.random() < 0.35;
       const delay = Math.random() * 3.5;
-      balls.appendChild(createBallElement(isFlag, flag, delay));
+      balls.appendChild(createBallElement(isFlag, goal.scoringTeamFlag, delay));
     }
 
-    if (goal.isOwnCountry) {
-      try {
-        const audio = new Audio("/sounds/goal.wav");
-        audio.volume = 0.8;
-        audio.play().catch(() => {});
-      } catch { /* empty */ }
-    }
+    try {
+      const audio = new Audio("/sounds/goal.wav");
+      audio.volume = 0.8;
+      audio.play().catch(() => {});
+    } catch { /* empty */ }
 
     text.style.animation = "goalTextIn 0.6s cubic-bezier(0.34,1.56,0.64,1) forwards";
 
@@ -206,18 +201,13 @@ export default function GoalCelebration() {
       >
         <p
           style={{
-            fontSize: active.isOwnCountry ? 56 : 48,
+            fontSize: 56,
             fontWeight: 900,
             margin: 0,
             letterSpacing: "0.05em",
-            color: active.isOwnCountry ? active.countryColor : "#fff",
-            textShadow: active.isOwnCountry
-              ? `0 0 30px ${active.countryColor}, 0 0 60px ${active.countryColor}`
-              : "0 0 30px rgba(0,0,0,0.5), 0 2px 4px rgba(0,0,0,0.8)",
-            animation: active.isOwnCountry
-              ? "goalOwnGlow 0.8s ease-in-out infinite"
-              : "none",
-            WebkitTextStroke: active.isOwnCountry ? "none" : "1px rgba(0,0,0,0.3)",
+            color: active.countryColor,
+            textShadow: `0 0 30px ${active.countryColor}, 0 0 60px ${active.countryColor}`,
+            animation: "goalOwnGlow 0.8s ease-in-out infinite",
           }}
         >
           GOAL!
@@ -227,7 +217,7 @@ export default function GoalCelebration() {
             fontSize: 20,
             fontWeight: 700,
             margin: "8px 0 0",
-            color: active.isOwnCountry ? active.countryColor : "#333",
+            color: active.countryColor,
             textShadow: "0 1px 3px rgba(0,0,0,0.3)",
           }}
         >
