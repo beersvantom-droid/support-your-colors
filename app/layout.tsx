@@ -7,6 +7,7 @@ import { AchievementsProvider } from "@/components/achievements/AchievementsProv
 import { ChatNotificationProvider } from "@/components/chat/ChatNotificationProvider";
 import { LiveSyncTrigger } from "@/components/LiveSyncTrigger";
 import GoalCelebration from "@/components/GoalCelebration";
+import StartupSound from "@/components/StartupSound";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -42,6 +43,7 @@ export default function RootLayout({
             <ChatNotificationProvider>
               <LiveSyncTrigger />
               <GoalCelebration />
+              <StartupSound />
               <main className="flex-1 w-full max-w-md mx-auto pb-28">
                 {children}
               </main>
