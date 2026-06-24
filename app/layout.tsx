@@ -38,12 +38,12 @@ export default function RootLayout({
   return (
     <html lang="en" className={inter.className}>
       <body className="min-h-full flex flex-col">
+        <StartupSound />
         <AuthProvider>
           <AchievementsProvider>
             <ChatNotificationProvider>
               <LiveSyncTrigger />
               <GoalCelebration />
-              <StartupSound />
               <main className="flex-1 w-full max-w-md mx-auto pb-28">
                 {children}
               </main>
