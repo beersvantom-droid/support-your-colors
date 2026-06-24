@@ -949,3 +949,30 @@ body {
 .mascot-goat {
   animation: goatGoldenToothGlow 1.5s ease-in-out infinite;
 }
+
+/* Goal celebration */
+@keyframes goalBallFall {
+  0%   { transform: translateY(-40px) rotate(0deg); opacity: 1; }
+  85%  { opacity: 1; }
+  100% { transform: translateY(105vh) rotate(720deg); opacity: 0; }
+}
+@keyframes goalFlagFall {
+  0%   { transform: translateY(-40px) rotate(0deg) scale(1); opacity: 1; }
+  50%  { transform: translateY(50vh) rotate(360deg) scale(1.1); opacity: 1; }
+  100% { transform: translateY(105vh) rotate(720deg) scale(0.8); opacity: 0; }
+}
+@keyframes goalTextIn {
+  0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.3); }
+  40%  { opacity: 1; transform: translate(-50%, -50%) scale(1.15); }
+  60%  { transform: translate(-50%, -50%) scale(0.95); }
+  80%  { transform: translate(-50%, -50%) scale(1.02); }
+  100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+@keyframes goalTextOut {
+  0%   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+}
+@keyframes goalOwnGlow {
+  0%, 100% { filter: brightness(1); }
+  50%      { filter: brightness(1.3); }
+}
