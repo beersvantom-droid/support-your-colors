@@ -14,6 +14,7 @@ export interface Post {
   caption: string | null;
   image_url: string | null;
   flame_count?: number;
+  mascots?: string[];
 }
 
 export interface Comment {
@@ -39,6 +40,8 @@ export interface Profile {
   equipped_badge: string | null;
   equipped_card_bg: string | null;
   equipped_mascots: string[] | null; // max 3 mascot IDs
+  post_mascot_slots: number;
+  equipped_post_mascots: string[] | null;
 }
 
 export interface UserAchievement {

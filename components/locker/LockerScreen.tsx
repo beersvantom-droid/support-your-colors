@@ -180,6 +180,8 @@ export default function LockerScreen() {
   const [inventory,      setInventory]      = useState<Set<string>>(new Set());
   const [equipped,       setEquipped]       = useState<Equipped>({ name_color: null, border: null, badge: null, card_bg: null });
   const [equippedMascots, setEquippedMascots] = useState<string[]>([]);
+  const [equippedPostMascots, setEquippedPostMascots] = useState<string[]>([]);
+  const [postMascotSlots, setPostMascotSlots] = useState(0);
   const [loading,        setLoading]        = useState(true);
   const [saving,         setSaving]         = useState(false);
   const [equipError,     setEquipError]     = useState<string | null>(null);
@@ -197,7 +199,7 @@ export default function LockerScreen() {
         supabase.from("user_cosmetics").select("cosmetic_id").eq("user_id", profile!.id),
         supabase
           .from("profiles")
-          .select("equipped_name_color, equipped_border, equipped_badge, equipped_card_bg, equipped_mascots")
+          .select("equipped_name_color, equipped_border, equipped_badge, equipped_card_bg, equipped_mascots, equipped_post_mascots, post_mascot_slots")
           .eq("id", profile!.id)
           .single(),
       ]);
@@ -210,6 +212,8 @@ export default function LockerScreen() {
         card_bg:    fresh?.equipped_card_bg    ?? null,
       });
       setEquippedMascots((fresh?.equipped_mascots as string[] | null) ?? []);
+      setEquippedPostMascots((fresh?.equipped_post_mascots as string[] | null) ?? []);
+      setPostMascotSlots((fresh?.post_mascot_slots as number) ?? 0);
       setLoading(false);
     }
     load();
@@ -312,6 +316,74 @@ export default function LockerScreen() {
       })
       .finally(() => setSaving(false));
   }, [equippedMascots, refreshProfile]);
+
+  const togglePostMascot = useCallback((id: string) => {
+    setEquipError(null);
+    const isEquipped = equippedPostMascots.includes(id);
+    const prev = equippedPostMascots;
+
+    // Can't equip if also on ranking card
+    if (!isEquipped && equippedMascots.includes(id)) {
+      setEquipError("Deze mascot staat al op je ranking card");
+      return;
+    }
+
+    let next: string[];
+    if (isEquipped) {
+      next = equippedPostMascots.filter(m => m !== id);
+    } else {
+      if (equippedPostMascots.length >= postMascotSlots) {
+        setEquipError(`Je hebt ${postMascotSlots} post-slots. Koop meer!`);
+        return;
+      }
+      next = [...equippedPostMascots, id];
+    }
+
+    setEquippedPostMascots(next);
+    setSaving(true);
+
+    fetch("/api/cosmetics/equip-post-mascot", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ mascots: next }),
+    })
+      .then(async r => {
+        let data: { success?: boolean; error?: string } = {};
+        try { data = await r.json(); } catch { /* empty */ }
+        if (data.success) {
+          refreshProfile();
+        } else {
+          setEquipError(data.error ?? `HTTP ${r.status}`);
+          setEquippedPostMascots(prev);
+        }
+      })
+      .catch(() => {
+        setEquipError("Network error — try again");
+        setEquippedPostMascots(prev);
+      })
+      .finally(() => setSaving(false));
+  }, [equippedPostMascots, equippedMascots, postMascotSlots, refreshProfile]);
+
+  const buyPostSlot = useCallback(() => {
+    setSaving(true);
+    setEquipError(null);
+
+    fetch("/api/cosmetics/buy-post-slot", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+    })
+      .then(async r => {
+        const data = await r.json();
+        if (data.success) {
+          setPostMascotSlots(data.newSlotCount);
+          refreshProfile();
+        } else {
+          setEquipError(data.error ?? "Kon slot niet kopen");
+        }
+      })
+      .catch(() => setEquipError("Network error"))
+      .finally(() => setSaving(false));
+  }, [refreshProfile]);
 
   if (!profile || loading) {
     return (
@@ -530,6 +602,94 @@ export default function LockerScreen() {
               </>
             );
           })()}
+
+          {/* ── Post Mascots Section ──────────────────────────────── */}
+          {equippedMascots.length >= 3 && (
+            <>
+              <div className="flex items-center gap-3 mt-8 mb-3">
+                <div className="flex-1 h-px" style={{ background: "linear-gradient(to right, transparent, #10B98160, transparent)" }} />
+                <span className="text-[10px] font-black uppercase tracking-widest" style={{ color: "#10B981" }}>
+                  📸 Post Mascots
+                </span>
+                <div className="flex-1 h-px" style={{ background: "linear-gradient(to right, transparent, #10B98160, transparent)" }} />
+              </div>
+
+              <p className="text-[11px] font-semibold mb-3" style={{ color: "#6B7280" }}>
+                Mascots die naast je naam verschijnen op nieuwe posts.
+                {postMascotSlots === 0 && " Koop je eerste slot!"}
+              </p>
+
+              {/* Slot info + buy button */}
+              {postMascotSlots < 5 && (
+                <button
+                  onClick={buyPostSlot}
+                  disabled={saving}
+                  className="w-full rounded-xl px-4 py-3 mb-3 transition-all active:scale-[0.98]"
+                  style={{
+                    background: "rgba(16,185,129,0.10)",
+                    border: "1.5px solid rgba(16,185,129,0.30)",
+                  }}
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs font-black" style={{ color: "#10B981" }}>
+                        Koop Post Slot {postMascotSlots + 1}
+                      </p>
+                      <p className="text-[10px] font-semibold" style={{ color: "#6B7280" }}>
+                        {equippedPostMascots.length}/{postMascotSlots} slots bezet
+                      </p>
+                    </div>
+                    <span className="text-xs font-black" style={{ color: "#10B981" }}>
+                      {[200, 400, 600, 800, 1000][postMascotSlots]} 🪙
+                    </span>
+                  </div>
+                </button>
+              )}
+
+              {/* Equipped post mascots */}
+              {postMascotSlots > 0 && (
+                <div className="flex flex-wrap gap-3">
+                  {MASCOTS.filter(m => inventory.has(m.id) && !equippedMascots.includes(m.id)).map((mascot, i) => {
+                    const isPostEquipped = equippedPostMascots.includes(mascot.id);
+                    const isFull = !isPostEquipped && equippedPostMascots.length >= postMascotSlots;
+
+                    return (
+                      <div key={mascot.id} className="relative">
+                        <button
+                          onClick={() => togglePostMascot(mascot.id)}
+                          disabled={isFull && !isPostEquipped}
+                          className="flex flex-col items-center gap-2 p-3 rounded-2xl transition-all active:scale-95"
+                          style={{
+                            background: isPostEquipped
+                              ? "rgba(16,185,129,0.15)"
+                              : "rgba(255,255,255,0.04)",
+                            border: isPostEquipped
+                              ? "1.5px solid rgba(16,185,129,0.6)"
+                              : "1.5px solid rgba(255,255,255,0.07)",
+                            boxShadow: isPostEquipped ? "0 0 14px rgba(16,185,129,0.2)" : "none",
+                            opacity: isFull && !isPostEquipped ? 0.4 : 1,
+                            minWidth: 80,
+                            cursor: isFull && !isPostEquipped ? "not-allowed" : "pointer",
+                          }}
+                        >
+                          <MascotSprite id={mascot.id} size={52} animationDelay={i * 800} />
+                          <span
+                            className="text-[9px] font-black text-center"
+                            style={{ color: isPostEquipped ? "#10B981" : "#9CA3AF" }}
+                          >
+                            {mascot.label}
+                          </span>
+                          {isPostEquipped && (
+                            <span className="text-[8px] font-black" style={{ color: "#10B981" }}>✓ Post</span>
+                          )}
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </>
+          )}
         </div>
       )}
     </div>

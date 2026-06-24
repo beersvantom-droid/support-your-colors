@@ -7,6 +7,7 @@ import type { Post } from "@/lib/supabase";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { getCountryInfo, timeAgo } from "@/lib/countries";
+import MascotSprite from "@/components/mascot/MascotSprite";
 import CommentsSheet from "./CommentsSheet";
 
 interface RealFeedPostProps {
@@ -18,6 +19,7 @@ export default function RealFeedPost({ post }: RealFeedPostProps) {
   const country = getCountryInfo(post.country);
   const initials = country.initials(post.username);
   const time = timeAgo(post.created_at);
+  const postMascots = (post.mascots ?? []).slice(0, 5);
 
   const [flameCount, setFlameCount] = useState(post.flame_count ?? 0);
   const [isFlamed, setIsFlamed] = useState(false);
@@ -119,6 +121,14 @@ export default function RealFeedPost({ post }: RealFeedPostProps) {
               </div>
             </div>
           </div>
+          {/* Post mascots */}
+          {postMascots.length > 0 && (
+            <div className="flex items-end gap-0.5">
+              {postMascots.map((id, i) => (
+                <MascotSprite key={id} id={id} size={28} animationDelay={i * 1000} />
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Caption */}

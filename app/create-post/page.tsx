@@ -108,6 +108,7 @@ export default function CreatePostPage() {
           country:   profile.country ?? "Unknown",
           caption:   caption.trim() || null,
           image_url: urlData.publicUrl,
+          mascots:   profile.equipped_post_mascots ?? [],
         })
         .select("id")
         .single();
