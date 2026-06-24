@@ -6,8 +6,8 @@ import { AuthProvider } from "@/components/auth/AuthProvider";
 import { AchievementsProvider } from "@/components/achievements/AchievementsProvider";
 import { ChatNotificationProvider } from "@/components/chat/ChatNotificationProvider";
 import { LiveSyncTrigger } from "@/components/LiveSyncTrigger";
-import Script from "next/script";
 import GoalCelebration from "@/components/GoalCelebration";
+import SplashScreen from "@/components/SplashScreen";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -38,17 +38,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={inter.className}>
       <body className="min-h-full flex flex-col">
-        <Script id="startup-sound" strategy="beforeInteractive">{`
-(function(){
-  var k="startup_sound_at",c=60000;
-  var last=parseInt(localStorage.getItem(k)||"0",10);
-  if(Date.now()-last<c)return;
-  localStorage.setItem(k,Date.now().toString());
-  var a=new Audio("/sounds/startup.mp3");
-  a.volume=0.6;
-  a.play().catch(function(){});
-})();
-`}</Script>
+        <SplashScreen>
         <AuthProvider>
           <AchievementsProvider>
             <ChatNotificationProvider>
@@ -61,6 +51,7 @@ export default function RootLayout({
             </ChatNotificationProvider>
           </AchievementsProvider>
         </AuthProvider>
+        </SplashScreen>
       </body>
     </html>
   );
