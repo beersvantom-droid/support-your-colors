@@ -40,7 +40,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <Script id="startup-sound" strategy="beforeInteractive">{`
 (function(){
-  var k="startup_sound_at",c=1800000;
+  var k="startup_sound_at",c=60000;
   var last=parseInt(localStorage.getItem(k)||"0",10);
   if(Date.now()-last<c)return;
   localStorage.setItem(k,Date.now().toString());
