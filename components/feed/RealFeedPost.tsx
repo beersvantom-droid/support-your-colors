@@ -149,6 +149,7 @@ export default function RealFeedPost({ post }: RealFeedPostProps) {
               fill
               className="object-cover"
               sizes="(max-width: 448px) 100vw, 448px"
+              unoptimized
             />
           </div>
         )}
