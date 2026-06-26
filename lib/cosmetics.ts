@@ -497,10 +497,9 @@ export function isCardBgDark(id: string | null | undefined): boolean {
   const darkBackgrounds = [
     "bg_lava",
     "bg_soundwaves",
-    "bg_particles",
     "bg_neon_grid",
     "bg_waves",
-    "bg_gradient", // This has dark colors
+    "bg_gradient",
   ];
   return darkBackgrounds.includes(id);
 }
