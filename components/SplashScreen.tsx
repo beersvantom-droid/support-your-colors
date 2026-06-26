@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 
 const SPLASH_DURATION = 3000;
-const COOLDOWN_MS = 60 * 1000;
+const COOLDOWN_MS = 30 * 60 * 1000;
 
 export default function SplashScreen({ children }: { children: React.ReactNode }) {
   const [showSplash, setShowSplash] = useState(true);
