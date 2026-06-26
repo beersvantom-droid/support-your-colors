@@ -468,10 +468,36 @@ export function resolveNewUnlocks(
     ],
   ];
 
-  return checks
+  const normal = checks
     .filter(([id, met]) => met && !alreadyUnlocked.has(id))
     .map(([id]) => getAchievementById(id)!)
     .filter(Boolean);
+
+  // Tiered achievement checks
+  const tieredChecks: { base: string; stat: number }[] = [
+    { base: "login_challenge",      stat: stats.consecutiveActivityDays },
+    { base: "pack_hunter",          stat: stats.packsOpenedCount },
+    { base: "cosmetics_collector",  stat: stats.cosmeticsOwnedCount },
+    { base: "mascot_master",        stat: stats.mascotsOwnedCount },
+  ];
+
+  for (const { base, stat } of tieredChecks) {
+    const def = getAchievementById(base);
+    if (!def?.tiers) continue;
+    for (const tier of def.tiers) {
+      const tierId = `${base}_${tier.level}`;
+      if (stat >= tier.threshold && !alreadyUnlocked.has(tierId)) {
+        normal.push({
+          ...def,
+          id: tierId,
+          name: `${def.name} (${tier.level === "bronze" ? "🥉" : tier.level === "silver" ? "🥈" : "🥇"})`,
+          coins: tier.coins,
+        });
+      }
+    }
+  }
+
+  return normal;
 }
 
 // Get the current tier level for a tiered achievement
