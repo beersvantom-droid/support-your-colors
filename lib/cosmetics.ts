@@ -238,6 +238,16 @@ export const MASCOTS: Mascot[] = [
     unlockHint:    "Earn as a Community Challenge reward",
     wheelEligible: false,
   },
+  {
+    id:            "mascot_hand_van_god",
+    type:          "mascot",
+    rarity:        "special",
+    label:         "Hand van God",
+    emoji:         "✋",
+    imagePath:     "/mascots/hand-van-god.png",
+    unlockHint:    "Earn as a Community Challenge reward",
+    wheelEligible: false,
+  },
 ];
 
 // All mascots are available from the dedicated "mascots" wheel segment.
@@ -313,6 +323,10 @@ export const COSMETICS: Cosmetic[] = [
   { id: "bg_waves",     type: "card_bg", rarity: "legendary", label: "Waves",    emoji: "🌊", wheelEligible: true },
   { id: "bg_gold_foil", type: "card_bg", rarity: "legendary", label: "Gold Foil", emoji: "🥇", wheelEligible: true },
   { id: "bg_neon_grid", type: "card_bg", rarity: "legendary", label: "Neon Grid", emoji: "💜", wheelEligible: true },
+
+  // ── Special Challenge Rewards ──────────────────────────────────────────────
+  { id: "bg_hand_van_god", type: "card_bg", rarity: "special", label: "Hand van God", emoji: "✋", wheelEligible: false },
+  { id: "badge_kami",      type: "badge",   rarity: "special", label: "神 Kami",       emoji: "神", wheelEligible: false },
 ];
 
 export const WHEEL_COSMETICS = COSMETICS.filter(c => c.wheelEligible);
@@ -424,6 +438,7 @@ export function badgeInfo(id: string | null | undefined): { emoji: string; class
   if (id === "badge_vinyl")     return { emoji: "🎵", className: "cosmetic-badge-vinyl" };
   if (id === "badge_crown")     return { emoji: "👑", className: "cosmetic-badge-crown" };
   if (id === "badge_phoenix")   return { emoji: "🔥", className: "cosmetic-badge-phoenix" };
+  if (id === "badge_kami")      return { emoji: "神", className: "cosmetic-badge-kami" };
   return null;
 }
 
@@ -470,6 +485,12 @@ const BG_LAYER_STYLES: Partial<Record<string, CSSProperties>> = {
     backgroundSize: "200px 120px",
     backgroundColor: "#0d0221",
   },
+  bg_hand_van_god: {
+    backgroundImage: [
+      "linear-gradient(135deg, #1a0800 0%, #2d1200 30%, #1a0a00 60%, #0d0500 100%)",
+    ].join(", "),
+    backgroundColor: "#1a0800",
+  },
 };
 
 const BG_LAYER_CLASSES: Partial<Record<string, string>> = {
@@ -477,6 +498,7 @@ const BG_LAYER_CLASSES: Partial<Record<string, string>> = {
   bg_waves:      "cosmetic-bg-waves",
   bg_neon_grid:  "cosmetic-bg-neon-grid",
   bg_soundwaves: "cosmetic-bg-soundwaves",
+  bg_hand_van_god: "cosmetic-bg-hand-van-god",
 };
 
 export function cardBgLayerProps(id: string | null | undefined): {
@@ -500,6 +522,7 @@ export function isCardBgDark(id: string | null | undefined): boolean {
     "bg_neon_grid",
     "bg_waves",
     "bg_gradient",
+    "bg_hand_van_god",
   ];
   return darkBackgrounds.includes(id);
 }

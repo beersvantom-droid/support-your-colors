@@ -1,17 +1,24 @@
+export interface ChallengeReward {
+  type: "mascot" | "card_bg" | "badge" | "coins";
+  cosmeticId?: string;
+  amount?: number;
+  label: string;
+  emoji: string;
+}
+
 export interface Challenge {
   id: string;
-  mascotId: string;
   mascotLabel: string;
   mascotEmoji: string;
   mascotImage: string;
+  packImage: string;
   targetPoints: number;
   startDate: string;
   endDate: string;
-  rewards: {
-    top3: { type: "mascot"; mascotId: string };
-    rank4to6: { type: "coins"; amount: number };
-    rest: { type: "coins"; amount: number };
-  };
+  mode: "community" | "mystery";
+  multipliers?: Record<string, number>;
+  rewards: ChallengeReward[];
+  fallbackReward: { type: "coins"; amount: number };
 }
 
 export const ACTION_POINTS = {
@@ -26,18 +33,42 @@ export const ACTION_POINTS = {
 export const CHALLENGES: Challenge[] = [
   {
     id: "week1_goat",
-    mascotId: "mascot_goat",
     mascotLabel: "GOAT",
     mascotEmoji: "🐐",
     mascotImage: "/mascots/goat.png",
+    packImage: "/packs/goatpack.png",
     targetPoints: 12_500,
     startDate: "2026-06-23",
     endDate: "2026-06-29",
-    rewards: {
-      top3: { type: "mascot", mascotId: "mascot_goat" },
-      rank4to6: { type: "coins", amount: 150 },
-      rest: { type: "coins", amount: 50 },
+    mode: "community",
+    rewards: [
+      { type: "mascot", cosmeticId: "mascot_goat", label: "GOAT", emoji: "🐐" },
+      { type: "mascot", cosmeticId: "mascot_goat", label: "GOAT", emoji: "🐐" },
+      { type: "mascot", cosmeticId: "mascot_goat", label: "GOAT", emoji: "🐐" },
+    ],
+    fallbackReward: { type: "coins", amount: 50 },
+  },
+  {
+    id: "week2_hand_van_god",
+    mascotLabel: "Hand van God",
+    mascotEmoji: "✋",
+    mascotImage: "/mascots/hand-van-god.png",
+    packImage: "/packs/hand-van-god-pack.png",
+    targetPoints: 15_000,
+    startDate: "2026-06-30",
+    endDate: "2026-07-06",
+    mode: "mystery",
+    multipliers: {
+      "Tuur": 10, "Finn": 8, "Siem": 6, "Tobias ": 5, "Tiemen": 4,
+      "Michiel": 4, "Sep": 3, "Roel": 3, "Kas": 2, "Jokk": 2,
+      "Willem": 1, "Albert": 1, "Tom (Built)": 1,
     },
+    rewards: [
+      { type: "mascot", cosmeticId: "mascot_hand_van_god", label: "Hand van God", emoji: "✋" },
+      { type: "card_bg", cosmeticId: "bg_hand_van_god", label: "Hand van God BG", emoji: "🎴" },
+      { type: "badge", cosmeticId: "badge_kami", label: "神 Kami Badge", emoji: "神" },
+    ],
+    fallbackReward: { type: "coins", amount: 150 },
   },
 ];
 

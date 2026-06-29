@@ -950,6 +950,58 @@ body {
   animation: goatGoldenToothGlow 1.5s ease-in-out infinite;
 }
 
+/* Hand van God card background */
+.cosmetic-bg-hand-van-god {
+  position: relative;
+}
+.cosmetic-bg-hand-van-god::before {
+  content: "必殺技 神の手 ゴッドハンド 必殺技 神の手 ゴッドハンド 必殺技 神の手 ゴッドハンド";
+  position: absolute;
+  inset: 0;
+  font-family: serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: rgba(255,215,0,0.07);
+  letter-spacing: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  animation: hvgScroll 18s linear infinite;
+}
+.cosmetic-bg-hand-van-god::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 80% 30%, rgba(255,215,0,0.20) 0%, transparent 50%),
+    radial-gradient(circle at 20% 70%, rgba(255,165,0,0.12) 0%, transparent 45%),
+    repeating-linear-gradient(45deg, transparent, transparent 8px, rgba(255,215,0,0.04) 8px, rgba(255,215,0,0.04) 9px);
+  pointer-events: none;
+  animation: hvgGlowPulse 2.5s ease-in-out infinite;
+}
+@keyframes hvgScroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+@keyframes hvgGlowPulse {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 1; }
+}
+
+/* 神 Kami badge */
+.cosmetic-badge-kami {
+  font-family: serif;
+  font-weight: 900;
+  color: #FFD700;
+  text-shadow: 0 0 5px rgba(255,215,0,0.8), 0 0 10px rgba(255,165,0,0.5);
+  animation: kamiBadgePulse 2s ease-in-out infinite;
+}
+@keyframes kamiBadgePulse {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(1.3); }
+}
+
 /* Goal celebration */
 @keyframes goalBallFall {
   0%   { transform: translateY(-40px) rotate(0deg); opacity: 1; }

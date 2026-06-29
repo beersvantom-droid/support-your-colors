@@ -13,6 +13,7 @@ interface ChallengeData {
   percentage?: number;
   endDate?: string;
   claimed?: boolean;
+  mode?: string;
 }
 
 function timeLeft(endDate: string): string {
@@ -220,12 +221,25 @@ export default function ChallengeSection() {
             Beloningen
           </p>
           <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
-            <p style={{ color: "#FFD700", fontSize: 11, fontWeight: 700 }}>
-              🏆 Top 3 → {data.mascotEmoji} {data.mascotLabel} mascot
-            </p>
-            <p style={{ color: "#9CA3AF", fontSize: 11 }}>
-              4-6 → 150 🪙 &nbsp;·&nbsp; Rest → 50 🪙
-            </p>
+            {data.mode === "mystery" ? (
+              <>
+                <p style={{ color: "#FFD700", fontSize: 11, fontWeight: 700 }}>
+                  🎲 Willekeurige exclusieve beloningen
+                </p>
+                <p style={{ color: "#9CA3AF", fontSize: 11 }}>
+                  Rest → 150 🪙
+                </p>
+              </>
+            ) : (
+              <>
+                <p style={{ color: "#FFD700", fontSize: 11, fontWeight: 700 }}>
+                  🏆 Top 3 → {data.mascotEmoji} {data.mascotLabel} mascot
+                </p>
+                <p style={{ color: "#9CA3AF", fontSize: 11 }}>
+                  4-6 → 150 🪙 &nbsp;·&nbsp; Rest → 50 🪙
+                </p>
+              </>
+            )}
           </div>
         </div>
       )}

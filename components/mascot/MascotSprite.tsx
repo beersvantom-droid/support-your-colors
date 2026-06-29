@@ -23,6 +23,7 @@ const MASCOT_IMAGE: Record<string, string> = {
   mascot_aardbei:     "/mascots/aardbei.png",
   mascot_leren_bal:   "/mascots/leren-bal.png",
   mascot_goat:        "/mascots/goat.png",
+  mascot_hand_van_god: "/mascots/hand-van-god.png",
 };
 
 // ── Per-mascot animation class ────────────────────────────────────────────────
@@ -49,6 +50,7 @@ const MASCOT_ANIMATION: Record<string, string> = {
   mascot_aardbei:     "mascot-idle-default",
   mascot_leren_bal:   "mascot-idle-default",
   mascot_goat:        "mascot-goat",
+  mascot_hand_van_god: "mascot-idle-default",
 };
 
 // ── Per-mascot blend mode ──────────────────────────────────────────────────────
@@ -75,6 +77,7 @@ const MASCOT_BLEND_MODE: Record<string, string> = {
   mascot_aardbei:     "normal",  // Transparent background
   mascot_leren_bal:   "normal",  // Transparent background
   mascot_goat:        "normal",  // Transparent background
+  mascot_hand_van_god: "normal",  // Transparent background
 };
 
 // Per-mascot scale factor — 1.0 = normal, < 1.0 = smaller
