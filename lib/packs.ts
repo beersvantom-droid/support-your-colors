@@ -56,83 +56,33 @@ export function getPack(id: string): Pack | undefined {
 
 export const SHOP_PACKS: Pack[] = [
   {
-    id:              "cor_pack",
-    label:           "The Cor Pack",
-    description:     "Legends Don't Follow, They Lead | 30% Golden Cor • 30% Gouden Items • 40% Random",
-    emoji:           "🧣",
-    imagePath:       "/packs/cor-pack.png",
-    cost:            { currency: "coins", amount: 500 },
-    rarityPool:      { common: 50, rare: 25, epic: 15, legendary: 10 }, // Dummy - not used, pickFromCorPack() handles it
-    cooldownMinutes: 0,
-  },
-  {
-    id:              "ron_pack",
-    label:           "The Ron Pack",
-    description:     "Voetbal Legend | 30% Ron Jans • 60% Random Cosmetica • 10% Bonus",
-    emoji:           "⚽",
-    imagePath:       "/packs/Ron-pack.png",
-    cost:            { currency: "coins", amount: 300 },
-    rarityPool:      { common: 50, rare: 25, epic: 15, legendary: 10 }, // Dummy - not used, pickFromRonPack() handles it
-    cooldownMinutes: 0,
-  },
-  {
-    id:              "jannes_pack",
-    label:           "The Jannes Pack",
-    description:     "Talent Ontkent | 30% Jannes • 60% Random Cosmetica • 10% Bonus",
-    emoji:           "🌟",
-    imagePath:       "/packs/jannes-pack.png",
-    cost:            { currency: "coins", amount: 300 },
-    rarityPool:      { common: 50, rare: 25, epic: 15, legendary: 10 }, // Dummy - not used, pickFromJannesPack() handles it
-    cooldownMinutes: 0,
-  },
-  {
-    id:              "villain_pack",
-    label:           "The Villain Pack",
-    description:     "Chaos & Destruction | 30% Abu Harb • 40% Vuur Items • 30% Random",
-    emoji:           "🦅",
-    imagePath:       "/packs/villain-pack.png",
-    cost:            { currency: "coins", amount: 300 },
-    rarityPool:      { common: 50, rare: 25, epic: 15, legendary: 10 }, // Dummy - not used, pickFromVillainPack() handles it
-    cooldownMinutes: 0,
-  },
-  {
-    id:              "udo_pack",
-    label:           "The Udo Pack",
-    description:     "Stijl & Swag | 30% Udo • 60% Random Cosmetica • 10% Bonus",
-    emoji:           "😎",
-    imagePath:       "/packs/udo-pack.png",
-    cost:            { currency: "coins", amount: 300 },
-    rarityPool:      { common: 50, rare: 25, epic: 15, legendary: 10 }, // Dummy - not used, pickFromUdoPack() handles it
-    cooldownMinutes: 0,
-  },
-  {
-    id:              "rustaagh_pack",
-    label:           "The Rustaagh Pack",
-    description:     "Rust & Relaxation | 30% Rustaagh • 70% Random Items",
-    emoji:           "😌",
-    imagePath:       "/packs/rustaagh-pack.png",
-    cost:            { currency: "coins", amount: 200 },
-    rarityPool:      { common: 50, rare: 25, epic: 15, legendary: 10 }, // Dummy - not used, pickFromRustaraghPack() handles it
-    cooldownMinutes: 0,
-  },
-  {
-    id:              "mascotte_pack",
-    label:           "Mascotte Pack",
-    description:     "100% Mascotte | Hoe zeldzamer hoe moeilijker",
-    emoji:           "🎭",
-    imagePath:       "/packs/mascotte-pack.png",
-    cost:            { currency: "coins", amount: 350 },
-    rarityPool:      { mascots: 100 }, // 100% mascots
-    cooldownMinutes: 0,
-  },
-  {
     id:              "roulette_pack",
     label:           "Roulette Pack",
     description:     "50/50 GOKKEN | Verdubbel je munten of verlies alles! (1% DJ Derksen!)",
     emoji:           "🎰",
     imagePath:       "/packs/roulette.png",
     cost:            { currency: "coins", amount: 100 },
-    rarityPool:      { common: 50, rare: 50 }, // Dummy - will be overridden by roulette logic
+    rarityPool:      { common: 50, rare: 50 },
+    cooldownMinutes: 0,
+  },
+  {
+    id:              "bruno_pack",
+    label:           "Bruno Pack",
+    description:     "30% Bruno mascot • 40% Epic items • 30% Random",
+    emoji:           "🐕",
+    imagePath:       "/packs/brunopack.png",
+    cost:            { currency: "coins", amount: 300 },
+    rarityPool:      { common: 30, rare: 20, epic: 20, legendary: 10, mascots: 20 },
+    cooldownMinutes: 0,
+  },
+  {
+    id:              "infantino_pack",
+    label:           "Infantino Pack",
+    description:     "De baas van het voetbal | 25% Infantino • 35% Legendary items • 40% Random",
+    emoji:           "🤵",
+    imagePath:       "/packs/infantinopack.png",
+    cost:            { currency: "coins", amount: 500 },
+    rarityPool:      { common: 20, rare: 15, epic: 20, legendary: 25, mascots: 20 },
     cooldownMinutes: 0,
   },
   // ← add future shop packs here

@@ -268,6 +268,36 @@ export const MASCOTS: Mascot[] = [
     unlockHint:    "Earn as a Community Challenge reward",
     wheelEligible: false,
   },
+  {
+    id:            "mascot_leeuw",
+    type:          "mascot",
+    rarity:        "epic",
+    label:         "Leeuw",
+    emoji:         "🦁",
+    imagePath:     "/mascots/leeuw.png",
+    unlockHint:    "Spin the Wheel of Chaos (Mascots)",
+    wheelEligible: false,
+  },
+  {
+    id:            "mascot_bruno",
+    type:          "mascot",
+    rarity:        "epic",
+    label:         "Bruno",
+    emoji:         "🐕",
+    imagePath:     "/mascots/bruno.png",
+    unlockHint:    "Open the Bruno Pack",
+    wheelEligible: false,
+  },
+  {
+    id:            "mascot_infantino",
+    type:          "mascot",
+    rarity:        "legendary",
+    label:         "Infantino",
+    emoji:         "🤵",
+    imagePath:     "/mascots/infantino.png",
+    unlockHint:    "Open the Infantino Pack",
+    wheelEligible: false,
+  },
 ];
 
 // All mascots are available from the dedicated "mascots" wheel segment.

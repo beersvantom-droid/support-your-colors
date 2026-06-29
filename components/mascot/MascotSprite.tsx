@@ -26,6 +26,9 @@ const MASCOT_IMAGE: Record<string, string> = {
   mascot_hand_van_god: "/mascots/hand-van-god.png",
   mascot_confused:     "/mascots/confused.png",
   mascot_orgeljoke:    "/mascots/orgeljoke.png",
+  mascot_leeuw:        "/mascots/leeuw.png",
+  mascot_bruno:        "/mascots/bruno.png",
+  mascot_infantino:    "/mascots/infantino.png",
 };
 
 // ── Per-mascot animation class ────────────────────────────────────────────────
@@ -55,6 +58,9 @@ const MASCOT_ANIMATION: Record<string, string> = {
   mascot_hand_van_god: "mascot-idle-default",
   mascot_confused:     "mascot-idle-default",
   mascot_orgeljoke:    "mascot-idle-default",
+  mascot_leeuw:        "mascot-idle-default",
+  mascot_bruno:        "mascot-idle-default",
+  mascot_infantino:    "mascot-idle-default",
 };
 
 // ── Per-mascot blend mode ──────────────────────────────────────────────────────
@@ -84,6 +90,9 @@ const MASCOT_BLEND_MODE: Record<string, string> = {
   mascot_hand_van_god: "normal",  // Transparent background
   mascot_confused:     "normal",  // Transparent background
   mascot_orgeljoke:    "normal",  // Transparent background
+  mascot_leeuw:        "normal",
+  mascot_bruno:        "normal",
+  mascot_infantino:    "normal",
 };
 
 // Per-mascot scale factor — 1.0 = normal, < 1.0 = smaller
