@@ -144,6 +144,8 @@ export default function ChallengeSection() {
           <p style={{ color: "#9CA3AF", fontSize: 11, lineHeight: 1.4, marginTop: 2 }}>
             {isComplete
               ? "Claim je beloning!"
+              : data.mode === "mystery"
+              ? "Help de groep het doel te halen! Willekeurige beloningen bij 100%"
               : <>Help de groep! De top 3 verdient de <span style={{ color: "#FFD700" }}>{data.mascotLabel}</span> mascot</>
             }
           </p>

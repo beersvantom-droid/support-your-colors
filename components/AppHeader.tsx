@@ -268,7 +268,10 @@ export default function AppHeader() {
             )}
 
             {/* Challenge badge — only when a challenge is active */}
-            {getActiveChallenge() && (
+            {(() => {
+              const ch = getActiveChallenge();
+              if (!ch) return null;
+              return (
               <span
                 className="absolute -top-1.5 -right-1.5 flex items-center justify-center"
                 style={{
@@ -281,9 +284,10 @@ export default function AppHeader() {
                   lineHeight: 1,
                 }}
               >
-                🐐
+                {ch.mascotEmoji}
               </span>
-            )}
+              );
+            })()}
           </Link>
         </div>
       </div>
