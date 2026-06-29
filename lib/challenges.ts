@@ -87,6 +87,23 @@ export const CHALLENGES: Challenge[] = [
     ],
     fallbackReward: { type: "coins", amount: 150 },
   },
+  {
+    id: "week4_orgeljoke",
+    mascotLabel: "Orgel Joke",
+    mascotEmoji: "🎹",
+    mascotImage: "/mascots/orgeljoke.png",
+    packImage: "/packs/orgeljokepack.png",
+    targetPoints: 15_000,
+    startDate: "2026-07-13",
+    endDate: "2026-07-19",
+    mode: "community",
+    rewards: [
+      { type: "mascot", cosmeticId: "mascot_orgeljoke", label: "Orgel Joke", emoji: "🎹" },
+      { type: "card_bg", cosmeticId: "bg_orgeljoke", label: "Orgel Joke BG", emoji: "🎵" },
+      { type: "badge", cosmeticId: "badge_orgeljoke", label: "♫ Orgel Badge", emoji: "♫" },
+    ],
+    fallbackReward: { type: "coins", amount: 150 },
+  },
 ];
 
 export function getActiveChallenge(): Challenge | null {

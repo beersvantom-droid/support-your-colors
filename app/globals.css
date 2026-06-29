@@ -1053,6 +1053,57 @@ body {
   50% { opacity: 0.7; transform: scale(1.1) rotate(5deg); }
 }
 
+/* Orgel Joke card background */
+.cosmetic-bg-orgeljoke {
+  position: relative;
+}
+.cosmetic-bg-orgeljoke::before {
+  content: "♫ ♩ ♯ ♫ ♩ ♯ ♫ ♩ ♯ ♫ ♩ ♯ ♫ ♩ ♯ ♫ ♩ ♯ ♫ ♩ ♯ ♫ ♩ ♯ ♫ ♩ ♯ ♫ ♩ ♯";
+  position: absolute;
+  inset: 0;
+  font-size: 18px;
+  font-weight: 900;
+  color: rgba(255,102,0,0.08);
+  letter-spacing: 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  animation: orgelScroll 16s linear infinite;
+}
+.cosmetic-bg-orgeljoke::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 75% 30%, rgba(255,102,0,0.18) 0%, transparent 50%),
+    radial-gradient(circle at 25% 70%, rgba(255,102,0,0.10) 0%, transparent 45%);
+  pointer-events: none;
+  animation: orgelGlow 3s ease-in-out infinite;
+}
+@keyframes orgelScroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+@keyframes orgelGlow {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+
+/* Orgel Joke badge */
+.cosmetic-badge-orgeljoke {
+  font-weight: 900;
+  color: #FF6600;
+  text-shadow: 0 0 5px rgba(255,102,0,0.6), 0 0 10px rgba(255,102,0,0.3);
+  animation: orgelBadgeBounce 2s ease-in-out infinite;
+  display: inline-block;
+}
+@keyframes orgelBadgeBounce {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-2px) rotate(-5deg); }
+  75% { transform: translateY(-1px) rotate(5deg); }
+}
+
 /* Goal celebration */
 @keyframes goalBallFall {
   0%   { transform: translateY(-40px) rotate(0deg); opacity: 1; }

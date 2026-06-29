@@ -258,6 +258,16 @@ export const MASCOTS: Mascot[] = [
     unlockHint:    "Earn as a Community Challenge reward",
     wheelEligible: false,
   },
+  {
+    id:            "mascot_orgeljoke",
+    type:          "mascot",
+    rarity:        "special",
+    label:         "Orgel Joke",
+    emoji:         "🎹",
+    imagePath:     "/mascots/orgeljoke.png",
+    unlockHint:    "Earn as a Community Challenge reward",
+    wheelEligible: false,
+  },
 ];
 
 // All mascots are available from the dedicated "mascots" wheel segment.
@@ -337,8 +347,10 @@ export const COSMETICS: Cosmetic[] = [
   // ── Special Challenge Rewards ──────────────────────────────────────────────
   { id: "bg_hand_van_god", type: "card_bg", rarity: "special", label: "Hand van God", emoji: "✋", wheelEligible: false },
   { id: "badge_kami",      type: "badge",   rarity: "special", label: "神 Kami",       emoji: "神", wheelEligible: false },
-  { id: "bg_confused",    type: "card_bg", rarity: "special", label: "Confused",     emoji: "❓", wheelEligible: false },
-  { id: "badge_confused", type: "badge",   rarity: "special", label: "?! Confused",  emoji: "?!", wheelEligible: false },
+  { id: "bg_confused",      type: "card_bg", rarity: "special", label: "Confused",     emoji: "❓", wheelEligible: false },
+  { id: "badge_confused",   type: "badge",   rarity: "special", label: "?! Confused",  emoji: "?!", wheelEligible: false },
+  { id: "bg_orgeljoke",    type: "card_bg", rarity: "special", label: "Orgel Joke",  emoji: "🎹", wheelEligible: false },
+  { id: "badge_orgeljoke", type: "badge",   rarity: "special", label: "♫ Orgel",     emoji: "♫", wheelEligible: false },
 ];
 
 export const WHEEL_COSMETICS = COSMETICS.filter(c => c.wheelEligible);
@@ -452,6 +464,7 @@ export function badgeInfo(id: string | null | undefined): { emoji: string; class
   if (id === "badge_phoenix")   return { emoji: "🔥", className: "cosmetic-badge-phoenix" };
   if (id === "badge_kami")      return { emoji: "神", className: "cosmetic-badge-kami" };
   if (id === "badge_confused") return { emoji: "?!", className: "cosmetic-badge-confused" };
+  if (id === "badge_orgeljoke") return { emoji: "♫", className: "cosmetic-badge-orgeljoke" };
   return null;
 }
 
@@ -508,6 +521,10 @@ const BG_LAYER_STYLES: Partial<Record<string, CSSProperties>> = {
     backgroundImage: "linear-gradient(145deg, #0a1f0e 0%, #0d2a12 30%, #0a1f0e 60%, #061209 100%)",
     backgroundColor: "#0a1f0e",
   },
+  bg_orgeljoke: {
+    backgroundImage: "linear-gradient(145deg, #1a0800 0%, #2d1200 30%, #1a0a00 60%, #0d0500 100%)",
+    backgroundColor: "#1a0800",
+  },
 };
 
 const BG_LAYER_CLASSES: Partial<Record<string, string>> = {
@@ -517,6 +534,7 @@ const BG_LAYER_CLASSES: Partial<Record<string, string>> = {
   bg_soundwaves: "cosmetic-bg-soundwaves",
   bg_hand_van_god: "cosmetic-bg-hand-van-god",
   bg_confused: "cosmetic-bg-confused",
+  bg_orgeljoke: "cosmetic-bg-orgeljoke",
 };
 
 export function cardBgLayerProps(id: string | null | undefined): {
@@ -542,6 +560,7 @@ export function isCardBgDark(id: string | null | undefined): boolean {
     "bg_gradient",
     "bg_hand_van_god",
     "bg_confused",
+    "bg_orgeljoke",
   ];
   return darkBackgrounds.includes(id);
 }
