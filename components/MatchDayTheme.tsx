@@ -4,42 +4,51 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { TEAMS } from "@/lib/wc2026-data";
 
-interface MatchDayTheme {
-  color: string;
-  flag: string;
-  team: string;
-}
+const MANUAL_THEMES: { team: string; date: string }[] = [
+  { team: "Netherlands", date: "2026-06-29" },
+];
 
 export default function MatchDayTheme() {
-  const [theme, setTheme] = useState<MatchDayTheme | null>(null);
+  const [active, setActive] = useState(false);
 
   useEffect(() => {
-    async function checkMatchDay() {
+    async function check() {
       const amsNow = new Date(Date.now() + 2 * 60 * 60 * 1000);
       const today = amsNow.toISOString().split("T")[0];
+      const hour = amsNow.getHours();
 
+      // Check manual overrides (active until 5 AM next day)
+      const yesterday = new Date(amsNow);
+      yesterday.setDate(yesterday.getDate() - 1);
+      const yesterdayStr = yesterday.toISOString().split("T")[0];
+
+      const manualToday = MANUAL_THEMES.some(t => t.team === "Netherlands" && t.date === today);
+      const manualYesterday = MANUAL_THEMES.some(t => t.team === "Netherlands" && t.date === yesterdayStr && hour < 5);
+
+      if (manualToday || manualYesterday) {
+        setActive(true);
+        return;
+      }
+
+      // Auto-detect from match_results
       const { data } = await supabase
         .from("match_results")
         .select("home_team, away_team, status")
-        .eq("match_date", today)
-        .in("status", ["live", "upcoming", "finished"]);
+        .eq("match_date", today);
 
-      if (!data || data.length === 0) return;
+      if (!data) return;
 
-      const match = data.find(
+      const hasNL = data.some(
         (m) => m.home_team === "Netherlands" || m.away_team === "Netherlands"
       );
 
-      if (match) {
-        const info = TEAMS["Netherlands"];
-        setTheme({ color: info.color, flag: info.flag, team: "Netherlands" });
-      }
+      if (hasNL) setActive(true);
     }
 
-    checkMatchDay();
+    check();
   }, []);
 
-  if (!theme) return null;
+  if (!active) return null;
 
   return (
     <style>{`
