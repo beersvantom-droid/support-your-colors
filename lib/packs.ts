@@ -70,7 +70,7 @@ export const SHOP_PACKS: Pack[] = [
     label:           "Bruno Pack",
     description:     "30% Bruno mascot • 40% Epic items • 30% Random",
     emoji:           "🐕",
-    imagePath:       "/packs/brunopack.png",
+    imagePath:       "/packs/Brunopack.png",
     cost:            { currency: "coins", amount: 300 },
     rarityPool:      { common: 30, rare: 20, epic: 20, legendary: 10, mascots: 20 },
     cooldownMinutes: 0,
