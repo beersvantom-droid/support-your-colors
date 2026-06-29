@@ -343,6 +343,9 @@ export const COSMETICS: Cosmetic[] = [
   { id: "bg_waves",     type: "card_bg", rarity: "legendary", label: "Waves",    emoji: "🌊", wheelEligible: true },
   { id: "bg_gold_foil", type: "card_bg", rarity: "legendary", label: "Gold Foil", emoji: "🥇", wheelEligible: true },
   { id: "bg_neon_grid", type: "card_bg", rarity: "legendary", label: "Neon Grid", emoji: "💜", wheelEligible: true },
+  { id: "bg_midnight", type: "card_bg", rarity: "legendary", label: "Midnight", emoji: "🌙", wheelEligible: true },
+  { id: "bg_embers",   type: "card_bg", rarity: "legendary", label: "Embers",   emoji: "🔥", wheelEligible: true },
+  { id: "bg_matrix",   type: "card_bg", rarity: "legendary", label: "Matrix",   emoji: "💚", wheelEligible: true },
 
   // ── Special Challenge Rewards ──────────────────────────────────────────────
   { id: "bg_hand_van_god", type: "card_bg", rarity: "special", label: "Hand van God", emoji: "✋", wheelEligible: false },
@@ -525,6 +528,18 @@ const BG_LAYER_STYLES: Partial<Record<string, CSSProperties>> = {
     backgroundImage: "linear-gradient(145deg, #1a0800 0%, #2d1200 30%, #1a0a00 60%, #0d0500 100%)",
     backgroundColor: "#1a0800",
   },
+  bg_midnight: {
+    backgroundImage: "linear-gradient(135deg, #0a0a2e 0%, #1a1a4e 50%, #0a0a2e 100%)",
+    backgroundColor: "#0a0a2e",
+  },
+  bg_embers: {
+    backgroundImage: "linear-gradient(145deg, #200a00 0%, #3d1400 50%, #200a00 100%)",
+    backgroundColor: "#200a00",
+  },
+  bg_matrix: {
+    backgroundImage: "linear-gradient(135deg, #001a0a 0%, #002d12 50%, #001a0a 100%)",
+    backgroundColor: "#001a0a",
+  },
 };
 
 const BG_LAYER_CLASSES: Partial<Record<string, string>> = {
@@ -535,6 +550,9 @@ const BG_LAYER_CLASSES: Partial<Record<string, string>> = {
   bg_hand_van_god: "cosmetic-bg-hand-van-god",
   bg_confused: "cosmetic-bg-confused",
   bg_orgeljoke: "cosmetic-bg-orgeljoke",
+  bg_midnight: "cosmetic-bg-midnight",
+  bg_embers: "cosmetic-bg-embers",
+  bg_matrix: "cosmetic-bg-matrix",
 };
 
 export function cardBgLayerProps(id: string | null | undefined): {
@@ -561,6 +579,9 @@ export function isCardBgDark(id: string | null | undefined): boolean {
     "bg_hand_van_god",
     "bg_confused",
     "bg_orgeljoke",
+    "bg_midnight",
+    "bg_embers",
+    "bg_matrix",
   ];
   return darkBackgrounds.includes(id);
 }
