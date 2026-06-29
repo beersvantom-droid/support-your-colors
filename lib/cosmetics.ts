@@ -248,6 +248,16 @@ export const MASCOTS: Mascot[] = [
     unlockHint:    "Earn as a Community Challenge reward",
     wheelEligible: false,
   },
+  {
+    id:            "mascot_confused",
+    type:          "mascot",
+    rarity:        "special",
+    label:         "Confused",
+    emoji:         "❓",
+    imagePath:     "/mascots/confused.png",
+    unlockHint:    "Earn as a Community Challenge reward",
+    wheelEligible: false,
+  },
 ];
 
 // All mascots are available from the dedicated "mascots" wheel segment.
@@ -327,6 +337,8 @@ export const COSMETICS: Cosmetic[] = [
   // ── Special Challenge Rewards ──────────────────────────────────────────────
   { id: "bg_hand_van_god", type: "card_bg", rarity: "special", label: "Hand van God", emoji: "✋", wheelEligible: false },
   { id: "badge_kami",      type: "badge",   rarity: "special", label: "神 Kami",       emoji: "神", wheelEligible: false },
+  { id: "bg_confused",    type: "card_bg", rarity: "special", label: "Confused",     emoji: "❓", wheelEligible: false },
+  { id: "badge_confused", type: "badge",   rarity: "special", label: "?! Confused",  emoji: "?!", wheelEligible: false },
 ];
 
 export const WHEEL_COSMETICS = COSMETICS.filter(c => c.wheelEligible);
@@ -439,6 +451,7 @@ export function badgeInfo(id: string | null | undefined): { emoji: string; class
   if (id === "badge_crown")     return { emoji: "👑", className: "cosmetic-badge-crown" };
   if (id === "badge_phoenix")   return { emoji: "🔥", className: "cosmetic-badge-phoenix" };
   if (id === "badge_kami")      return { emoji: "神", className: "cosmetic-badge-kami" };
+  if (id === "badge_confused") return { emoji: "?!", className: "cosmetic-badge-confused" };
   return null;
 }
 
@@ -491,6 +504,10 @@ const BG_LAYER_STYLES: Partial<Record<string, CSSProperties>> = {
     ].join(", "),
     backgroundColor: "#1a0800",
   },
+  bg_confused: {
+    backgroundImage: "linear-gradient(145deg, #0a1f0e 0%, #0d2a12 30%, #0a1f0e 60%, #061209 100%)",
+    backgroundColor: "#0a1f0e",
+  },
 };
 
 const BG_LAYER_CLASSES: Partial<Record<string, string>> = {
@@ -499,6 +516,7 @@ const BG_LAYER_CLASSES: Partial<Record<string, string>> = {
   bg_neon_grid:  "cosmetic-bg-neon-grid",
   bg_soundwaves: "cosmetic-bg-soundwaves",
   bg_hand_van_god: "cosmetic-bg-hand-van-god",
+  bg_confused: "cosmetic-bg-confused",
 };
 
 export function cardBgLayerProps(id: string | null | undefined): {
@@ -523,6 +541,7 @@ export function isCardBgDark(id: string | null | undefined): boolean {
     "bg_waves",
     "bg_gradient",
     "bg_hand_van_god",
+    "bg_confused",
   ];
   return darkBackgrounds.includes(id);
 }
