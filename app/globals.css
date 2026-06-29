@@ -1053,6 +1053,26 @@ body {
   50% { opacity: 0.7; transform: scale(1.1) rotate(5deg); }
 }
 
+/* Pirot: druk heen en weer springen + trillen */
+.mascot-pirot {
+  animation: pirotHyper 1.2s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+@keyframes pirotHyper {
+  0%, 100% { transform: translateX(0) translateY(0) rotate(0deg); }
+  8% { transform: translateX(-4px) translateY(-5px) rotate(-3deg); }
+  16% { transform: translateX(3px) translateY(0) rotate(2deg); }
+  24% { transform: translateX(-2px) translateY(-7px) rotate(-4deg); }
+  32% { transform: translateX(4px) translateY(-2px) rotate(3deg); }
+  40% { transform: translateX(-3px) translateY(-4px) rotate(-2deg); }
+  48% { transform: translateX(2px) translateY(0) rotate(1deg); }
+  56% { transform: translateX(-4px) translateY(-6px) rotate(-3deg); }
+  64% { transform: translateX(3px) translateY(-1px) rotate(4deg); }
+  72% { transform: translateX(-1px) translateY(-3px) rotate(-1deg); }
+  80% { transform: translateX(4px) translateY(-5px) rotate(2deg); }
+  88% { transform: translateX(-2px) translateY(0) rotate(-2deg); }
+}
+
 /* Mr. Bier: dronken wiebel */
 .mascot-mrbier {
   animation: bierWobble 2.5s ease-in-out infinite;

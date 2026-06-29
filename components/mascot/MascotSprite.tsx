@@ -31,6 +31,7 @@ const MASCOT_IMAGE: Record<string, string> = {
   mascot_infantino:    "/mascots/infantino.png",
   mascot_mrbier:       "/mascots/mrbier.png",
   mascot_ref:          "/mascots/ref.png",
+  mascot_pirot:        "/mascots/pirot.png",
 };
 
 // ── Per-mascot animation class ────────────────────────────────────────────────
@@ -65,6 +66,7 @@ const MASCOT_ANIMATION: Record<string, string> = {
   mascot_infantino:    "mascot-idle-default",
   mascot_mrbier:       "mascot-mrbier",
   mascot_ref:          "mascot-idle-default",
+  mascot_pirot:        "mascot-pirot",
 };
 
 // ── Per-mascot blend mode ──────────────────────────────────────────────────────
@@ -99,6 +101,7 @@ const MASCOT_BLEND_MODE: Record<string, string> = {
   mascot_infantino:    "normal",
   mascot_mrbier:       "normal",
   mascot_ref:          "normal",
+  mascot_pirot:        "normal",
 };
 
 // Per-mascot scale factor — 1.0 = normal, < 1.0 = smaller

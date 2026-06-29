@@ -95,6 +95,16 @@ export const SHOP_PACKS: Pack[] = [
     rarityPool:      { common: 40, rare: 20, epic: 20, legendary: 20 },
     cooldownMinutes: 0,
   },
+  {
+    id:              "pirot_pack",
+    label:           "Pirot Pack",
+    description:     "Angry bird! | 30% Pirot • 60% Random Cosmetica • 10% Bonus",
+    emoji:           "🐦",
+    imagePath:       "/packs/pirotpack.png",
+    cost:            { currency: "coins", amount: 300 },
+    rarityPool:      { common: 40, rare: 25, epic: 20, legendary: 15 },
+    cooldownMinutes: 0,
+  },
   // ← add future shop packs here
 ];
 

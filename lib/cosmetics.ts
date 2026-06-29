@@ -299,6 +299,16 @@ export const MASCOTS: Mascot[] = [
     wheelEligible: false,
   },
   {
+    id:            "mascot_pirot",
+    type:          "mascot",
+    rarity:        "legendary",
+    label:         "Pirot",
+    emoji:         "🐦",
+    imagePath:     "/mascots/pirot.png",
+    unlockHint:    "Open the Pirot Pack",
+    wheelEligible: false,
+  },
+  {
     id:            "mascot_ref",
     type:          "mascot",
     rarity:        "rare",
