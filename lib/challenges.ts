@@ -39,7 +39,7 @@ export const CHALLENGES: Challenge[] = [
     packImage: "/packs/goatpack.png",
     targetPoints: 12_500,
     startDate: "2026-06-23",
-    endDate: "2026-06-29",
+    endDate: "2026-06-28",
     mode: "community",
     rewards: [
       { type: "mascot", cosmeticId: "mascot_goat", label: "GOAT", emoji: "🐐" },
