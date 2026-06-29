@@ -105,6 +105,16 @@ export const SHOP_PACKS: Pack[] = [
     rarityPool:      { common: 40, rare: 25, epic: 20, legendary: 15 },
     cooldownMinutes: 0,
   },
+  {
+    id:              "schwoz_pack",
+    label:           "Schwoz Pack",
+    description:     "30% Schwoz • 60% Random Cosmetica • 10% Bonus",
+    emoji:           "🧑‍🔬",
+    imagePath:       "/packs/schwozpack.png",
+    cost:            { currency: "coins", amount: 300 },
+    rarityPool:      { common: 40, rare: 25, epic: 20, legendary: 15 },
+    cooldownMinutes: 0,
+  },
   // ← add future shop packs here
 ];
 

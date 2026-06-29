@@ -466,6 +466,32 @@ function pickFromInfantinoPack(
   return null;
 }
 
+// ── Internal: Schwoz Pack special selection ──────────────────────────────────
+function pickFromSchwozPack(
+  owned: Set<string>,
+): { item: Cosmetic | Mascot; rarity: string } | null {
+  const roll = Math.random();
+
+  if (roll < 0.30) {
+    if (!owned.has("mascot_schwoz")) {
+      const schwoz = MASCOTS.find(m => m.id === "mascot_schwoz");
+      if (schwoz) return { item: schwoz, rarity: "mascots" };
+    }
+  }
+
+  const rarityPool: RarityPool = { common: 47, rare: 23, epic: 14, legendary: 7 };
+  const rarity = rollRarityFromPool(rarityPool) as Rarity;
+  const result = pickCosmeticWithFallback(rarity, owned);
+  if (result) return result;
+
+  const fallback = WHEEL_COSMETICS.filter(c => !owned.has(c.id));
+  if (fallback.length > 0) {
+    const item = fallback[Math.floor(Math.random() * fallback.length)];
+    return { item, rarity: item.rarity };
+  }
+  return null;
+}
+
 // ── Internal: Pirot Pack special selection ───────────────────────────────────
 function pickFromPirotPack(
   owned: Set<string>,
@@ -597,6 +623,10 @@ export function pickFromPack(
 
   if (pack.id === "pirot_pack") {
     return pickFromPirotPack(owned) as any;
+  }
+
+  if (pack.id === "schwoz_pack") {
+    return pickFromSchwozPack(owned) as any;
   }
 
   const rarity = rollRarityFromPool(pack.rarityPool);

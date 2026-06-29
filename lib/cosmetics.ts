@@ -299,6 +299,16 @@ export const MASCOTS: Mascot[] = [
     wheelEligible: false,
   },
   {
+    id:            "mascot_schwoz",
+    type:          "mascot",
+    rarity:        "legendary",
+    label:         "Schwoz",
+    emoji:         "🧑‍🔬",
+    imagePath:     "/mascots/schwoz.png",
+    unlockHint:    "Open the Schwoz Pack",
+    wheelEligible: false,
+  },
+  {
     id:            "mascot_pirot",
     type:          "mascot",
     rarity:        "legendary",
