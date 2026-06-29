@@ -299,6 +299,16 @@ export const MASCOTS: Mascot[] = [
     wheelEligible: false,
   },
   {
+    id:            "mascot_ref",
+    type:          "mascot",
+    rarity:        "rare",
+    label:         "Ref",
+    emoji:         "🟨",
+    imagePath:     "/mascots/ref.png",
+    unlockHint:    "Spin the Wheel of Chaos (Mascots)",
+    wheelEligible: false,
+  },
+  {
     id:            "mascot_mrbier",
     type:          "mascot",
     rarity:        "legendary",
