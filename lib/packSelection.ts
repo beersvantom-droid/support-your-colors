@@ -394,6 +394,78 @@ function pickFromMascottePack(
   return { item: mascot, rarity: "mascots" };
 }
 
+// ── Internal: Bruno Pack special selection ───────────────────────────────────
+function pickFromBrunoPack(
+  owned: Set<string>,
+): { item: Cosmetic | Mascot; rarity: string } | null {
+  const roll = Math.random();
+
+  if (roll < 0.30) {
+    if (!owned.has("mascot_bruno")) {
+      const bruno = MASCOTS.find(m => m.id === "mascot_bruno");
+      if (bruno) return { item: bruno, rarity: "mascots" };
+    }
+  }
+
+  if (roll < 0.70) {
+    const epicItems = WHEEL_COSMETICS.filter(
+      c => (c.rarity === "epic" || c.rarity === "legendary") && !owned.has(c.id)
+    );
+    if (epicItems.length > 0) {
+      const item = epicItems[Math.floor(Math.random() * epicItems.length)];
+      return { item, rarity: item.rarity };
+    }
+  }
+
+  const rarityPool: RarityPool = { common: 47, rare: 23, epic: 14, legendary: 7 };
+  const rarity = rollRarityFromPool(rarityPool) as Rarity;
+  const result = pickCosmeticWithFallback(rarity, owned);
+  if (result) return result;
+
+  const fallback = WHEEL_COSMETICS.filter(c => !owned.has(c.id));
+  if (fallback.length > 0) {
+    const item = fallback[Math.floor(Math.random() * fallback.length)];
+    return { item, rarity: item.rarity };
+  }
+  return null;
+}
+
+// ── Internal: Infantino Pack special selection ───────────────────────────────
+function pickFromInfantinoPack(
+  owned: Set<string>,
+): { item: Cosmetic | Mascot; rarity: string } | null {
+  const roll = Math.random();
+
+  if (roll < 0.30) {
+    if (!owned.has("mascot_infantino")) {
+      const infantino = MASCOTS.find(m => m.id === "mascot_infantino");
+      if (infantino) return { item: infantino, rarity: "mascots" };
+    }
+  }
+
+  if (roll < 0.65) {
+    const legendaryItems = WHEEL_COSMETICS.filter(
+      c => c.rarity === "legendary" && !owned.has(c.id)
+    );
+    if (legendaryItems.length > 0) {
+      const item = legendaryItems[Math.floor(Math.random() * legendaryItems.length)];
+      return { item, rarity: item.rarity };
+    }
+  }
+
+  const rarityPool: RarityPool = { common: 30, rare: 20, epic: 25, legendary: 15 };
+  const rarity = rollRarityFromPool(rarityPool) as Rarity;
+  const result = pickCosmeticWithFallback(rarity, owned);
+  if (result) return result;
+
+  const fallback = WHEEL_COSMETICS.filter(c => !owned.has(c.id));
+  if (fallback.length > 0) {
+    const item = fallback[Math.floor(Math.random() * fallback.length)];
+    return { item, rarity: item.rarity };
+  }
+  return null;
+}
+
 // ── Coin pack selection ───────────────────────────────────────────────────────
 export function pickCoinsFromPack(pool: RarityPool): { coins: number; rarity: keyof RarityPool } {
   const rarity = rollRarityFromPool(pool);
@@ -450,6 +522,14 @@ export function pickFromPack(
   // Special handling for Mascotte Pack
   if (pack.id === "mascotte_pack") {
     return pickFromMascottePack(owned) as any;
+  }
+
+  if (pack.id === "bruno_pack") {
+    return pickFromBrunoPack(owned) as any;
+  }
+
+  if (pack.id === "infantino_pack") {
+    return pickFromInfantinoPack(owned) as any;
   }
 
   const rarity = rollRarityFromPool(pack.rarityPool);
