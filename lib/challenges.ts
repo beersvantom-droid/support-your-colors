@@ -55,7 +55,7 @@ export const CHALLENGES: Challenge[] = [
     mascotImage: "/mascots/hand-van-god.png",
     packImage: "/packs/hand-van-god-pack.png",
     targetPoints: 15_000,
-    startDate: "2026-06-30",
+    startDate: "2026-06-29",
     endDate: "2026-07-06",
     mode: "mystery",
     multipliers: {
