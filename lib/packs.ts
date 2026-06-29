@@ -85,6 +85,16 @@ export const SHOP_PACKS: Pack[] = [
     rarityPool:      { common: 20, rare: 15, epic: 20, legendary: 25, mascots: 20 },
     cooldownMinutes: 0,
   },
+  {
+    id:              "biermannetje_pack",
+    label:           "Biermannetje Pack",
+    description:     "Proost! | 30% Mr. Bier • 30% Guiness • 40% Random Cosmetica",
+    emoji:           "🍺",
+    imagePath:       "/packs/biermannetjepack.png",
+    cost:            { currency: "coins", amount: 400 },
+    rarityPool:      { common: 40, rare: 20, epic: 20, legendary: 20 },
+    cooldownMinutes: 0,
+  },
   // ← add future shop packs here
 ];
 

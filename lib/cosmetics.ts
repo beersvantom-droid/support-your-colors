@@ -298,6 +298,16 @@ export const MASCOTS: Mascot[] = [
     unlockHint:    "Open the Infantino Pack",
     wheelEligible: false,
   },
+  {
+    id:            "mascot_mrbier",
+    type:          "mascot",
+    rarity:        "legendary",
+    label:         "Mr. Bier",
+    emoji:         "🍺",
+    imagePath:     "/mascots/mrbier.png",
+    unlockHint:    "Open the Biermannetje Pack",
+    wheelEligible: false,
+  },
 ];
 
 // All mascots are available from the dedicated "mascots" wheel segment.

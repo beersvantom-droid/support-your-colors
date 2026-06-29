@@ -466,6 +466,39 @@ function pickFromInfantinoPack(
   return null;
 }
 
+// ── Internal: Biermannetje Pack special selection ────────────────────────────
+function pickFromBiermannetjePack(
+  owned: Set<string>,
+): { item: Cosmetic | Mascot; rarity: string } | null {
+  const roll = Math.random();
+
+  if (roll < 0.30) {
+    if (!owned.has("mascot_mrbier")) {
+      const mrbier = MASCOTS.find(m => m.id === "mascot_mrbier");
+      if (mrbier) return { item: mrbier, rarity: "mascots" };
+    }
+  }
+
+  if (roll < 0.60) {
+    if (!owned.has("mascot_guiness")) {
+      const guiness = MASCOTS.find(m => m.id === "mascot_guiness");
+      if (guiness) return { item: guiness, rarity: "mascots" };
+    }
+  }
+
+  const rarityPool: RarityPool = { common: 47, rare: 23, epic: 14, legendary: 7 };
+  const rarity = rollRarityFromPool(rarityPool) as Rarity;
+  const result = pickCosmeticWithFallback(rarity, owned);
+  if (result) return result;
+
+  const fallback = WHEEL_COSMETICS.filter(c => !owned.has(c.id));
+  if (fallback.length > 0) {
+    const item = fallback[Math.floor(Math.random() * fallback.length)];
+    return { item, rarity: item.rarity };
+  }
+  return null;
+}
+
 // ── Coin pack selection ───────────────────────────────────────────────────────
 export function pickCoinsFromPack(pool: RarityPool): { coins: number; rarity: keyof RarityPool } {
   const rarity = rollRarityFromPool(pool);
@@ -530,6 +563,10 @@ export function pickFromPack(
 
   if (pack.id === "infantino_pack") {
     return pickFromInfantinoPack(owned) as any;
+  }
+
+  if (pack.id === "biermannetje_pack") {
+    return pickFromBiermannetjePack(owned) as any;
   }
 
   const rarity = rollRarityFromPool(pack.rarityPool);

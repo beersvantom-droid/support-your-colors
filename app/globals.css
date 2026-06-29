@@ -1053,6 +1053,21 @@ body {
   50% { opacity: 0.7; transform: scale(1.1) rotate(5deg); }
 }
 
+/* Mr. Bier: dronken wiebel */
+.mascot-mrbier {
+  animation: bierWobble 2.5s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+@keyframes bierWobble {
+  0%, 100% { transform: rotate(0deg) translateX(0); }
+  15% { transform: rotate(4deg) translateX(3px); }
+  30% { transform: rotate(-3deg) translateX(-2px); }
+  45% { transform: rotate(5deg) translateX(4px); }
+  60% { transform: rotate(-4deg) translateX(-3px); }
+  75% { transform: rotate(2deg) translateX(2px); }
+  90% { transform: rotate(-1deg) translateX(-1px); }
+}
+
 /* Midnight card background */
 .cosmetic-bg-midnight {
   position: relative;
