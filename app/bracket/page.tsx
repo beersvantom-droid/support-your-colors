@@ -43,13 +43,38 @@ async function buildSupporterMap(): Promise<SupporterMap> {
 }
 
 async function getR32Matches(): Promise<KnockoutMatch[]> {
-  const { data } = await supabase
+  // Try knockout_matches first (has bracket structure)
+  const { data: kmData } = await supabase
     .from("knockout_matches")
     .select("round, match_number, home_team, away_team, home_source, away_source, home_score, away_score, winner, status")
     .eq("round", "R32")
     .order("match_number");
 
-  return (data ?? []) as KnockoutMatch[];
+  if (kmData && kmData.length > 0) {
+    return kmData as KnockoutMatch[];
+  }
+
+  // Fallback: match_results for R32 period (Jun 28 onwards)
+  const { data: mrData } = await supabase
+    .from("match_results")
+    .select("home_team, away_team, home_score, away_score, status, match_date")
+    .gte("match_date", "2026-06-28")
+    .order("match_date");
+
+  if (!mrData || mrData.length === 0) return [];
+
+  return mrData.map((m, i) => ({
+    round: "R32",
+    match_number: 65 + i,
+    home_team: m.home_team,
+    away_team: m.away_team,
+    home_source: null,
+    away_source: null,
+    home_score: m.home_score,
+    away_score: m.away_score,
+    winner: null,
+    status: m.status,
+  }));
 }
 
 function countFriendGroups(supporters: SupporterMap) {
