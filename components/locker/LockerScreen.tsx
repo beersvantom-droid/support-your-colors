@@ -398,10 +398,10 @@ export default function LockerScreen() {
   // Build owned cosmetics per type (wheel-eligible only, sorted by rarity)
   const ownedByType = (type: CosmeticType): Cosmetic[] =>
     COSMETICS
-      .filter(c => c.type === type && c.wheelEligible && inventory.has(c.id))
+      .filter(c => c.type === type && inventory.has(c.id))
       .sort((a, b) => RARITY_ORDER.indexOf(a.rarity) - RARITY_ORDER.indexOf(b.rarity));
 
-  const hasAnyUnlocked = COSMETICS.some(c => c.wheelEligible && inventory.has(c.id));
+  const hasAnyUnlocked = COSMETICS.some(c => inventory.has(c.id));
 
   const types: CosmeticType[] = ["name_color", "border", "badge", "card_bg"];
 
