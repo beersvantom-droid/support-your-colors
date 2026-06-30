@@ -77,7 +77,7 @@ export default function FanSupportRanking() {
               </div>
 
               {/* Flag, badge & username — stays compact, never grows */}
-              <div className="flex items-center gap-1 flex-shrink-0 min-w-0">
+              <div className="flex items-center gap-1 flex-shrink-0 min-w-0 relative">
                 <span className="text-xl flex-shrink-0">{countryFlag}</span>
                 <div className="min-w-0 truncate">
                   <p className="text-sm font-bold truncate flex items-center gap-1">
@@ -99,7 +99,7 @@ export default function FanSupportRanking() {
 
               {/* Mascots — smaller size to preserve space */}
               {mascots.length > 0 && (
-                <div className="flex items-end gap-0.5 flex-shrink-0">
+                <div className="flex items-end gap-0.5 flex-shrink-0 relative">
                   {mascots.map((id, i) => (
                     <MascotSprite
                       key={id}
