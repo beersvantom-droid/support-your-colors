@@ -3,6 +3,7 @@ import MatchSpotlight from "@/components/feed/MatchSpotlight";
 import LiveScoresBar from "@/components/feed/LiveScoresBar";
 import FeedList from "@/components/feed/FeedList";
 import FloatingActionButton from "@/components/FloatingActionButton";
+import MexicoEcuadorBetCard from "@/components/feed/MexicoEcuadorBetCard";
 import { supabase } from "@/lib/supabase";
 import type { Post, CommentatorPost, CommentatorConfig } from "@/lib/supabase";
 
@@ -31,6 +32,10 @@ export default async function HomePage() {
       <AppHeader />
       <LiveScoresBar />
       <MatchSpotlight />
+
+      <div className="px-4 pt-3">
+        <MexicoEcuadorBetCard />
+      </div>
 
       <div className="flex flex-col gap-3 px-4 pt-3 pb-6">
         <div className="flex items-center justify-between">

@@ -1,9 +1,9 @@
-import GroupCard from "@/components/bracket/GroupCard";
 import { GROUPS } from "@/lib/wc2026-data";
 import { supabase } from "@/lib/supabase";
 import type { Profile } from "@/lib/supabase";
 import type { SupporterMap } from "@/components/bracket/GroupCard";
-import Link from "next/link";
+import type { KnockoutMatch } from "@/components/bracket/KnockoutMatchCard";
+import BracketView from "@/components/bracket/BracketView";
 
 export const dynamic = "force-dynamic";
 
@@ -42,6 +42,16 @@ async function buildSupporterMap(): Promise<SupporterMap> {
   return map;
 }
 
+async function getR32Matches(): Promise<KnockoutMatch[]> {
+  const { data } = await supabase
+    .from("knockout_matches")
+    .select("round, match_number, home_team, away_team, home_source, away_source, home_score, away_score, winner, status")
+    .eq("round", "R32")
+    .order("match_number");
+
+  return (data ?? []) as KnockoutMatch[];
+}
+
 function countFriendGroups(supporters: SupporterMap) {
   return GROUPS.filter((g) => g.teams.some((t) => supporters[t])).length;
 }
@@ -57,11 +67,15 @@ function countDerbies(supporters: SupporterMap) {
 }
 
 export default async function BracketPage() {
-  const supporters = await buildSupporterMap();
-  const liveTeams = await getLiveTeams();
+  const [supporters, liveTeams, r32Matches] = await Promise.all([
+    buildSupporterMap(),
+    getLiveTeams(),
+    getR32Matches(),
+  ]);
+
+  const liveTeamsList = Array.from(liveTeams);
   const friendGroupCount = countFriendGroups(supporters);
   const derbyCount = countDerbies(supporters);
-  const hasLiveMatches = liveTeams.size > 0;
 
   return (
     <div className="min-h-full">
@@ -185,90 +199,14 @@ export default async function BracketPage() {
         </div>
       </div>
 
-      {/* ── Phase navigation bar ─────────────────────────────────────── */}
-      <div
-        className="sticky top-0 z-20 flex items-center gap-2 px-4 py-2.5 overflow-x-auto"
-        style={{
-          background: "rgba(240,242,245,0.95)",
-          backdropFilter: "blur(12px)",
-          borderBottom: "1px solid rgba(0,0,0,0.06)",
-        }}
-      >
-        {[
-          { label: "Groups", active: true },
-          { label: "R32", active: false },
-          { label: "R16", active: false },
-          { label: "QF", active: false },
-          { label: "SF", active: false },
-          { label: "Final", active: false },
-        ].map(({ label, active }) => (
-          <div
-            key={label}
-            className="flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-black"
-            style={{
-              background: active ? "#D52B1E" : "rgba(0,0,0,0.05)",
-              color: active ? "#FFFFFF" : "rgba(0,0,0,0.25)",
-              cursor: active ? "default" : "not-allowed",
-            }}
-          >
-            {label}
-          </div>
-        ))}
-
-        <div className="flex-shrink-0 ml-auto text-[10px] font-bold text-text-muted whitespace-nowrap">
-          Jun 11 – 27
-        </div>
-      </div>
-
-      {/* ── Predict button ───────────────────────────────────────────── */}
-      <div className="px-4 py-3">
-        <Link
-          href="/predictions"
-          className="w-full py-3 rounded-2xl font-black text-center text-white transition-all active:scale-95"
-          style={{
-            background: "#3B82F6",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: "8px",
-          }}
-        >
-          <span>🎯</span>
-          <span>Predict Upcoming Matches</span>
-        </Link>
-      </div>
-
-      {/* ── Group overview ───────────────────────────────────────────── */}
-      <div className="px-4 py-4 space-y-3">
-        <div className="flex items-center justify-between mb-1">
-          <div>
-            <h2 className="text-sm font-black text-text-primary uppercase tracking-widest">
-              Group Stage
-            </h2>
-            <p className="text-xs text-text-muted mt-0.5">
-              Tap a group to see fixtures &amp; standings
-            </p>
-          </div>
-          <div
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wide"
-            style={{ background: "#D52B1E18", color: "#D52B1E" }}
-          >
-            {hasLiveMatches && (
-              <span
-                className="w-1.5 h-1.5 rounded-full"
-                style={{ background: "#D52B1E", animation: "pulse 2s ease-in-out infinite" }}
-              />
-            )}
-            {hasLiveMatches ? "Live" : "Upcoming"}
-          </div>
-        </div>
-
-        {GROUPS.map((group) => (
-          <GroupCard key={group.id} group={group} supporters={supporters} liveTeams={liveTeams} />
-        ))}
-
-        <div className="h-4" />
-      </div>
+      <BracketView
+        groups={GROUPS}
+        supporters={supporters}
+        liveTeamsList={liveTeamsList}
+        r32Matches={r32Matches}
+        friendGroupCount={friendGroupCount}
+        derbyCount={derbyCount}
+      />
     </div>
   );
 }
