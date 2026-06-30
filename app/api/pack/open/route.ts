@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { getPack } from "@/lib/packs";
-import { pickFromPack, pickCoinsFromPack } from "@/lib/packSelection";
+import { pickFromPack, pickCoinsFromPack, pickAirballReward } from "@/lib/packSelection";
 import * as coins from "@/lib/coins";
 
 export const runtime = "nodejs";
@@ -252,6 +252,57 @@ export async function POST(req: NextRequest) {
 
   const owned = new Set((existing ?? []).map((r: { cosmetic_id: string }) => r.cosmetic_id));
   console.log(`[pack/open] User owns ${owned.size} items`);
+
+  // ── Airball Pack: 10% coins / 30% mascot / 60% cosmetic ───────────────────
+  if (pack.id === "airball_pack") {
+    const reward = pickAirballReward(owned);
+
+    if (!reward) return NextResponse.json({ alreadyOwnsAll: true });
+
+    if (reward.type === "coins") {
+      const serviceDb = createServerClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!,
+        { cookies: { getAll: () => req.cookies.getAll(), setAll: () => {} } }
+      );
+      const { data: existingCoins } = await serviceDb
+        .from("user_coins").select("balance").eq("user_id", user.id).maybeSingle();
+      if (existingCoins) {
+        await serviceDb.from("user_coins")
+          .update({ balance: existingCoins.balance + 1000, updated_at: new Date().toISOString() })
+          .eq("user_id", user.id);
+      } else {
+        await serviceDb.from("user_coins").insert({ user_id: user.id, balance: 1000 });
+      }
+      if (pack.cooldownMinutes > 0 && !skipCooldown) {
+        await db.from("user_pack_cooldowns").upsert(
+          { user_id: user.id, pack_id: pack.id, last_opened_at: new Date().toISOString() },
+          { onConflict: "user_id,pack_id" }
+        );
+      }
+      return NextResponse.json({ isCoinsPackage: true, coins: 1000, rarity: "legendary" });
+    }
+
+    // mascot or cosmetic
+    const { error: insertErr } = await db.from("user_cosmetics").insert({
+      user_id: user.id,
+      cosmetic_id: reward.item.id,
+    });
+    if (insertErr && !insertErr.message.includes("duplicate")) {
+      console.error("airball insert error:", insertErr);
+      return NextResponse.json({ error: insertErr.message }, { status: 500 });
+    }
+    if (pack.cooldownMinutes > 0 && !skipCooldown) {
+      await db.from("user_pack_cooldowns").upsert(
+        { user_id: user.id, pack_id: pack.id, last_opened_at: new Date().toISOString() },
+        { onConflict: "user_id,pack_id" }
+      );
+    }
+    return NextResponse.json({
+      item: reward.item,
+      rarity: reward.type === "mascot" ? "mascots" : reward.rarity,
+    });
+  }
 
   // ── Pick a reward ──────────────────────────────────────────────────────────
   console.log(`[pack/open] Calling pickFromPack for pack: ${pack.id}, owned items: ${owned.size}`);

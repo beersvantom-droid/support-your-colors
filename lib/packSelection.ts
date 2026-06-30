@@ -551,6 +551,41 @@ function pickFromBiermannetjePack(
   return null;
 }
 
+// ── Internal: Airball Pack special selection ─────────────────────────────────
+// - 10% 1000 coins (signalled via { type: "coins" })
+// - 30% Airball mascot
+// - 60% random cosmetic
+export function pickAirballReward(
+  owned: Set<string>,
+): { type: "mascot"; item: Mascot } | { type: "cosmetic"; item: Cosmetic; rarity: Rarity } | { type: "coins" } | null {
+  const roll = Math.random();
+
+  // 0–10%: coins
+  if (roll < 0.10) return { type: "coins" };
+
+  // 10–40%: Airball mascot (30%)
+  if (roll < 0.40) {
+    if (!owned.has("mascot_airball")) {
+      const airball = MASCOTS.find(m => m.id === "mascot_airball");
+      if (airball) return { type: "mascot", item: airball };
+    }
+    // Airball already owned → fall through to cosmetic
+  }
+
+  // 40–100%: random cosmetic (60%, or fallback when mascot was owned)
+  const rarityPool: RarityPool = { common: 47, rare: 23, epic: 14, legendary: 7 };
+  const rarity = rollRarityFromPool(rarityPool) as Rarity;
+  const result = pickCosmeticWithFallback(rarity, owned);
+  if (result) return { type: "cosmetic", item: result.item, rarity: result.rarity };
+
+  const fallback = WHEEL_COSMETICS.filter(c => !owned.has(c.id));
+  if (fallback.length > 0) {
+    const item = fallback[Math.floor(Math.random() * fallback.length)];
+    return { type: "cosmetic", item, rarity: item.rarity as Rarity };
+  }
+  return null;
+}
+
 // ── Coin pack selection ───────────────────────────────────────────────────────
 export function pickCoinsFromPack(pool: RarityPool): { coins: number; rarity: keyof RarityPool } {
   const rarity = rollRarityFromPool(pool);

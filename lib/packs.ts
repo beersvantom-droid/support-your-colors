@@ -115,6 +115,16 @@ export const SHOP_PACKS: Pack[] = [
     rarityPool:      { common: 40, rare: 25, epic: 20, legendary: 15 },
     cooldownMinutes: 0,
   },
+  {
+    id:              "airball_pack",
+    label:           "Airball Pack",
+    description:     "30% Airball mascot • 60% Random Cosmetica • 10% 1000 coins",
+    emoji:           "⚽",
+    imagePath:       "/packs/airballpack.png",
+    cost:            { currency: "coins", amount: 300 },
+    rarityPool:      { common: 40, rare: 25, epic: 20, legendary: 15 },
+    cooldownMinutes: 0,
+  },
   // ← add future shop packs here
 ];
 

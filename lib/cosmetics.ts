@@ -338,6 +338,16 @@ export const MASCOTS: Mascot[] = [
     unlockHint:    "Open the Biermannetje Pack",
     wheelEligible: false,
   },
+  {
+    id:            "mascot_airball",
+    type:          "mascot",
+    rarity:        "legendary",
+    label:         "Airball",
+    emoji:         "⚽",
+    imagePath:     "/mascots/airball.png",
+    unlockHint:    "Open the Airball Pack",
+    wheelEligible: false,
+  },
 ];
 
 // All mascots are available from the dedicated "mascots" wheel segment.
