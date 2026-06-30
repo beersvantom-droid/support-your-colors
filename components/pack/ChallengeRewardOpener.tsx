@@ -36,7 +36,7 @@ function makeParticles(isMascot: boolean): Particle[] {
 export default function ChallengeRewardOpener({ packImage, onDone }: Props) {
   const [phase, setPhase] = useState<Phase>("idle");
   const [reward, setReward] = useState<{
-    rewardType: "mascot" | "coins";
+    rewardType: "mascot" | "card_bg" | "badge" | "coins";
     coinsAmount: number;
     mascotLabel?: string;
     mascotEmoji?: string;
@@ -45,9 +45,10 @@ export default function ChallengeRewardOpener({ packImage, onDone }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [particles, setParticles] = useState<Particle[]>([]);
 
+  const isCosmetic = reward?.rewardType !== "coins";
   const isMascot = reward?.rewardType === "mascot";
-  const glowRgb = isMascot ? "255,215,0" : "16,185,129";
-  const accent = isMascot ? "#FFD700" : "#10B981";
+  const glowRgb = isMascot ? "255,215,0" : isCosmetic ? "168,85,247" : "16,185,129";
+  const accent = isMascot ? "#FFD700" : isCosmetic ? "#A855F7" : "#10B981";
 
   function openPack() {
     if (phase !== "idle") return;
@@ -61,7 +62,7 @@ export default function ChallengeRewardOpener({ packImage, onDone }: Props) {
           return;
         }
         setReward(data);
-        setParticles(makeParticles(data.rewardType === "mascot"));
+        setParticles(makeParticles(data.rewardType !== "coins"));
       })
       .catch(() => setError("Er ging iets mis, probeer opnieuw"));
 
@@ -144,7 +145,7 @@ export default function ChallengeRewardOpener({ packImage, onDone }: Props) {
             fontSize: 11, fontWeight: 900, letterSpacing: "0.15em", textTransform: "uppercase",
             animation: isMascot ? "badgePulse 1.8s ease-in-out 0.6s infinite" : "none",
           }}>
-            {isMascot ? "Special Mascot" : "Community Reward"}
+            {isMascot ? "Special Mascot 🐐" : reward?.rewardType === "card_bg" ? "Kaart Achtergrond 🎴" : reward?.rewardType === "badge" ? "Badge 🏅" : "Community Reward"}
           </div>
 
           {/* Icon */}
@@ -154,7 +155,7 @@ export default function ChallengeRewardOpener({ packImage, onDone }: Props) {
             filter: `drop-shadow(0 0 ${isMascot ? 32 : 20}px ${accent}) drop-shadow(0 0 ${isMascot ? 64 : 40}px rgba(${glowRgb},0.5))`,
             animation: `cosmeticReveal 0.55s cubic-bezier(0.34,1.56,0.64,1) both${isMascot ? ", legendaryGlow 1.6s ease-in-out 0.6s infinite" : ""}`,
           }}>
-            {error ? "❌" : isMascot ? reward?.mascotEmoji : "🪙"}
+            {error ? "❌" : isCosmetic ? reward?.mascotEmoji : "🪙"}
           </div>
 
           {/* Text */}
@@ -167,10 +168,10 @@ export default function ChallengeRewardOpener({ packImage, onDone }: Props) {
                   fontWeight: 900, color: "#fff", fontSize: isMascot ? 28 : 22,
                   letterSpacing: "-0.02em", marginBottom: 4,
                 }}>
-                  {isMascot ? reward.mascotLabel : `${reward.coinsAmount} Munten`}
+                  {isCosmetic ? reward.mascotLabel : `${reward.coinsAmount} Munten`}
                 </p>
-                <p style={{ fontWeight: 700, fontSize: isMascot ? 15 : 13, color: accent }}>
-                  {isMascot ? "SPECIAL MASCOT UNLOCKED! 🐐👑" : "Community Challenge beloning!"}
+                <p style={{ fontWeight: 700, fontSize: isCosmetic ? 15 : 13, color: accent }}>
+                  {isMascot ? "SPECIAL MASCOT UNLOCKED! 🐐👑" : reward?.rewardType === "card_bg" ? "KAARTACHTERGROND UNLOCKED! 🎴✨" : reward?.rewardType === "badge" ? "BADGE UNLOCKED! 🏅✨" : "Community Challenge beloning!"}
                 </p>
                 <p style={{ color: "#6B7280", fontSize: 11, marginTop: 8 }}>
                   #{reward.rank} in de groep
@@ -195,7 +196,7 @@ export default function ChallengeRewardOpener({ packImage, onDone }: Props) {
                 fontWeight: 900, fontSize: 14, cursor: "pointer",
               }}
             >
-              {reward && isMascot ? "Naar Locker →" : "Sluiten"}
+              {reward && isCosmetic ? "Naar Locker →" : "Sluiten"}
             </button>
           </div>
         </div>
@@ -285,7 +286,7 @@ export default function ChallengeRewardOpener({ packImage, onDone }: Props) {
                   filter: `drop-shadow(0 0 30px ${accent}) drop-shadow(0 0 60px rgba(${glowRgb},0.6))`,
                   animation: "packRevealItem 0.6s cubic-bezier(0.34,1.56,0.64,1) both",
                 }}>
-                  {isMascot ? reward.mascotEmoji : "🪙"}
+                  {isCosmetic ? reward.mascotEmoji : "🪙"}
                 </div>
               </div>
               <div style={{
@@ -293,7 +294,7 @@ export default function ChallengeRewardOpener({ packImage, onDone }: Props) {
                 textShadow: `0 0 20px ${accent}`,
                 animation: "cosmeticReveal 0.4s 0.2s both",
               }}>
-                {isMascot ? reward.mascotLabel : `${reward.coinsAmount} Munten`}
+                {isCosmetic ? reward.mascotLabel : `${reward.coinsAmount} Munten`}
               </div>
             </div>
           )}
