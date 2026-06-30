@@ -2,7 +2,6 @@ import AppHeader from "@/components/AppHeader";
 import MatchSpotlight from "@/components/feed/MatchSpotlight";
 import LiveScoresBar from "@/components/feed/LiveScoresBar";
 import FeedList from "@/components/feed/FeedList";
-import MatchBetCard from "@/components/feed/MatchBetCard";
 import FloatingActionButton from "@/components/FloatingActionButton";
 import { supabase } from "@/lib/supabase";
 import type { Post, CommentatorPost, CommentatorConfig } from "@/lib/supabase";
@@ -34,8 +33,6 @@ export default async function HomePage() {
       <MatchSpotlight />
 
       <div className="flex flex-col gap-3 px-4 pt-3 pb-6">
-        <MatchBetCard />
-
         <div className="flex items-center justify-between">
           <span className="text-[11px] font-black uppercase tracking-widest text-text-muted">
             Latest from the group

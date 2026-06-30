@@ -7,7 +7,6 @@ import { AchievementsProvider } from "@/components/achievements/AchievementsProv
 import { ChatNotificationProvider } from "@/components/chat/ChatNotificationProvider";
 import { LiveSyncTrigger } from "@/components/LiveSyncTrigger";
 import GoalCelebration from "@/components/GoalCelebration";
-import MatchDayTheme from "@/components/MatchDayTheme";
 import SplashScreen from "@/components/SplashScreen";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -45,7 +44,6 @@ export default function RootLayout({
             <ChatNotificationProvider>
               <LiveSyncTrigger />
               <GoalCelebration />
-              <MatchDayTheme />
               <main className="flex-1 w-full max-w-md mx-auto pb-28">
                 {children}
               </main>
