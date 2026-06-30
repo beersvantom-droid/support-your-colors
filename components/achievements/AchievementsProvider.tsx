@@ -9,7 +9,6 @@ import {
   useState,
 } from "react";
 import { supabase } from "@/lib/supabase";
-import { createServerClient } from "@supabase/ssr";
 import { useAuth } from "@/components/auth/AuthProvider";
 import {
   type AchievementDef,
@@ -423,35 +422,11 @@ export function AchievementsProvider({
         const coinTotal = coinAchievements.reduce((sum, a) => sum + (a.coins ?? 0), 0);
         if (coinTotal > 0) {
           try {
-            // Use service role to bypass RLS
-            const serviceDb = createServerClient(
-              process.env.NEXT_PUBLIC_SUPABASE_URL!,
-              process.env.SUPABASE_SERVICE_ROLE_KEY!,
-              {
-                cookies: {
-                  getAll: () => [],
-                  setAll: () => {},
-                },
-              }
-            );
-
-            const { data: existingCoins } = await serviceDb
-              .from("user_coins")
-              .select("balance")
-              .eq("user_id", user!.id)
-              .maybeSingle();
-
-            if (existingCoins) {
-              await serviceDb
-                .from("user_coins")
-                .update({ balance: existingCoins.balance + coinTotal })
-                .eq("user_id", user!.id);
-            } else {
-              await serviceDb.from("user_coins").insert({
-                user_id: user!.id,
-                balance: coinTotal,
-              });
-            }
+            await fetch("/api/coins/award", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ amount: coinTotal }),
+            });
             console.log(`[Achievements] Awarded ${coinTotal} coins`);
           } catch (err) {
             console.error("[Achievements] Error awarding coins:", err);
