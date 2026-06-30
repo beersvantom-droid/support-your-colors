@@ -551,6 +551,32 @@ function pickFromBiermannetjePack(
   return null;
 }
 
+// ── Internal: Tung Pack special selection ────────────────────────────────────
+function pickFromTungPack(
+  owned: Set<string>,
+): { item: Cosmetic | Mascot; rarity: string } | null {
+  const roll = Math.random();
+
+  if (roll < 0.30) {
+    if (!owned.has("mascot_tung")) {
+      const tung = MASCOTS.find(m => m.id === "mascot_tung");
+      if (tung) return { item: tung, rarity: "mascots" };
+    }
+  }
+
+  const rarityPool: RarityPool = { common: 47, rare: 23, epic: 14, legendary: 7 };
+  const rarity = rollRarityFromPool(rarityPool) as Rarity;
+  const result = pickCosmeticWithFallback(rarity, owned);
+  if (result) return result;
+
+  const fallback = WHEEL_COSMETICS.filter(c => !owned.has(c.id));
+  if (fallback.length > 0) {
+    const item = fallback[Math.floor(Math.random() * fallback.length)];
+    return { item, rarity: item.rarity };
+  }
+  return null;
+}
+
 // ── Internal: Airball Pack special selection ─────────────────────────────────
 // - 10% 1000 coins (signalled via { type: "coins" })
 // - 30% Airball mascot
@@ -662,6 +688,10 @@ export function pickFromPack(
 
   if (pack.id === "schwoz_pack") {
     return pickFromSchwozPack(owned) as any;
+  }
+
+  if (pack.id === "tung_pack") {
+    return pickFromTungPack(owned) as any;
   }
 
   const rarity = rollRarityFromPool(pack.rarityPool);

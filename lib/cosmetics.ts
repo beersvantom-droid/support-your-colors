@@ -348,6 +348,16 @@ export const MASCOTS: Mascot[] = [
     unlockHint:    "Open the Airball Pack",
     wheelEligible: false,
   },
+  {
+    id:            "mascot_tung",
+    type:          "mascot",
+    rarity:        "legendary",
+    label:         "Tung",
+    emoji:         "🦈",
+    imagePath:     "/mascots/tung.png",
+    unlockHint:    "Open the Tung Pack",
+    wheelEligible: false,
+  },
 ];
 
 // All mascots are available from the dedicated "mascots" wheel segment.

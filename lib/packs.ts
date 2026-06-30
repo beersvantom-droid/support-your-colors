@@ -125,6 +125,16 @@ export const SHOP_PACKS: Pack[] = [
     rarityPool:      { common: 40, rare: 25, epic: 20, legendary: 15 },
     cooldownMinutes: 0,
   },
+  {
+    id:              "tung_pack",
+    label:           "Tung Pack",
+    description:     "30% Tung mascot • 60% Random Cosmetica",
+    emoji:           "🦈",
+    imagePath:       "/packs/tungpack.png",
+    cost:            { currency: "coins", amount: 300 },
+    rarityPool:      { common: 40, rare: 25, epic: 20, legendary: 15 },
+    cooldownMinutes: 0,
+  },
   // ← add future shop packs here
 ];
 
