@@ -5,6 +5,7 @@ import Link from "next/link";
 import type { Pack } from "@/lib/packs";
 import type { Cosmetic, Mascot } from "@/lib/cosmetics";
 import { RARITY_META } from "@/lib/cosmetics";
+import { useAchievements } from "@/components/achievements/AchievementsProvider";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -175,6 +176,7 @@ function ConfettiRain({ rarity }: { rarity: Rarity }) {
 // ── Main component ────────────────────────────────────────────────────────────
 
 export default function PackOpener({ pack, onReset }: PackOpenerProps) {
+  const { triggerCheck } = useAchievements();
   const [phase,    setPhase]    = useState<Phase>("idle");
   const [rarity,   setRarity]   = useState<Rarity | null>(null);
   const [item,     setItem]     = useState<Cosmetic | Mascot | null>(null);
@@ -188,12 +190,13 @@ export default function PackOpener({ pack, onReset }: PackOpenerProps) {
 
   const cfg = rarity ? RARITY_CFG[rarity] : null;
 
-  // ── Dispatch pack-opened event when successful ──────────────────────────────
+  // ── Dispatch pack-opened event + check achievements when successful ──────────
   useEffect(() => {
     if (status === "ok") {
       window.dispatchEvent(new Event("pack-opened"));
+      triggerCheck();
     }
-  }, [status]);
+  }, [status, triggerCheck]);
 
   // ── Trigger opening sequence ───────────────────────────────────────────────
   function openPack() {
