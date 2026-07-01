@@ -33,6 +33,8 @@ const MASCOT_IMAGE: Record<string, string> = {
   mascot_ref:          "/mascots/ref.png",
   mascot_pirot:        "/mascots/pirot.png",
   mascot_schwoz:       "/mascots/schwoz.png",
+  mascot_airball:      "/mascots/airball.png",
+  mascot_tung:         "/mascots/tung.png",
 };
 
 // ── Per-mascot animation class ────────────────────────────────────────────────
@@ -69,6 +71,8 @@ const MASCOT_ANIMATION: Record<string, string> = {
   mascot_ref:          "mascot-idle-default",
   mascot_pirot:        "mascot-pirot",
   mascot_schwoz:       "mascot-idle-default",
+  mascot_airball:      "mascot-idle-default",
+  mascot_tung:         "mascot-idle-default",
 };
 
 // ── Per-mascot blend mode ──────────────────────────────────────────────────────
@@ -105,6 +109,8 @@ const MASCOT_BLEND_MODE: Record<string, string> = {
   mascot_ref:          "normal",
   mascot_pirot:        "normal",
   mascot_schwoz:       "normal",
+  mascot_airball:      "multiply",
+  mascot_tung:         "multiply",
 };
 
 // Per-mascot scale factor — 1.0 = normal, < 1.0 = smaller
